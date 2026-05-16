@@ -46,3 +46,21 @@ jobs:
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
             --paths "/*"
+
+      - name: Notify Discord deploy success
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d "{
+              \"content\": \"✅[FRONTED] 배포 성공\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nURL: https://d27bvnjwx94rj6.cloudfront.net\"
+            }" \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Notify Discord deploy failure
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d "{
+              \"content\": \"❌[FRONTEND] 배포 실패\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nActions 확인 필요\"
+            }" \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
