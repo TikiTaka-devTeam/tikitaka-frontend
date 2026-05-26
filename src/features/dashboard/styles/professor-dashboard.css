@@ -1,0 +1,345 @@
+.professor-dashboard {
+  min-height: 100vh;
+  padding: 34px 48px 40px;
+  background: #f6f7fc;
+  color: #1a2544;
+}
+
+.professor-dashboard__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(360px, 0.95fr);
+  gap: 34px;
+  align-items: start;
+}
+
+.professor-dashboard__main {
+  min-width: 0;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 46px;
+}
+
+.dashboard-header__logo {
+  color: #2f66f5;
+  font-size: clamp(2rem, 3vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.dashboard-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icon-button,
+.avatar-button {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(29, 48, 101, 0.08);
+  cursor: pointer;
+}
+
+.icon-button__symbol {
+  font-size: 1.2rem;
+  color: #2d3552;
+}
+
+.icon-button__badge {
+  position: absolute;
+  top: 13px;
+  right: 14px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff4d4d;
+}
+
+.avatar-button__face {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #b6ff64, #7ed957);
+  color: #284525;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.welcome-block p,
+.welcome-block h1,
+.section-title,
+.next-space-card h2,
+.next-space-card p,
+.recent-space-item p {
+  margin: 0;
+}
+
+.welcome-block p {
+  margin-bottom: 4px;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.welcome-block h1 {
+  font-size: clamp(2.5rem, 4vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.dashboard-tabs {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+  margin-bottom: 28px;
+}
+
+.dashboard-tabs__item {
+  min-width: 106px;
+  padding: 14px 22px;
+  border: 1.5px solid #2f66f5;
+  border-radius: 999px;
+  background: transparent;
+  color: #2f66f5;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.dashboard-tabs__item.is-active {
+  background: #2f66f5;
+  color: #ffffff;
+}
+
+.dashboard-section {
+  margin-top: 18px;
+}
+
+.section-title {
+  margin-bottom: 12px;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.section-title span {
+  color: #2f66f5;
+}
+
+.section-title--dark {
+  font-size: 2rem;
+  color: #202b4a;
+}
+
+.next-space-card {
+  position: relative;
+  overflow: hidden;
+  padding: 38px 32px 24px;
+  border-radius: 24px;
+  color: #ffffff;
+  box-shadow: 0 18px 34px rgba(36, 47, 104, 0.14);
+}
+
+.next-space-card__time {
+  position: absolute;
+  top: 26px;
+  right: 28px;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.next-space-card__meta {
+  margin-bottom: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.next-space-card h2 {
+  margin-bottom: 42px;
+  font-size: clamp(2rem, 3.2vw, 3rem);
+  letter-spacing: -0.04em;
+}
+
+.next-space-card p {
+  font-size: 0.98rem;
+  opacity: 0.96;
+}
+
+.panel-card {
+  padding: 22px 24px;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(31, 46, 97, 0.08);
+}
+
+.recent-space-item {
+  display: flex;
+  gap: 16px;
+  padding: 2px 0 18px;
+}
+
+.recent-space-item.has-divider {
+  margin-bottom: 18px;
+  border-bottom: 1px solid #e5e9f3;
+}
+
+.recent-space-item__accent {
+  width: 6px;
+  flex-shrink: 0;
+  border-radius: 999px;
+}
+
+.recent-space-item__body strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 1.7rem;
+  letter-spacing: -0.04em;
+}
+
+.recent-space-item__body p {
+  color: #7b859d;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.schedule-panel {
+  padding-top: 84px;
+}
+
+.schedule-board {
+  overflow: hidden;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(31, 46, 97, 0.08);
+}
+
+.schedule-board__day,
+.schedule-board__corner {
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #dfe4ef;
+  border-right: 1px solid #dfe4ef;
+  background: #ffffff;
+  color: #9aa3b8;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.schedule-board {
+  display: grid;
+  grid-template-columns: 56px repeat(5, 1fr);
+  grid-template-rows: 46px;
+}
+
+.schedule-board__hour {
+  height: 72px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12px;
+  border-right: 1px solid #dfe4ef;
+  border-bottom: 1px solid #dfe4ef;
+  color: #8d96ae;
+  font-size: 0.95rem;
+}
+
+.schedule-board__grid {
+  grid-column: 2 / -1;
+  grid-row: 2 / span 9;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(9, 72px);
+  position: relative;
+}
+
+.schedule-board__cell {
+  border-right: 1px solid #dfe4ef;
+  border-bottom: 1px solid #dfe4ef;
+}
+
+.schedule-block {
+  z-index: 1;
+  margin: 2px;
+  padding: 10px 8px;
+  border-radius: 0;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.theme-sunset {
+  background: linear-gradient(90deg, #5544d8 0%, #7d74cf 48%, #edb9b5 100%);
+}
+
+.theme-ocean {
+  background: linear-gradient(90deg, #2350b2 0%, #6991d9 100%);
+}
+
+.theme-indigo {
+  background: linear-gradient(180deg, #4c41c9 0%, #433fb5 100%);
+}
+
+.theme-blue {
+  background: linear-gradient(180deg, #366cf0 0%, #2d63dd 100%);
+}
+
+@media (max-width: 1200px) {
+  .professor-dashboard {
+    padding: 28px 22px 36px;
+  }
+
+  .professor-dashboard__layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .schedule-panel {
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .dashboard-header {
+    margin-bottom: 28px;
+  }
+
+  .welcome-block h1 {
+    font-size: 2.5rem;
+  }
+
+  .section-title,
+  .section-title--dark {
+    font-size: 1.6rem;
+  }
+
+  .next-space-card {
+    padding: 28px 22px 20px;
+  }
+
+  .next-space-card__time {
+    position: static;
+    margin-bottom: 14px;
+  }
+
+  .next-space-card h2 {
+    margin-bottom: 28px;
+  }
+
+  .schedule-board {
+    overflow-x: auto;
+  }
+}
