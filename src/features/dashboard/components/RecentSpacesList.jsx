@@ -1,7 +1,9 @@
 function RecentSpacesList({ spaces }) {
   return (
     <section className="dashboard-section">
-      <div className="section-title section-title--dark">최근 Spaces</div>
+      <div className="section-title section-title--dark">
+        {"\uCD5C\uADFC Spaces"}
+      </div>
 
       <div className="panel-card recent-spaces">
         {spaces.map((space, index) => (

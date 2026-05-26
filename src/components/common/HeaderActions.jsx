@@ -1,0 +1,59 @@
+import "./header-actions.css";
+
+function BellIcon() {
+  return (
+    <svg
+      className="header-actions__icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M12 4.75C9.37665 4.75 7.25 6.87665 7.25 9.5V11.7942C7.25 12.2817 7.06616 12.7513 6.73518 13.1091L5.71776 14.2081C4.86141 15.1332 5.5173 16.625 6.77741 16.625H17.2226C18.4827 16.625 19.1386 15.1332 18.2822 14.2081L17.2648 13.1091C16.9338 12.7513 16.75 12.2817 16.75 11.7942V9.5C16.75 6.87665 14.6234 4.75 12 4.75Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M10.25 19.125C10.672 19.7463 11.2854 20.125 12 20.125C12.7146 20.125 13.328 19.7463 13.75 19.125"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function HeaderActions({
+  unreadCount = 0,
+  avatarLabel = "\uC0C8\uC2F9",
+  notificationLabel = "\uC54C\uB9BC",
+  profileLabel = "\uD504\uB85C\uD544",
+}) {
+  return (
+    <div className="header-actions">
+      <button
+        type="button"
+        className="header-actions__button"
+        aria-label={notificationLabel}
+      >
+        <BellIcon />
+        {unreadCount > 0 ? (
+          <span className="header-actions__badge" aria-hidden="true" />
+        ) : null}
+      </button>
+
+      <button
+        type="button"
+        className="header-actions__button"
+        aria-label={profileLabel}
+      >
+        <span className="header-actions__avatar">{avatarLabel}</span>
+      </button>
+    </div>
+  );
+}
+
+export default HeaderActions;

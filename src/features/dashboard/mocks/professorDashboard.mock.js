@@ -9,7 +9,7 @@ export const professorProfile = {
 
 export const professorNextSpace = {
   space_id: "space-1",
-  nickname: "캡스톤디자인",
+  nickname: "캡디",
   space_name: "캡스톤디자인(CE)",
   day: "WEDNESDAY",
   start_time: "10:30",

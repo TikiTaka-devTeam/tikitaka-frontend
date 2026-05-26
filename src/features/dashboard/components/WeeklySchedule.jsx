@@ -17,45 +17,41 @@ function toGridColumn(day) {
 
 function WeeklySchedule({ schedules }) {
   return (
-    <section className="schedule-panel">
-      <div className="section-title section-title--dark">시간표</div>
-
-      <div className="schedule-board">
-        <div className="schedule-board__corner" />
-        {DAYS.map((day) => (
-          <div key={day} className="schedule-board__day">
-            {day}
-          </div>
-        ))}
-
-        {HOURS.map((hour) => (
-          <div key={hour} className="schedule-board__hour">
-            {hour}
-          </div>
-        ))}
-
-        <div className="schedule-board__grid">
-          {DAYS.map((day) =>
-            HOURS.map((hour) => (
-              <div key={`${day}-${hour}`} className="schedule-board__cell" />
-            )),
-          )}
-
-          {schedules.map((schedule) => (
-            <article
-              key={`${schedule.space_id}-${schedule.day}-${schedule.start_hour}`}
-              className={`schedule-block theme-${schedule.color}`}
-              style={{
-                gridColumn: toGridColumn(schedule.day),
-                gridRow: `${toGridRow(schedule)} / span ${toGridSpan(schedule)}`,
-              }}
-            >
-              <strong>{schedule.space_name}</strong>
-            </article>
-          ))}
+    <div className="schedule-board">
+      <div className="schedule-board__corner" />
+      {DAYS.map((day) => (
+        <div key={day} className="schedule-board__day">
+          {day}
         </div>
+      ))}
+
+      {HOURS.map((hour) => (
+        <div key={hour} className="schedule-board__hour">
+          {hour}
+        </div>
+      ))}
+
+      <div className="schedule-board__grid">
+        {DAYS.map((day) =>
+          HOURS.map((hour) => (
+            <div key={`${day}-${hour}`} className="schedule-board__cell" />
+          )),
+        )}
+
+        {schedules.map((schedule) => (
+          <article
+            key={`${schedule.space_id}-${schedule.day}-${schedule.start_hour}`}
+            className={`schedule-block theme-${schedule.color}`}
+            style={{
+              gridColumn: toGridColumn(schedule.day),
+              gridRow: `${toGridRow(schedule)} / span ${toGridSpan(schedule)}`,
+            }}
+          >
+            <strong>{schedule.space_name}</strong>
+          </article>
+        ))}
       </div>
-    </section>
+    </div>
   );
 }
 
