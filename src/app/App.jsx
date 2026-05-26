@@ -1,7 +1,7 @@
-import ProfessorDashboardPage from "../features/dashboard/pages/ProfessorDashboardPage.jsx";
+import DashboardPage from "../features/dashboard/pages/DashboardPage.jsx";
 
 function App() {
-  return <ProfessorDashboardPage />;
+  return <DashboardPage />;
 }
 
 export default App;

@@ -1,3 +1,4 @@
+import userIconSrc from "../../assets/icons/userIcon.png";
 import "./header-actions.css";
 
 function BellIcon() {
@@ -50,7 +51,11 @@ function HeaderActions({
         className="header-actions__button"
         aria-label={profileLabel}
       >
-        <span className="header-actions__avatar">{avatarLabel}</span>
+        <img
+          className="header-actions__avatar-image"
+          src={userIconSrc}
+          alt={avatarLabel}
+        />
       </button>
     </div>
   );

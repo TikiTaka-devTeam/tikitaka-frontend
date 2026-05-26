@@ -1,13 +1,13 @@
-export const professorProfile = {
+export const dashboardProfile = {
   user_id: "prof-1",
   name: "김승훈",
   role: "PROFESSOR",
   role_label: "관리자",
   profile_url: "",
-  unread_notification_count: 1,
+  unread_notification_count: 0,
 };
 
-export const professorNextSpace = {
+export const dashboardNextSpace = {
   space_id: "space-1",
   nickname: "캡디",
   space_name: "캡스톤디자인(CE)",
@@ -20,7 +20,7 @@ export const professorNextSpace = {
   color: "sunset",
 };
 
-export const professorRecentSpaces = [
+export const dashboardRecentSpaces = [
   {
     space_id: "space-1",
     name: "캡스톤디자인",
@@ -41,14 +41,14 @@ export const professorRecentSpaces = [
   },
 ];
 
-export const professorSchedules = [
+export const dashboardSchedules = [
   {
     space_id: "space-1",
     space_name: "캡스톤디자인",
     day: "WED",
     start_hour: 9,
     start_minute: 0,
-    end_hour: 11,
+    end_hour: 12,
     end_minute: 0,
     color: "indigo",
   },
@@ -57,8 +57,8 @@ export const professorSchedules = [
     space_name: "운영체제",
     day: "THU",
     start_hour: 10,
-    start_minute: 0,
-    end_hour: 11,
+    start_minute: 30,
+    end_hour: 12,
     end_minute: 0,
     color: "blue",
   },
@@ -66,10 +66,10 @@ export const professorSchedules = [
     space_id: "space-3",
     space_name: "운영체제",
     day: "TUE",
-    start_hour: 15,
+    start_hour: 13,
     start_minute: 0,
-    end_hour: 16,
-    end_minute: 0,
+    end_hour: 15,
+    end_minute: 25,
     color: "blue",
   },
 ];

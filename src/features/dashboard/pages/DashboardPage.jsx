@@ -4,27 +4,27 @@ import NextSpaceCard from "../components/NextSpaceCard.jsx";
 import RecentSpacesList from "../components/RecentSpacesList.jsx";
 import WeeklySchedule from "../components/WeeklySchedule.jsx";
 import {
-  professorNextSpace,
-  professorProfile,
-  professorRecentSpaces,
-  professorSchedules,
-} from "../mocks/professorDashboard.mock.js";
-import "../styles/professor-dashboard.css";
+  dashboardNextSpace,
+  dashboardProfile,
+  dashboardRecentSpaces,
+  dashboardSchedules,
+} from "../mocks/dashboard.mock.js";
+import "../styles/dashboard.css";
 
 const dashboardTabs = [
   { label: "\uB300\uC2DC\uBCF4\uB4DC", active: true },
   { label: "space", active: false },
 ];
 
-function ProfessorDashboardPage() {
+function DashboardPage() {
   return (
-    <main className="professor-dashboard">
-      <DashboardHeader profile={professorProfile} />
+    <main className="dashboard-page">
+      <DashboardHeader profile={dashboardProfile} />
 
       <div className="welcome-block">
         <p>{"\uC5B4\uC11C\uC624\uC138\uC694,"}</p>
         <h1>
-          {professorProfile.name}({professorProfile.role_label})
+          {dashboardProfile.name}({dashboardProfile.role_label})
         </h1>
       </div>
 
@@ -34,21 +34,21 @@ function ProfessorDashboardPage() {
         <div className="dashboard-overview__main">
           <div className="section-title">
             {"\uB2E4\uC74C \uAC15\uC758\uAE4C\uC9C0 "}
-            <span>{professorNextSpace.remain_time}{"\uBD84"}</span>
+            <span>{dashboardNextSpace.remain_time}{"\uBD84"}</span>
           </div>
-          <NextSpaceCard nextSpace={professorNextSpace} />
-          <RecentSpacesList spaces={professorRecentSpaces} />
+          <NextSpaceCard nextSpace={dashboardNextSpace} />
+          <RecentSpacesList spaces={dashboardRecentSpaces} />
         </div>
 
         <aside className="dashboard-overview__side">
           <div className="section-title section-title--dark">
             {"\uC2DC\uAC04\uD45C"}
           </div>
-          <WeeklySchedule schedules={professorSchedules} />
+          <WeeklySchedule schedules={dashboardSchedules} />
         </aside>
       </section>
     </main>
   );
 }
 
-export default ProfessorDashboardPage;
+export default DashboardPage;

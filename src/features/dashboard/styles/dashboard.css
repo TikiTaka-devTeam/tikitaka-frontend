@@ -1,4 +1,4 @@
-.professor-dashboard {
+.dashboard-page {
   min-height: 100vh;
   padding: 56px 50px 40px;
   background: var(--page-bg);
@@ -92,40 +92,68 @@
 }
 
 .next-space-card {
-  position: relative;
   overflow: hidden;
   width: 662px;
   max-width: 100%;
-  min-height: 200px;
-  padding: 38px 32px 24px;
   border-radius: 12px;
-  color: var(--text-white);
+  border: 1px solid var(--border);
+  background: var(--surface);
   box-shadow: var(--shadow);
+}
+
+.next-space-card__hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 145px;
+  padding: 24px 24px 18px 18px;
+  color: var(--text-white);
+}
+
+.next-space-card__footer {
+  min-height: 55px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  background: var(--surface);
 }
 
 .next-space-card__time {
   position: absolute;
-  top: 26px;
-  right: 28px;
-  font-size: 1.05rem;
-  font-weight: 800;
+  top: 22px;
+  right: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: 0;
 }
 
 .next-space-card__meta {
-  margin-bottom: 12px;
-  font-size: 1rem;
-  font-weight: 700;
+  margin-bottom: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 19px;
+  letter-spacing: 0;
 }
 
 .next-space-card h2 {
-  margin-bottom: 42px;
-  font-size: clamp(2rem, 3.2vw, 3rem);
-  letter-spacing: -0.04em;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 29px;
+  letter-spacing: 0;
 }
 
-.next-space-card p {
-  font-size: 0.98rem;
-  opacity: 0.96;
+.next-space-card__footer p {
+  color: rgba(33, 35, 38, 0.75);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 15px;
 }
 
 .panel-card {
@@ -184,6 +212,8 @@
 
 .schedule-board {
   overflow: hidden;
+  width: 460px;
+  max-width: 100%;
   height: 460px;
   border-radius: 12px;
   border: 1px solid var(--border);
@@ -193,34 +223,35 @@
 
 .schedule-board__day,
 .schedule-board__corner {
-  height: 46px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-bottom: 1px solid var(--border);
   border-right: 1px solid var(--border);
   background: var(--surface);
-  color: #9aa3b8;
-  font-size: 0.95rem;
-  font-weight: 700;
+  color: #979797;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
 }
 
 .schedule-board {
   display: grid;
-  grid-template-columns: 56px repeat(5, 1fr);
-  grid-template-rows: 46px;
+  grid-template-columns: 30px repeat(5, 1fr);
+  grid-template-rows: 28px;
 }
 
 .schedule-board__hour {
-  height: 46px;
+  height: 48px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding-top: 12px;
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   color: #8d96ae;
-  font-size: 0.95rem;
+  font-size: 12px;
+  line-height: 15px;
 }
 
 .schedule-board__grid {
@@ -228,7 +259,7 @@
   grid-row: 2 / span 9;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(9, 46px);
+  grid-template-rows: repeat(9, 48px);
   position: relative;
 }
 
@@ -239,13 +270,23 @@
 
 .schedule-block {
   z-index: 1;
-  margin: 2px;
-  padding: 10px 8px;
+  margin: 0;
+  padding: 3px 4px;
   border-radius: 0;
   color: var(--text-white);
-  font-size: 0.95rem;
-  font-weight: 800;
-  line-height: 1.15;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 14px;
+}
+
+.schedule-block strong {
+  display: block;
+  max-width: 52px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 14px;
+  letter-spacing: 0;
+  word-break: keep-all;
 }
 
 .theme-sunset {
@@ -265,7 +306,7 @@
 }
 
 @media (max-width: 1200px) {
-  .professor-dashboard {
+  .dashboard-page {
     padding: 40px 28px 36px;
   }
 
@@ -277,7 +318,7 @@
 }
 
 @media (max-width: 720px) {
-  .professor-dashboard {
+  .dashboard-page {
     padding: 24px 16px 32px;
   }
 
@@ -295,7 +336,7 @@
   }
 
   .next-space-card {
-    padding: 28px 22px 20px;
+    min-height: 0;
   }
 
   .next-space-card__time {
@@ -303,8 +344,14 @@
     margin-bottom: 14px;
   }
 
-  .next-space-card h2 {
-    margin-bottom: 28px;
+  .next-space-card__hero {
+    min-height: 0;
+    padding: 28px 22px 20px;
+  }
+
+  .next-space-card__footer {
+    min-height: 0;
+    padding: 12px 16px;
   }
 
   .schedule-board {
