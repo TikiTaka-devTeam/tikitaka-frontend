@@ -1,0 +1,55 @@
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-actions__button {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+
+.header-actions__icon {
+  width: 24px;
+  height: 24px;
+  color: #2d3552;
+}
+
+.header-actions__badge {
+  position: absolute;
+  top: 13px;
+  right: 14px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff6a59;
+}
+
+.header-actions__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #b6ff64, #7ed957);
+  color: #284525;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.header-actions__avatar-image {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}

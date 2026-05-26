@@ -1,0 +1,69 @@
+@font-face {
+  font-family: "Tikitaka UI";
+  src: url("../assets/fonts/PretendardVariable.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  unicode-range:
+    U+1100-11FF,
+    U+3130-318F,
+    U+AC00-D7A3,
+    U+A960-A97F,
+    U+D7B0-D7FF;
+}
+
+@font-face {
+  font-family: "Tikitaka UI";
+  src: url("../assets/fonts/Inter-VariableFont_opsz,wght.ttf")
+    format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  unicode-range:
+    U+0000-00FF,
+    U+0100-024F,
+    U+1E00-1EFF,
+    U+2000-206F;
+}
+
+:root {
+  font-family: "Tikitaka UI", sans-serif;
+  color: #212326;
+  background: #f2f2f7;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --page-bg: #f2f2f7;
+  --text-main: #212326;
+  --text-white: #ffffff;
+  --primary: #2766ec;
+  --primary-soft: #e9f1ff;
+  --primary-dark: #1f57d4;
+  --surface: #ffffff;
+  --border: #e6e7e9;
+  --muted: #667089;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--page-bg);
+  color: var(--text-main);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
