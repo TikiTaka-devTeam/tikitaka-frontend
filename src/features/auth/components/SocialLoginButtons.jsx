@@ -1,15 +1,21 @@
+import googleLogoSrc from "../../../assets/images/logo_google.svg";
+import kakaoLogoSrc from "../../../assets/images/logo_kakao.svg";
+
 function SocialLoginButtons() {
   return (
     <div className="social-login-buttons">
       <button type="button" className="social-login-button social-login-button--google">
-        <span className="social-login-button__google-mark" aria-hidden="true">
-          G
-        </span>
-        <span>Continue with Google</span>
+        <img
+          className="social-login-button__google-mark"
+          src={googleLogoSrc}
+          alt=""
+          aria-hidden="true"
+        />
+        <span>{"Continue with Google"}</span>
       </button>
 
       <button type="button" className="social-login-button social-login-button--kakao">
-        <span className="social-login-button__kakao-mark" aria-hidden="true" />
+        <img src={kakaoLogoSrc} alt="" aria-hidden="true" />
         <span>{"카카오로 로그인"}</span>
       </button>
     </div>

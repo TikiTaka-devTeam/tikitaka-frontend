@@ -1,4 +1,4 @@
-import logoWhiteSrc from "../../../assets/images/tikitaka_logo_white.svg?url";
+import logoWhiteSrc from "../../../assets/images/logo_tikitaka_white.svg?url";
 
 function AuthBrandPanel() {
   return (
