@@ -1,7 +1,7 @@
-import DashboardPage from "../features/dashboard/pages/DashboardPage.jsx";
+import LoginPage from "../features/auth/pages/LoginPage.jsx";
 
 function App() {
-  return <DashboardPage />;
+  return <LoginPage />;
 }
 
 export default App;
