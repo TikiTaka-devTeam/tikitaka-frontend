@@ -8,6 +8,7 @@ function LoginForm() {
     password: "",
   });
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (event) => {
@@ -22,18 +23,25 @@ function LoginForm() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setErrorMessage("");
+    setSuccessMessage("");
     setIsSubmitting(true);
 
     try {
       const { data } = await login(formValues);
+      const { access_token, refresh_token, user } = data ?? {};
 
-      if (data?.access_token) {
-        localStorage.setItem("tikitaka_access_token", data.access_token);
+      if (!access_token || !refresh_token) {
+        throw new Error("로그인 응답에 토큰이 없습니다.");
       }
 
-      if (data?.refresh_token) {
-        localStorage.setItem("tikitaka_refresh_token", data.refresh_token);
+      localStorage.setItem("tikitaka_access_token", access_token);
+      localStorage.setItem("tikitaka_refresh_token", refresh_token);
+
+      if (user) {
+        localStorage.setItem("tikitaka_user", JSON.stringify(user));
       }
+
+      setSuccessMessage("로그인되었습니다.");
     } catch {
       setErrorMessage("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
     } finally {
@@ -81,6 +89,7 @@ function LoginForm() {
           </button>
 
           {errorMessage ? <p className="login-form__error">{errorMessage}</p> : null}
+          {successMessage ? <p className="login-form__success">{successMessage}</p> : null}
 
           <button type="submit" className="login-form__submit" disabled={isSubmitting}>
             {isSubmitting ? "로그인 중" : "로그인"}

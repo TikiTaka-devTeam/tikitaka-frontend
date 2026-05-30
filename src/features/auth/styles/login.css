@@ -89,7 +89,8 @@
 .login-form-panel__header h1,
 .login-form-panel__header p,
 .login-form-panel__signup,
-.login-form__error {
+.login-form__error,
+.login-form__success {
   margin: 0;
 }
 
@@ -190,6 +191,13 @@
 .login-form__error {
   margin-top: 12px;
   color: #d92d20;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.login-form__success {
+  margin-top: 12px;
+  color: #16a34a;
   font-size: 13px;
   font-weight: 700;
 }
