@@ -1,15 +1,35 @@
+function getHeroStyle(color) {
+  if (!color) {
+    return undefined;
+  }
+
+  return {
+    background: `linear-gradient(135deg, ${color} 0%, rgba(255, 255, 255, 0.2) 180%)`,
+  };
+}
+
 function NextSpaceCard({ nextSpace }) {
+  if (!nextSpace) {
+    return (
+      <article className="next-space-card">
+        <div className="next-space-card__empty">
+          <p>예정된 다음 강의가 없습니다.</p>
+        </div>
+      </article>
+    );
+  }
+
   return (
     <article className="next-space-card">
-      <div className={`next-space-card__hero theme-${nextSpace.color}`}>
-        <div className="next-space-card__time">◔ {nextSpace.start_time}</div>
+      <div className="next-space-card__hero" style={getHeroStyle(nextSpace.color)}>
+        <div className="next-space-card__time">{nextSpace.start_time}</div>
         <div className="next-space-card__meta">{nextSpace.semester}</div>
         <h2>{nextSpace.space_name}</h2>
       </div>
 
       <div className="next-space-card__footer">
         <p>
-          실무중심산학협력프로젝트1(캡스톤디자인-CE) - {nextSpace.professor_name}
+          {[nextSpace.nickname, nextSpace.professor_name].filter(Boolean).join(" · ")}
         </p>
       </div>
     </article>
