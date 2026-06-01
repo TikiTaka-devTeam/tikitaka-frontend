@@ -9,30 +9,29 @@
   justify-content: center;
   align-items: center;
 
-  background: #f7f7f7;
+  background: #FFFFFF;
 }
 
 .signup-card {
-  width: 900px;
-
+  width: 560px;
   background: white;
-
-  padding: 40px 60px;
-
-  border-radius: 16px;
 }
 
 .signup-card h1 {
-  font-size: 42px;
-  font-weight: 700;
-
-  margin-bottom: 40px;
+  font-size: 32px;
+  /* Pretendard Black */
+  font-family: "Tikitaka UI", Pretendard, sans-serif;
+  font-weight: 900;
+  font-variation-settings: "wght" 900;
+  margin-top: 58px;
+  margin-bottom: 7px;
 }
 
 .section-title {
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 600;
-
+  font-family: "Tikitaka UI", Pretendard, sans-serif;
+  font-variation-settings: "wght" 900;
   margin: 40px 0 20px;
 }
 
@@ -75,27 +74,92 @@
 }
 
 .terms-section {
-  margin-bottom: 40px;
+  padding: 0px 27px;
+  margin-bottom: 13px;
+  
+}
+
+/* 제목 밑줄 */
+.title-line-thick {
+  width: 100%;
+  height: 3px;
+  background: #000000;
+  margin-bottom: 21px;
+}
+
+/* 제목 밑줄 얇은 선 */
+.title-line-thin {
+  width: 100%;
+  height: 1px;
+  background: #000000;
+  margin-bottom: 21px;
 }
 
 .terms-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 19px;
+  min-height: 19px;
+  font-family: "Tikitaka UI", Pretendard, sans-serif;
+  font-variation-settings: "wght" 800;
+  line-height: 19px;
+  margin-bottom: 13px;
+}
 
-  margin-bottom: 16px;
+.terms-header h3,
+.terms-header .checkbox-label {
+  line-height: 19px;
+  font-family: "Tikitaka UI", Pretendard, sans-serif;
+  font-variation-settings: "wght" 900;
+  font-size: 12px;
+}
+
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  position: relative;
+}
+
+.checkbox-label input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkbox-custom {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  background-image: url("../../../assets/icons/Checkbox.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
+  background-image: url("../../../assets/icons/Check.svg");
 }
 
 .terms-content {
   height: 220px;
-
-  overflow-y: auto;
-
   border: 1px solid #dcdcdc;
-
   border-radius: 12px;
+  padding: 11px 10px 0px 15px;
+}
 
-  padding: 20px;
+.terms-content-inner {
+  height: 100%;
+  overflow-y: auto;
+  font-family: "Tikitaka UI", Pretendard, sans-serif;
+  font-variation-settings: "wght" 400;
+  font-size: 12px;
+  padding-right: 10px;
+
+  box-sizing: border-box;
 }
 
 .terms-content pre {
@@ -108,7 +172,7 @@
   justify-content: flex-end;
   gap: 16px;
 
-  margin-top: 40px;
+  
 }
 
 .prev-btn,
