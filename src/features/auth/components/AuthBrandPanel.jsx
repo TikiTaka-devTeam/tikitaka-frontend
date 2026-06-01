@@ -1,12 +1,12 @@
 import logoWhiteSrc from "../../../assets/images/logo_tikitaka_white.svg?url";
 
-function AuthBrandPanel() {
+function AuthBrandPanel({ onSignUp }) {
   return (
     <section className="auth-brand-panel" aria-label="tikitaka service intro">
       <div className="auth-brand-panel__nav">
         <img className="auth-brand-panel__logo" src={logoWhiteSrc} alt="tikitaka" />
         <div className="auth-brand-panel__links">
-          <button type="button">Sign Up</button>
+          <button type="button" onClick={onSignUp}>Sign Up</button>
           <button type="button" className="auth-brand-panel__contact">
             Contact Us
           </button>

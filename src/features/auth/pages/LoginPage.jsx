@@ -2,11 +2,11 @@ import AuthBrandPanel from "../components/AuthBrandPanel.jsx";
 import LoginForm from "../components/LoginForm.jsx";
 import "../styles/login.css";
 
-function LoginPage() {
+function LoginPage({ navigate }) {
   return (
     <main className="login-page">
-      <AuthBrandPanel />
-      <LoginForm />
+      <AuthBrandPanel onSignUp={() => navigate("signup-terms")} />
+      <LoginForm onSignUp={() => navigate("signup-terms")} />
     </main>
   );
 }

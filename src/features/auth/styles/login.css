@@ -112,7 +112,7 @@
 .login-form-panel {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   min-height: 100vh;
   padding: 72px clamp(40px, 8vw, 96px) 72px clamp(88px, 8vw, 98px);
   background: #ffffff;
@@ -260,7 +260,7 @@
 
 .social-login-buttons {
   display: grid;
-  grid-template-columns: repeat(2, 196px);
+  grid-template-columns: repeat(2, 200px);
   gap: 29px;
   justify-content: center;
 }
@@ -270,7 +270,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  height: 40px;
+  height: 41.46px;
   border-radius: 999px;
   cursor: pointer;
 }
