@@ -36,6 +36,44 @@
   margin: 40px 0 20px;
 }
 
+.signup-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #9ca3af;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.step-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.step-item.active {
+  color: #2563eb;
+}
+
+.step-item.active .step-circle {
+  background: #2563eb;
+  color: #ffffff;
+}
+
 .terms-section {
   margin-bottom: 40px;
 }

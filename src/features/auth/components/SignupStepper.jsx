@@ -1,4 +1,4 @@
-import "./SignupStepper.css";
+import "../styles/signupTerms.css";
 
 function SignupStepper({ currentStep }) {
   const steps = ["약관 동의", "정보 입력", "가입 완료"];
