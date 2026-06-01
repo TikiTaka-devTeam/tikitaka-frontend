@@ -2,7 +2,7 @@ import { useState } from "react";
 import { login } from "../api/auth.api.js";
 import SocialLoginButtons from "./SocialLoginButtons.jsx";
 
-function LoginForm() {
+function LoginForm({ onSignUp }) {
   const [formValues, setFormValues] = useState({
     email: "",
     password: "",
@@ -98,7 +98,7 @@ function LoginForm() {
 
         <p className="login-form-panel__signup">
           {"아직 계정이 없으시다면? "}
-          <button type="button">{"회원가입 하러 가기!"}</button>
+          <button type="button" onClick={onSignUp}>{"회원가입 하러 가기!"}</button>
         </p>
 
         <div className="login-form-panel__divider">

@@ -1,0 +1,100 @@
+* {
+  box-sizing: border-box;
+}
+
+.signup-container {
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #f7f7f7;
+}
+
+.signup-card {
+  width: 900px;
+
+  background: white;
+
+  padding: 40px 60px;
+
+  border-radius: 16px;
+}
+
+.signup-card h1 {
+  font-size: 42px;
+  font-weight: 700;
+
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 600;
+
+  margin: 40px 0 20px;
+}
+
+.terms-section {
+  margin-bottom: 40px;
+}
+
+.terms-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 16px;
+}
+
+.terms-content {
+  height: 220px;
+
+  overflow-y: auto;
+
+  border: 1px solid #dcdcdc;
+
+  border-radius: 12px;
+
+  padding: 20px;
+}
+
+.terms-content pre {
+  white-space: pre-wrap;
+  font-family: inherit;
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+
+  margin-top: 40px;
+}
+
+.prev-btn,
+.next-btn {
+  width: 120px;
+  height: 48px;
+
+  border: none;
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+.prev-btn {
+  background: #bdbdbd;
+  color: white;
+}
+
+.next-btn {
+  background: #2563eb;
+  color: white;
+}
+
+.next-btn:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
