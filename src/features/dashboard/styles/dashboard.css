@@ -28,6 +28,19 @@
   background: rgba(255, 246, 246, 0.9);
 }
 
+.dashboard-feedback-panel__action {
+  margin-top: 12px;
+  width: fit-content;
+  min-width: 108px;
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--text-white);
+  cursor: pointer;
+}
+
 .dashboard-overview {
   display: grid;
   grid-template-columns: minmax(0, 662px) minmax(320px, 1fr);
@@ -69,6 +82,14 @@
   letter-spacing: -0.04em;
 }
 
+.welcome-block__title-main {
+  font-weight: 700;
+}
+
+.welcome-block__title-role {
+  font-weight: 500;
+}
+
 .mode-tabs {
   display: flex;
   gap: 12px;
@@ -93,6 +114,174 @@
 .mode-tabs__item.is-active {
   background: var(--primary);
   color: var(--text-white);
+}
+
+.my-spaces-section {
+  margin-top: 4px;
+}
+
+.my-spaces-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 13px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: 0;
+  margin-bottom: 38px;
+}
+
+.my-spaces-toolbar__create,
+.my-spaces-toolbar__filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.my-spaces-toolbar__create {
+  width: 48px;
+  height: 48px;
+  background: var(--primary);
+  color: var(--text-white);
+  border-radius: 17px;
+  box-shadow: none;
+}
+
+.my-spaces-toolbar__filter {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  flex-shrink: 0;
+  background: transparent;
+  color: #252d48;
+  border-radius: 0;
+}
+
+.my-spaces-toolbar__create svg {
+  width: 14px;
+  height: 14px;
+}
+
+.my-spaces-toolbar__filter svg,
+.my-spaces-toolbar__search-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.my-spaces-toolbar__search-row {
+  display: flex;
+  align-items: center;
+  width: 361px;
+  height: 48px;
+  padding: 0 13px;
+  gap: 6px;
+  border: 1px solid rgba(221, 225, 234, 0.96);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.my-spaces-toolbar__search {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  gap: 6px;
+}
+
+.my-spaces-toolbar__search input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  outline: none;
+  color: var(--text-main);
+  padding: 0;
+}
+
+.my-spaces-toolbar__search input::placeholder {
+  color: #8c95aa;
+}
+
+.my-spaces-toolbar__search-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: #1d2843;
+}
+
+.my-spaces-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.my-spaces-empty {
+  grid-column: 1 / -1;
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed rgba(164, 174, 196, 0.85);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.my-spaces-empty p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.my-space-card {
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid rgba(211, 214, 224, 0.94);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  text-align: left;
+  cursor: pointer;
+}
+
+.my-space-card__hero {
+  min-height: 176px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px 18px;
+  color: var(--text-white);
+}
+
+.my-space-card__meta {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.my-space-card__hero strong {
+  font-size: 22px;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+}
+
+.my-space-card__footer {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  padding: 14px 18px;
+}
+
+.my-space-card__footer p {
+  margin: 0;
+  color: rgba(33, 35, 38, 0.76);
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .section-title {
@@ -355,6 +544,10 @@
     row-gap: 26px;
     column-gap: 0;
   }
+
+  .my-spaces-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -396,5 +589,24 @@
 
   .schedule-board {
     overflow-x: auto;
+  }
+
+  .my-spaces-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    width: 100%;
+  }
+
+  .my-spaces-toolbar__search-row {
+    width: 100%;
+  }
+
+  .my-spaces-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .my-space-card__hero {
+    min-height: 144px;
   }
 }

@@ -1,4 +1,4 @@
-function ModeTabs({ items }) {
+function ModeTabs({ items, onChange }) {
   return (
     <nav
       className="mode-tabs"
@@ -9,6 +9,8 @@ function ModeTabs({ items }) {
           key={item.label}
           type="button"
           className={`mode-tabs__item ${item.active ? "is-active" : ""}`}
+          onClick={() => onChange?.(item.value ?? item.label)}
+          aria-pressed={item.active}
         >
           {item.label}
         </button>
