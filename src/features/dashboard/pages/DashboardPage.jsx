@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 import ModeTabs from "../../../components/common/ModeTabs.jsx";
 import DashboardHeader from "../components/DashboardHeader.jsx";
+import MySpacesSection from "../components/MySpacesSection.jsx";
 import NextSpaceCard from "../components/NextSpaceCard.jsx";
 import RecentSpacesList from "../components/RecentSpacesList.jsx";
 import WeeklySchedule from "../components/WeeklySchedule.jsx";
-import { fetchDashboardData } from "../api/dashboard.api.js";
+import { fetchDashboardData, fetchMySpaces } from "../api/dashboard.api.js";
 import "../styles/dashboard.css";
 
+const DASHBOARD_SECTION = "dashboard";
+const SPACES_SECTION = "spaces";
+
 const dashboardTabs = [
-  { label: "\uB300\uC2DC\uBCF4\uB4DC", active: true },
-  { label: "space", active: false },
+  { label: "대시보드", value: DASHBOARD_SECTION },
+  { label: "space", value: SPACES_SECTION },
 ];
 
 const emptyProfile = {
@@ -19,17 +23,22 @@ const emptyProfile = {
 };
 
 function DashboardPage() {
+  const [activeSection, setActiveSection] = useState(DASHBOARD_SECTION);
   const [profile, setProfile] = useState(emptyProfile);
   const [nextSpace, setNextSpace] = useState(null);
   const [recentSpaces, setRecentSpaces] = useState([]);
   const [schedules, setSchedules] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingDashboard, setIsLoadingDashboard] = useState(true);
+  const [mySpaces, setMySpaces] = useState([]);
+  const [isLoadingMySpaces, setIsLoadingMySpaces] = useState(false);
+  const [mySpacesError, setMySpacesError] = useState("");
+  const [hasLoadedMySpaces, setHasLoadedMySpaces] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
 
     async function loadDashboard() {
-      setIsLoading(true);
+      setIsLoadingDashboard(true);
 
       try {
         const data = await fetchDashboardData();
@@ -48,7 +57,7 @@ function DashboardPage() {
         }
       } finally {
         if (isMounted) {
-          setIsLoading(false);
+          setIsLoadingDashboard(false);
         }
       }
     }
@@ -60,44 +69,90 @@ function DashboardPage() {
     };
   }, []);
 
+  async function loadMySpaces() {
+    setIsLoadingMySpaces(true);
+    setMySpacesError("");
+
+    try {
+      const data = await fetchMySpaces();
+      setMySpaces(Array.isArray(data) ? data : []);
+      setHasLoadedMySpaces(true);
+    } catch {
+      setMySpacesError("스페이스 목록을 불러오지 못했습니다.");
+    } finally {
+      setIsLoadingMySpaces(false);
+    }
+  }
+
+  function handleSectionChange(nextSection) {
+    setActiveSection(nextSection);
+
+    if (nextSection === SPACES_SECTION && !hasLoadedMySpaces && !isLoadingMySpaces) {
+      void loadMySpaces();
+    }
+  }
+
+  const tabItems = dashboardTabs.map((tab) => ({
+    ...tab,
+    active: tab.value === activeSection,
+  }));
+
+  const greeting =
+    activeSection === SPACES_SECTION
+      ? `반갑습니다, ${profile.name}님`
+      : "어서오세요,";
+
   return (
     <main className="dashboard-page">
       <DashboardHeader profile={profile} />
 
       <div className="welcome-block">
-        <p>{"\uC5B4\uC11C\uC624\uC138\uC694,"}</p>
-        <h1>
-          {profile.name}({profile.role_label})
-        </h1>
+        <p>{greeting}</p>
+        {activeSection === SPACES_SECTION ? (
+          <h1>My Spaces</h1>
+        ) : (
+          <h1>
+            <span className="welcome-block__title-main">{profile.name}</span>
+            <span className="welcome-block__title-role">({profile.role_label})</span>
+          </h1>
+        )}
       </div>
 
-      <ModeTabs items={dashboardTabs} />
+      <ModeTabs items={tabItems} onChange={handleSectionChange} />
 
-      {isLoading ? (
-        <section className="dashboard-feedback-panel">
-          <p>대시보드 데이터를 불러오는 중입니다.</p>
-        </section>
-      ) : null}
+      {activeSection === DASHBOARD_SECTION ? (
+        <>
+          {isLoadingDashboard ? (
+            <section className="dashboard-feedback-panel">
+              <p>대시보드 데이터를 불러오는 중입니다.</p>
+            </section>
+          ) : null}
 
-      <section className="dashboard-overview">
-        <div className="dashboard-overview__main">
-          <div className="section-title">
-            {nextSpace
-              ? "다음 강의까지 "
-              : "다음 강의 일정"}
-            {nextSpace ? <span>{nextSpace.remain_time}분</span> : null}
-          </div>
-          <NextSpaceCard nextSpace={nextSpace} />
-          <RecentSpacesList spaces={recentSpaces} />
-        </div>
+          <section className="dashboard-overview">
+            <div className="dashboard-overview__main">
+              <div className="section-title">
+                {nextSpace ? "다음 강의까지 " : "다음 강의 일정"}
+                {nextSpace ? <span>{nextSpace.remain_time}분</span> : null}
+              </div>
+              <NextSpaceCard nextSpace={nextSpace} />
+              <RecentSpacesList spaces={recentSpaces} />
+            </div>
 
-        <aside className="dashboard-overview__side">
-          <div className="section-title section-title--dark">
-            {"\uC2DC\uAC04\uD45C"}
-          </div>
-          <WeeklySchedule schedules={schedules} />
-        </aside>
-      </section>
+            <aside className="dashboard-overview__side">
+              <div className="section-title section-title--dark">시간표</div>
+              <WeeklySchedule schedules={schedules} />
+            </aside>
+          </section>
+        </>
+      ) : (
+        <MySpacesSection
+          spaces={mySpaces}
+          isLoading={isLoadingMySpaces}
+          errorMessage={mySpacesError}
+          onRetry={loadMySpaces}
+          onSelectSpace={() => {}}
+        />
+      )}
     </main>
   );
 }
