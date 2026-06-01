@@ -10,11 +10,19 @@ function SignupStepper({ currentStep }) {
           <div key={step} className="step-track-item">
             <div
               className={`step-dot ${
-                currentStep === index + 1 ? "active" : "inactive"
+                currentStep > index + 1
+                  ? "completed"
+                  : currentStep === index + 1
+                    ? "active"
+                    : "inactive"
               }`}
             />
             {index < steps.length - 1 && (
-              <div className="step-connector" />
+              <div
+                className={`step-connector ${
+                  currentStep > index + 1 ? "completed" : ""
+                }`}
+              />
             )}
           </div>
         ))}
@@ -24,7 +32,7 @@ function SignupStepper({ currentStep }) {
           <span
             key={step}
             className={`step-label ${
-              currentStep === index + 1 ? "active" : "inactive"
+              currentStep >= index + 1 ? "active" : "inactive"
             }`}
           >
             {step}

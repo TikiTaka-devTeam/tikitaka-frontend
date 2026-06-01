@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SignupStepper from "../components/SignupStepper";
 import TermsSection from "../components/TermsSection";
 
@@ -9,7 +10,8 @@ import {
 
 import "../styles/signupTerms.css";
 
-function SignupTermsPage({ navigate }) {
+function SignupTermsPage() {
+  const navigate = useNavigate();
   const [serviceAgree, setServiceAgree] =
     useState(false);
 
@@ -25,7 +27,7 @@ function SignupTermsPage({ navigate }) {
       return;
     }
 
-    console.log("다음 단계 이동");
+    navigate("/signup-inform");
   };
 
   return (
@@ -64,7 +66,7 @@ function SignupTermsPage({ navigate }) {
         <div className="button-group">
           <button
             className="prev-btn"
-            onClick={() => navigate("login")}
+            onClick={() => navigate("/login")}
           >
             이전
           </button>
