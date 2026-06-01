@@ -7,9 +7,9 @@ import {
   privacyTerms,
 } from "../data/terms";
 
-import "./signupTerms.css";
+import "../styles/signupTerms.css";
 
-function SignupTermsPage() {
+function SignupTermsPage({ navigate }) {
   const [serviceAgree, setServiceAgree] =
     useState(false);
 
@@ -59,7 +59,10 @@ function SignupTermsPage() {
         />
 
         <div className="button-group">
-          <button className="prev-btn">
+          <button
+            className="prev-btn"
+            onClick={() => navigate("login")}
+          >
             이전
           </button>
 
