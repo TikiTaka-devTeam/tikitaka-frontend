@@ -44,12 +44,12 @@ function mapProfile(profile) {
   };
 }
 
-function mapRecentSpaces(recentSpaces) {
-  if (!Array.isArray(recentSpaces)) {
+function mapColorizedSpaces(spaces) {
+  if (!Array.isArray(spaces)) {
     return [];
   }
 
-  return recentSpaces.map((space) => ({
+  return spaces.map((space) => ({
     ...space,
     color: space.color || getColorBySpaceId(space.space_id),
   }));
@@ -107,7 +107,7 @@ export async function fetchDashboardData() {
   const nextSpaceResponse =
     nextSpaceResult.status === "fulfilled" ? nextSpaceResult.value : { data: null };
 
-  const recentSpaces = mapRecentSpaces(recentSpacesResponse.data);
+  const recentSpaces = mapColorizedSpaces(recentSpacesResponse.data);
   const colorBySpaceId = recentSpaces.reduce((accumulator, space) => {
     accumulator[space.space_id] = space.color;
     return accumulator;
@@ -119,4 +119,10 @@ export async function fetchDashboardData() {
     schedules: mapSchedules(schedulesResponse.data, colorBySpaceId),
     nextSpace: mapNextSpace(nextSpaceResponse.data, colorBySpaceId),
   };
+}
+
+export async function fetchMySpaces() {
+  const response = await apiClient.get("/spaces");
+
+  return mapColorizedSpaces(response.data);
 }
