@@ -1,4 +1,6 @@
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
+import { createSpace } from "../api/dashboard.api.js";
+import CreateSpaceModal from "./CreateSpaceModal.jsx";
 import MySpaceCard from "./MySpaceCard.jsx";
 
 function SearchIcon() {
@@ -44,8 +46,11 @@ function MySpacesSection({
   errorMessage,
   onRetry,
   onSelectSpace,
+  ownerName,
+  onSpaceCreated,
 }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const filteredSpaces = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -61,61 +66,84 @@ function MySpacesSection({
     );
   }, [searchQuery, spaces]);
 
+  async function handleCreateSpace(payload) {
+    const createdSpace = await createSpace({
+      ...payload,
+      ownerName,
+    });
+
+    onSpaceCreated?.(createdSpace);
+  }
+
   return (
-    <section className="my-spaces-section">
-      <div className="my-spaces-toolbar">
-        <button type="button" className="my-spaces-toolbar__create" aria-label="스페이스 추가">
-          <PlusIcon />
-        </button>
-
-        <div className="my-spaces-toolbar__search-row">
-          <button type="button" className="my-spaces-toolbar__filter" aria-label="필터">
-            <FilterIcon />
+    <Fragment>
+      <section className="my-spaces-section">
+        <div className="my-spaces-toolbar">
+          <button
+            type="button"
+            className="my-spaces-toolbar__create"
+            aria-label="스페이스 추가"
+            onClick={() => setIsCreateModalOpen(true)}
+          >
+            <PlusIcon />
           </button>
 
-          <label className="my-spaces-toolbar__search">
-            <input
-              type="search"
-              placeholder="스페이스 검색"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-            />
-            <span className="my-spaces-toolbar__search-icon">
-              <SearchIcon />
-            </span>
-          </label>
+          <div className="my-spaces-toolbar__search-row">
+            <button type="button" className="my-spaces-toolbar__filter" aria-label="필터">
+              <FilterIcon />
+            </button>
+
+            <label className="my-spaces-toolbar__search">
+              <input
+                type="search"
+                placeholder="스페이스 검색"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+              />
+              <span className="my-spaces-toolbar__search-icon">
+                <SearchIcon />
+              </span>
+            </label>
+          </div>
         </div>
-      </div>
 
-      {isLoading ? (
-        <section className="dashboard-feedback-panel">
-          <p>스페이스 목록을 불러오는 중입니다.</p>
-        </section>
-      ) : null}
+        {isLoading ? (
+          <section className="dashboard-feedback-panel">
+            <p>스페이스 목록을 불러오는 중입니다.</p>
+          </section>
+        ) : null}
 
-      {!isLoading && errorMessage ? (
-        <section className="dashboard-feedback-panel is-error">
-          <p>{errorMessage}</p>
-          <button type="button" className="dashboard-feedback-panel__action" onClick={onRetry}>
-            다시 시도
-          </button>
-        </section>
-      ) : null}
+        {!isLoading && errorMessage ? (
+          <section className="dashboard-feedback-panel is-error">
+            <p>{errorMessage}</p>
+            <button type="button" className="dashboard-feedback-panel__action" onClick={onRetry}>
+              다시 시도
+            </button>
+          </section>
+        ) : null}
 
-      {!isLoading && !errorMessage ? (
-        <div className="my-spaces-grid">
-          {filteredSpaces.length === 0 ? (
-            <div className="my-spaces-empty">
-              <p>{searchQuery ? "검색 결과가 없습니다." : "참여 중인 스페이스가 없습니다."}</p>
-            </div>
-          ) : (
-            filteredSpaces.map((space) => (
-              <MySpaceCard key={space.space_id} space={space} onSelect={onSelectSpace} />
-            ))
-          )}
-        </div>
-      ) : null}
-    </section>
+        {!isLoading && !errorMessage ? (
+          <div className="my-spaces-grid">
+            {filteredSpaces.length === 0 ? (
+              <div className="my-spaces-empty">
+                <p>{searchQuery ? "검색 결과가 없습니다." : "참여 중인 스페이스가 없습니다."}</p>
+              </div>
+            ) : (
+              filteredSpaces.map((space) => (
+                <MySpaceCard key={space.space_id} space={space} onSelect={onSelectSpace} />
+              ))
+            )}
+          </div>
+        ) : null}
+      </section>
+
+      <CreateSpaceModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreate={handleCreateSpace}
+        ownerName={ownerName}
+      />
+    </Fragment>
   );
 }
 

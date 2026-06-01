@@ -1,4 +1,5 @@
 import { apiClient } from "../../../lib/api/client.js";
+import { buildSpaceGradient } from "../data/spaceThemes.js";
 
 const ROLE_LABELS = {
   STUDENT: "학생",
@@ -125,4 +126,36 @@ export async function fetchMySpaces() {
   const response = await apiClient.get("/spaces");
 
   return mapColorizedSpaces(response.data);
+}
+
+export async function createSpace(payload) {
+  const response = await apiClient.post("/spaces", {
+    name: payload.name,
+    nickname: payload.nickname,
+    semester: payload.semester,
+    color: payload.theme?.startColor ?? payload.color,
+    schedules: payload.schedules.map(({ day, start_time, end_time }) => ({
+      day,
+      start_time,
+      end_time,
+    })),
+  });
+
+  const createdSpace = response.data ?? {};
+  const theme = payload.theme ?? null;
+
+  return {
+    ...createdSpace,
+    space_id: createdSpace.space_id ?? crypto.randomUUID(),
+    name: createdSpace.name ?? payload.name,
+    nickname: createdSpace.nickname ?? payload.nickname,
+    semester: createdSpace.semester ?? payload.semester,
+    professor_name: createdSpace.professor_name ?? payload.ownerName ?? "",
+    color: createdSpace.color ?? theme?.startColor ?? payload.color,
+    startColor: theme?.startColor,
+    endColor: theme?.endColor,
+    gradient:
+      payload.gradient ??
+      (theme ? buildSpaceGradient(theme.startColor, theme.endColor) : undefined),
+  };
 }
