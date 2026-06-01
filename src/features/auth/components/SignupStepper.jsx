@@ -5,17 +5,32 @@ function SignupStepper({ currentStep }) {
 
   return (
     <div className="signup-stepper">
-      {steps.map((step, index) => (
-        <div
-          key={step}
-          className={`step-item ${
-            currentStep === index + 1 ? "active" : ""
-          }`}
-        >
-          <div className="step-circle">{index + 1}</div>
-          <span>{step}</span>
-        </div>
-      ))}
+      <div className="step-track">
+        {steps.map((step, index) => (
+          <div key={step} className="step-track-item">
+            <div
+              className={`step-dot ${
+                currentStep === index + 1 ? "active" : "inactive"
+              }`}
+            />
+            {index < steps.length - 1 && (
+              <div className="step-connector" />
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="step-labels">
+        {steps.map((step, index) => (
+          <span
+            key={step}
+            className={`step-label ${
+              currentStep === index + 1 ? "active" : "inactive"
+            }`}
+          >
+            {step}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

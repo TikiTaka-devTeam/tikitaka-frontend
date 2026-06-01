@@ -38,40 +38,73 @@
 
 .signup-stepper {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.step-item {
-  display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 10px;
-  color: #9ca3af;
-  font-size: 16px;
-  font-weight: 600;
+  margin-bottom: 23px;
 }
 
-.step-circle {
-  display: inline-flex;
+.step-track {
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+}
+
+.step-track-item {
+  display: flex;
+  align-items: center;
+}
+
+.step-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  background: #E6E7E9;
+  position: relative;
+}
+
+.step-dot.active {
+  background: #E6E7E9;
+  box-shadow: inset 0 0 0 3px #2563eb;
+}
+
+.step-dot.active::after {
+  content: "";
+  position: absolute;
+  inset: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: #e5e7eb;
-  color: #6b7280;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.step-item.active {
-  color: #2563eb;
-}
-
-.step-item.active .step-circle {
   background: #2563eb;
-  color: #ffffff;
+}
+
+.step-connector {
+  width: 224px;
+  height: 5px;
+  background: #E6E7E9;
+  margin: 0 0;
+}
+
+.step-labels {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 184px;
+  width: 100%;
+}
+
+.step-label {
+  font-size: 16px;
+  font-variation-settings: "wght" 900;
+  color: #979797;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.step-label.active {
+  color: #2563eb;
+  opacity: 1;
 }
 
 .terms-section {
