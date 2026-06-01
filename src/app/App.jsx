@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "../features/auth/pages/LoginPage.jsx";
 import SignupTermsPage from "../features/auth/pages/SignupTermsPage.jsx";
 import DashboardPage from "../features/dashboard/pages/DashboardPage.jsx";
-import SpacePage from "../features/spaces/pages/SpacePage.jsx";
+import StudentSpacePage from "../features/spaces/pages/StudentSpacePage.jsx";
 
 function App() {
   const accessToken = localStorage.getItem("tikitaka_access_token");
@@ -36,7 +36,9 @@ function App() {
 
       <Route
         path="/spaces/:spaceId"
-        element={accessToken ? <SpacePage /> : <Navigate to="/login" replace />}
+        element={
+          accessToken ? <StudentSpacePage /> : <Navigate to="/login" replace />
+        }
       />
 
       <Route

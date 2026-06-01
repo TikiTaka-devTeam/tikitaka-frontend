@@ -13,7 +13,7 @@
   font-display: swap;
 }
 
-.space-page {
+.student-space-page {
   width: 100%;
   min-height: 100vh;
   background: #f3f4fa;
@@ -22,15 +22,15 @@
   overflow-x: hidden;
 }
 
-.space-page__hero {
+.student-space-page__hero {
   position: relative;
   height: 281px;
   color: #ffffff;
 }
 
-.space-page__back-button {
+.student-space-page__back-button {
   position: absolute;
-  top: 33px;
+  top: 32px;
   left: 20px;
   width: 25px;
   height: 25px;
@@ -40,21 +40,21 @@
   cursor: pointer;
 }
 
-.space-page__back-button img {
+.student-space-page__back-button img {
   display: block;
   width: 25px;
   height: 25px;
   object-fit: contain;
 }
 
-.space-page__hero-text {
+.student-space-page__hero-text {
   position: absolute;
-  left: 43px;
+  left: 40px;
   bottom: 26px;
 }
 
-.space-page__semester {
-  margin: 0 0 4px;
+.student-space-page__semester {
+  margin: 0 0 4px 5px;
   font-family: "Pretendard", "Inter", sans-serif;
   font-size: 20px;
   font-weight: 600;
@@ -62,7 +62,7 @@
   letter-spacing: -0.02em;
 }
 
-.space-page__title {
+.student-space-page__title {
   margin: 0;
   font-family: "Pretendard", "Inter", sans-serif;
   font-size: 36px;
@@ -71,25 +71,25 @@
   letter-spacing: -0.04em;
 }
 
-.space-page__body {
+.student-space-page__body {
   height: calc(100vh - 281px);
   min-height: 564px;
-  padding-top: 24px;
-  padding-left: 54px;
+  padding-top: 23.5px;
+  padding-left: 40px;
   padding-right: 5px;
   overflow-y: auto;
   scrollbar-gutter: stable;
 }
 
-.space-page__body::-webkit-scrollbar {
+.student-space-page__body::-webkit-scrollbar {
   width: 11px;
 }
 
-.space-page__body::-webkit-scrollbar-track {
+.student-space-page__body::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.space-page__body::-webkit-scrollbar-thumb {
+.student-space-page__body::-webkit-scrollbar-thumb {
   width: 6px;
   border-radius: 15px;
   background: #979797;
@@ -97,19 +97,24 @@
   background-clip: content-box;
 }
 
-.space-page__tabs {
-  margin-bottom: 26px;
+.student-space-page__tabs {
+  margin: 0 0 26px 0;
+  padding: 0;
 }
 
-.mode-tabs {
+.student-space-page .mode-tabs {
   display: flex;
   align-items: center;
   gap: 11px;
+  margin: 0;
+  padding: 0;
 }
 
-.mode-tabs__item {
+.student-space-page .mode-tabs__item {
   width: 105px;
   height: 36px;
+  margin: 0;
+  padding: 0;
   border-radius: 999px;
   border: 1px solid #2f6ff2;
   background: #ffffff;
@@ -121,28 +126,28 @@
   cursor: pointer;
 }
 
-.mode-tabs__item.is-active {
+.student-space-page .mode-tabs__item.is-active {
   background: #2f6ff2;
   color: #ffffff;
   font-weight: 800;
 }
 
-.mode-tabs__item:disabled {
+.student-space-page .mode-tabs__item:disabled {
   cursor: default;
 }
 
-.space-page__documents {
+.student-space-page__documents {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 238px);
-  column-gap: 30px;
+  grid-template-columns: repeat(auto-fill, 237px);
+  column-gap: 31px;
   row-gap: 53px;
-  padding-left: 31px;
-  padding-right: 79px;
+  padding-left: 45px;
+  padding-right: 80px;
   padding-bottom: 80px;
 }
 
-.space-page__document-card {
-  width: 238px;
+.student-space-page__document-card {
+  width: 237px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -150,28 +155,28 @@
   cursor: default;
 }
 
-.space-page__thumbnail {
-  width: 238px;
+.student-space-page__thumbnail {
+  width: 237px;
   height: 130px;
   overflow: hidden;
   border-radius: 8px;
   background: #ffffff;
 }
 
-.space-page__thumbnail img {
+.student-space-page__thumbnail img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.space-page__thumbnail-empty {
+.student-space-page__thumbnail-empty {
   width: 100%;
   height: 100%;
   background: #ffffff;
 }
 
-.space-page__document-title {
+.student-space-page__document-title {
   margin: 10px 0 0;
   font-family: "Pretendard", "Inter", sans-serif;
   font-size: 14px;
@@ -184,7 +189,7 @@
   text-overflow: ellipsis;
 }
 
-.space-page__document-date {
+.student-space-page__document-date {
   margin: 2px 0 0;
   font-family: "Pretendard", "Inter", sans-serif;
   font-size: 12px;
@@ -193,7 +198,7 @@
   color: #8d8d8d;
 }
 
-.space-page__state {
+.student-space-page__state {
   padding-top: 80px;
   padding-right: 54px;
   text-align: center;
@@ -204,52 +209,54 @@
 }
 
 @media (max-width: 900px) {
-  .space-page__hero-text {
-    left: 32px;
+  .student-space-page__hero-text {
+    left: 45px;
   }
 
-  .space-page__title {
+  .student-space-page__title {
     font-size: 30px;
   }
 
-  .space-page__body {
-    padding-left: 32px;
+  .student-space-page__body {
+    padding-left: 40px;
   }
 
-  .space-page__documents {
-    grid-template-columns: repeat(auto-fill, minmax(210px, 238px));
-    padding-left: 0;
+  .student-space-page__documents {
+    grid-template-columns: repeat(auto-fill, 237px);
+    padding-left: 45px;
     padding-right: 32px;
   }
 }
 
 @media (max-width: 560px) {
-  .space-page__hero {
+  .student-space-page__hero {
     height: 240px;
   }
 
-  .space-page__body {
+  .student-space-page__body {
     height: calc(100vh - 240px);
     min-height: calc(100vh - 240px);
-    padding-left: 20px;
+    padding-left: 24px;
+    padding-top: 23.5px;
   }
 
-  .space-page__hero-text {
-    left: 24px;
+  .student-space-page__hero-text {
+    left: 45px;
     bottom: 24px;
   }
 
-  .space-page__semester {
+  .student-space-page__semester {
     font-size: 18px;
   }
 
-  .space-page__title {
-    font-size: 25px;
+  .student-space-page__title {
+    font-size: 28px;
   }
 
-  .space-page__documents {
+  .student-space-page__documents {
     grid-template-columns: 1fr;
     justify-items: center;
+    padding-left: 0;
     padding-right: 20px;
   }
 }
