@@ -2,10 +2,12 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "../features/auth/pages/LoginPage.jsx";
 import SignupTermsPage from "../features/auth/pages/SignupTermsPage.jsx";
 import DashboardPage from "../features/dashboard/pages/DashboardPage.jsx";
-import SpacePage from "../features/spaces/pages/SpacePage.jsx";
+import StudentSpacePage from "../features/spaces/pages/StudentSpacePage.jsx";
+import ProfessorSpacePage from "../features/spaces/pages/ProfessorSpacePage.jsx";
 
 function App() {
   const accessToken = localStorage.getItem("tikitaka_access_token");
+  const user = JSON.parse(localStorage.getItem("tikitaka_user") || "null");
 
   return (
     <Routes>
@@ -36,7 +38,15 @@ function App() {
 
       <Route
         path="/spaces/:spaceId"
-        element={accessToken ? <SpacePage /> : <Navigate to="/login" replace />}
+        element={
+          accessToken && user?.role === "STUDENT" ? (
+            <StudentSpacePage />
+          ) : accessToken && user?.role === "PROFESSOR" ? (
+            <ProfessorSpacePage />
+          ) : (
+            <Navigate to="/dashboard" replace />
+          )
+        }
       />
 
       <Route
