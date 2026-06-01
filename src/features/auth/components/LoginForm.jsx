@@ -28,20 +28,30 @@ function LoginForm() {
 
     try {
       const { data } = await login(formValues);
-      const { access_token, refresh_token, user } = data ?? {};
+      const accessToken = data?.access_token ?? data?.accessToken;
+      const refreshToken = data?.refresh_token ?? data?.refreshToken;
+      const user =
+        data?.user ??
+        (data?.email || data?.role
+          ? {
+              email: data.email,
+              role: data.role,
+            }
+          : null);
 
-      if (!access_token || !refresh_token) {
+      if (!accessToken || !refreshToken) {
         throw new Error("로그인 응답에 토큰이 없습니다.");
       }
 
-      localStorage.setItem("tikitaka_access_token", access_token);
-      localStorage.setItem("tikitaka_refresh_token", refresh_token);
+      localStorage.setItem("tikitaka_access_token", accessToken);
+      localStorage.setItem("tikitaka_refresh_token", refreshToken);
 
       if (user) {
         localStorage.setItem("tikitaka_user", JSON.stringify(user));
       }
 
       setSuccessMessage("로그인되었습니다.");
+      window.location.assign("/dashboard");
     } catch {
       setErrorMessage("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
     } finally {
@@ -53,13 +63,13 @@ function LoginForm() {
     <section className="login-form-panel" aria-labelledby="login-title">
       <div className="login-form-panel__inner">
         <div className="login-form-panel__header">
-          <h1 id="login-title">{"안녕하세요!"}</h1>
-          <p>{"오늘도 티키타카를 찾아주셔서 감사합니다."}</p>
+          <h1 id="login-title">안녕하세요!</h1>
+          <p>오늘도 티키타카를 찾아주셔서 감사합니다.</p>
         </div>
 
         <form className="login-form" onSubmit={handleSubmit}>
           <label className="login-form__field">
-            <span className="sr-only">{"이메일"}</span>
+            <span className="sr-only">이메일</span>
             <input
               type="email"
               name="email"
@@ -72,7 +82,7 @@ function LoginForm() {
           </label>
 
           <label className="login-form__field">
-            <span className="sr-only">{"비밀번호"}</span>
+            <span className="sr-only">비밀번호</span>
             <input
               type="password"
               name="password"
@@ -85,7 +95,7 @@ function LoginForm() {
           </label>
 
           <button type="button" className="login-form__forgot">
-            {"비밀번호 찾기"}
+            비밀번호 찾기
           </button>
 
           {errorMessage ? <p className="login-form__error">{errorMessage}</p> : null}
@@ -97,12 +107,11 @@ function LoginForm() {
         </form>
 
         <p className="login-form-panel__signup">
-          {"아직 계정이 없으시다면? "}
-          <button type="button">{"회원가입 하러 가기!"}</button>
+          아직 계정이 없으시다면 <button type="button">회원가입 하러 가기!</button>
         </p>
 
         <div className="login-form-panel__divider">
-          <span>{"간편 로그인"}</span>
+          <span>간편 로그인</span>
         </div>
 
         <SocialLoginButtons />

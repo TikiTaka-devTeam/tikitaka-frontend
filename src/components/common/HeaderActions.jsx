@@ -1,4 +1,6 @@
+import { useEffect, useRef, useState } from "react";
 import userIconSrc from "../../assets/icons/userIcon.png";
+import NotificationPopover from "./NotificationPopover.jsx";
 import "./header-actions.css";
 
 function BellIcon() {
@@ -29,22 +31,85 @@ function BellIcon() {
 
 function HeaderActions({
   unreadCount = 0,
+  notifications = [],
+  isLoadingNotifications = false,
+  notificationError = "",
+  onNotificationRead,
   avatarLabel = "\uC0C8\uC2F9",
   notificationLabel = "\uC54C\uB9BC",
   profileLabel = "\uD504\uB85C\uD544",
 }) {
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [notificationFilter, setNotificationFilter] = useState("all");
+  const notificationAreaRef = useRef(null);
+
+  useEffect(() => {
+    if (!isNotificationOpen) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event) => {
+      if (notificationAreaRef.current?.contains(event.target)) {
+        return;
+      }
+
+      setIsNotificationOpen(false);
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsNotificationOpen(false);
+      }
+    };
+
+    window.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isNotificationOpen]);
+
+  const handleNotificationClick = async (notification) => {
+    if (!notification.is_read && onNotificationRead) {
+      try {
+        await onNotificationRead(notification.notification_id);
+      } catch {
+        return;
+      }
+    }
+  };
+
   return (
     <div className="header-actions">
-      <button
-        type="button"
-        className="header-actions__button"
-        aria-label={notificationLabel}
-      >
-        <BellIcon />
-        {unreadCount > 0 ? (
-          <span className="header-actions__badge" aria-hidden="true" />
+      <div className="header-actions__notifications" ref={notificationAreaRef}>
+        <button
+          type="button"
+          className={`header-actions__button${isNotificationOpen ? " is-active" : ""}`}
+          aria-label={notificationLabel}
+          aria-expanded={isNotificationOpen}
+          aria-haspopup="dialog"
+          onClick={() => setIsNotificationOpen((prev) => !prev)}
+        >
+          <BellIcon />
+          {unreadCount > 0 ? (
+            <span className="header-actions__badge" aria-hidden="true" />
+          ) : null}
+        </button>
+
+        {isNotificationOpen ? (
+          <NotificationPopover
+            notifications={notifications}
+            activeFilter={notificationFilter}
+            isLoading={isLoadingNotifications}
+            errorMessage={notificationError}
+            onClose={() => setIsNotificationOpen(false)}
+            onFilterChange={setNotificationFilter}
+            onNotificationClick={handleNotificationClick}
+          />
         ) : null}
-      </button>
+      </div>
 
       <button
         type="button"

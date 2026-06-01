@@ -41,15 +41,20 @@ function WeeklySchedule({ schedules }) {
         {schedules.map((schedule) => (
           <article
             key={`${schedule.space_id}-${schedule.day}-${schedule.start_hour}`}
-            className={`schedule-block theme-${schedule.color}`}
+            className="schedule-block"
             style={{
               gridColumn: toGridColumn(schedule.day),
               gridRow: `${toGridRow(schedule)} / span ${toGridSpan(schedule)}`,
+              background: schedule.color,
             }}
           >
             <strong>{schedule.space_name}</strong>
           </article>
         ))}
+
+        {schedules.length === 0 ? (
+          <p className="schedule-board__empty">표시할 시간표가 없습니다.</p>
+        ) : null}
       </div>
     </div>
   );
