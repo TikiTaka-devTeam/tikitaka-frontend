@@ -1,0 +1,255 @@
+@font-face {
+  font-family: "Pretendard";
+  src: url("../../../assets/fonts/PretendardVariable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../../../assets/fonts/Inter-VariableFont_opsz,wght.ttf")
+    format("truetype");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+.space-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #f3f4fa;
+  color: #111111;
+  font-family: "Pretendard", "Inter", sans-serif;
+  overflow-x: hidden;
+}
+
+.space-page__hero {
+  position: relative;
+  height: 281px;
+  color: #ffffff;
+}
+
+.space-page__back-button {
+  position: absolute;
+  top: 33px;
+  left: 20px;
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.space-page__back-button img {
+  display: block;
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+}
+
+.space-page__hero-text {
+  position: absolute;
+  left: 43px;
+  bottom: 26px;
+}
+
+.space-page__semester {
+  margin: 0 0 4px;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+.space-page__title {
+  margin: 0;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.04em;
+}
+
+.space-page__body {
+  height: calc(100vh - 281px);
+  min-height: 564px;
+  padding-top: 24px;
+  padding-left: 54px;
+  padding-right: 5px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.space-page__body::-webkit-scrollbar {
+  width: 11px;
+}
+
+.space-page__body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.space-page__body::-webkit-scrollbar-thumb {
+  width: 6px;
+  border-radius: 15px;
+  background: #979797;
+  border: 2.5px solid transparent;
+  background-clip: content-box;
+}
+
+.space-page__tabs {
+  margin-bottom: 26px;
+}
+
+.mode-tabs {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.mode-tabs__item {
+  width: 105px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid #2f6ff2;
+  background: #ffffff;
+  color: #2f6ff2;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mode-tabs__item.is-active {
+  background: #2f6ff2;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.mode-tabs__item:disabled {
+  cursor: default;
+}
+
+.space-page__documents {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 238px);
+  column-gap: 30px;
+  row-gap: 53px;
+  padding-left: 31px;
+  padding-right: 79px;
+  padding-bottom: 80px;
+}
+
+.space-page__document-card {
+  width: 238px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  cursor: default;
+}
+
+.space-page__thumbnail {
+  width: 238px;
+  height: 130px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.space-page__thumbnail img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.space-page__thumbnail-empty {
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+}
+
+.space-page__document-title {
+  margin: 10px 0 0;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.04em;
+  color: #000000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.space-page__document-date {
+  margin: 2px 0 0;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: #8d8d8d;
+}
+
+.space-page__state {
+  padding-top: 80px;
+  padding-right: 54px;
+  text-align: center;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #777777;
+}
+
+@media (max-width: 900px) {
+  .space-page__hero-text {
+    left: 32px;
+  }
+
+  .space-page__title {
+    font-size: 30px;
+  }
+
+  .space-page__body {
+    padding-left: 32px;
+  }
+
+  .space-page__documents {
+    grid-template-columns: repeat(auto-fill, minmax(210px, 238px));
+    padding-left: 0;
+    padding-right: 32px;
+  }
+}
+
+@media (max-width: 560px) {
+  .space-page__hero {
+    height: 240px;
+  }
+
+  .space-page__body {
+    height: calc(100vh - 240px);
+    min-height: calc(100vh - 240px);
+    padding-left: 20px;
+  }
+
+  .space-page__hero-text {
+    left: 24px;
+    bottom: 24px;
+  }
+
+  .space-page__semester {
+    font-size: 18px;
+  }
+
+  .space-page__title {
+    font-size: 25px;
+  }
+
+  .space-page__documents {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding-right: 20px;
+  }
+}
