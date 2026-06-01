@@ -50,7 +50,7 @@ function SignupTermsPage({ navigate }) {
           }
           content={serviceTerms}
         />
-
+        <div className="blank-space"></div>
         <TermsSection
           title="개인정보 수집 및 이용 약관 동의"
           checked={privacyAgree}

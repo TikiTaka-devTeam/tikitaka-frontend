@@ -4,10 +4,11 @@
 
 .signup-container {
   min-height: 100vh;
-
+  width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: 40px;
 
   background: #FFFFFF;
 }
@@ -23,7 +24,7 @@
   font-family: "Tikitaka UI", Pretendard, sans-serif;
   font-weight: 900;
   font-variation-settings: "wght" 900;
-  margin-top: 58px;
+  margin-top: 18px;
   margin-bottom: 7px;
 }
 
@@ -74,7 +75,7 @@
 }
 
 .terms-section {
-  padding: 0px 27px;
+  padding: 0px 27px;    
   margin-bottom: 13px;
   
 }
@@ -107,7 +108,9 @@
   margin-bottom: 13px;
 }
 
-.terms-header h3,
+.terms-header h3 {
+    font-size: 16px;
+}
 .terms-header .checkbox-label {
   line-height: 19px;
   font-family: "Tikitaka UI", Pretendard, sans-serif;
@@ -145,7 +148,7 @@
 }
 
 .terms-content {
-  height: 220px;
+  height: 174px;
   border: 1px solid #dcdcdc;
   border-radius: 12px;
   padding: 11px 10px 0px 15px;
@@ -171,8 +174,6 @@
   display: flex;
   justify-content: flex-end;
   gap: 16px;
-
-  
 }
 
 .prev-btn,
@@ -183,11 +184,15 @@
   border: none;
   border-radius: 8px;
 
+  font-family: "Tikitaka UI", Pretendard, sans-serif;
+  font-variation-settings: "wght" 700;
+  font-size: 16px;
+
   cursor: pointer;
 }
 
 .prev-btn {
-  background: #bdbdbd;
+  background: #979797;
   color: white;
 }
 
@@ -199,4 +204,9 @@
 .next-btn:disabled {
   background: #d1d5db;
   cursor: not-allowed;
+  color: #000000;
+}
+
+.blank-space {
+  height: 19px;
 }
