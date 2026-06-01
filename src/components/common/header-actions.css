@@ -4,6 +4,10 @@
   gap: 16px;
 }
 
+.header-actions__notifications {
+  position: relative;
+}
+
 .header-actions__button {
   position: relative;
   width: 56px;
@@ -15,6 +19,21 @@
   background: var(--surface);
   box-shadow: var(--shadow);
   cursor: pointer;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.header-actions__button:hover {
+  transform: translateY(-1px);
+}
+
+.header-actions__button.is-active {
+  border-color: rgba(80, 104, 241, 0.28);
+  box-shadow:
+    0 14px 28px rgba(61, 80, 149, 0.14),
+    0 0 0 4px rgba(80, 104, 241, 0.08);
 }
 
 .header-actions__icon {
@@ -52,4 +71,20 @@
   border-radius: 50%;
   object-fit: cover;
   display: block;
+}
+
+@media (max-width: 720px) {
+  .header-actions {
+    gap: 12px;
+  }
+
+  .header-actions__button {
+    width: 48px;
+    height: 48px;
+  }
+
+  .header-actions__badge {
+    top: 10px;
+    right: 11px;
+  }
 }

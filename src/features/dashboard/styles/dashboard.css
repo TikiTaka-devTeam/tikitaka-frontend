@@ -5,6 +5,29 @@
   color: var(--text-main);
 }
 
+.dashboard-feedback-panel {
+  margin: 0 0 24px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--shadow);
+}
+
+.dashboard-feedback-panel p,
+.dashboard-empty-copy,
+.schedule-board__empty,
+.next-space-card__empty p {
+  margin: 0;
+  color: #66708a;
+  line-height: 1.6;
+}
+
+.dashboard-feedback-panel.is-error {
+  border-color: rgba(228, 112, 112, 0.24);
+  background: rgba(255, 246, 246, 0.9);
+}
+
 .dashboard-overview {
   display: grid;
   grid-template-columns: minmax(0, 662px) minmax(320px, 1fr);
@@ -117,6 +140,13 @@
   align-items: center;
   padding: 0 24px;
   background: var(--surface);
+}
+
+.next-space-card__empty {
+  min-height: 200px;
+  display: grid;
+  place-items: center;
+  padding: 24px;
 }
 
 .next-space-card__time {
@@ -261,6 +291,16 @@
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(9, 48px);
   position: relative;
+}
+
+.schedule-board__empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.82);
+  text-align: center;
 }
 
 .schedule-board__cell {
