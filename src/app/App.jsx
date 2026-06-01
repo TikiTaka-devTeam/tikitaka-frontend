@@ -3,9 +3,11 @@ import LoginPage from "../features/auth/pages/LoginPage.jsx";
 import SignupTermsPage from "../features/auth/pages/SignupTermsPage.jsx";
 import DashboardPage from "../features/dashboard/pages/DashboardPage.jsx";
 import StudentSpacePage from "../features/spaces/pages/StudentSpacePage.jsx";
+import ProfessorSpacePage from "../features/spaces/pages/ProfessorSpacePage.jsx";
 
 function App() {
   const accessToken = localStorage.getItem("tikitaka_access_token");
+  const user = JSON.parse(localStorage.getItem("tikitaka_user") || "null");
 
   return (
     <Routes>
@@ -37,7 +39,13 @@ function App() {
       <Route
         path="/spaces/:spaceId"
         element={
-          accessToken ? <StudentSpacePage /> : <Navigate to="/login" replace />
+          accessToken && user?.role === "STUDENT" ? (
+            <StudentSpacePage />
+          ) : accessToken && user?.role === "PROFESSOR" ? (
+            <ProfessorSpacePage />
+          ) : (
+            <Navigate to="/dashboard" replace />
+          )
         }
       />
 
