@@ -101,7 +101,7 @@ function SpacePage() {
   ];
 
   const handleBack = () => {
-    navigate(-1);
+    navigate("/dashboard?section=spaces");
   };
 
   const handleDocumentClick = (document) => {

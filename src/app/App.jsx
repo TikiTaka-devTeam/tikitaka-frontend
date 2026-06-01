@@ -1,22 +1,56 @@
-import { useState } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "../features/auth/pages/LoginPage.jsx";
 import SignupTermsPage from "../features/auth/pages/SignupTermsPage.jsx";
 import DashboardPage from "../features/dashboard/pages/DashboardPage.jsx";
+import SpacePage from "../features/spaces/pages/SpacePage.jsx";
 
 function App() {
-  const [page, setPage] = useState("login");
   const accessToken = localStorage.getItem("tikitaka_access_token");
 
-  // 로그인 상태 확인
-  if (accessToken) {
-    return <DashboardPage />;
-  }
+  return (
+    <Routes>
+      <Route
+        path="/login"
+        element={
+          accessToken ? <Navigate to="/dashboard" replace /> : <LoginPage />
+        }
+      />
 
-  if (page === "signup-terms") {
-    return <SignupTermsPage navigate={setPage} />;
-  }
+      <Route
+        path="/signup-terms"
+        element={
+          accessToken ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <SignupTermsPage />
+          )
+        }
+      />
 
-  return <LoginPage navigate={setPage} />;
+      <Route
+        path="/dashboard"
+        element={
+          accessToken ? <DashboardPage /> : <Navigate to="/login" replace />
+        }
+      />
+
+      <Route
+        path="/spaces/:spaceId"
+        element={accessToken ? <SpacePage /> : <Navigate to="/login" replace />}
+      />
+
+      <Route
+        path="*"
+        element={
+          accessToken ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+    </Routes>
+  );
 }
 
 export default App;
