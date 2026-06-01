@@ -33,12 +33,14 @@ function SignupTermsPage({ navigate }) {
       <div className="signup-card">
 
         <h1>회원가입</h1>
+        <div className="title-line-thick"></div>
 
         <SignupStepper currentStep={1} />
 
         <div className="section-title">
           약관 동의
         </div>
+        <div className="title-line-thin"></div>
 
         <TermsSection
           title="서비스 이용 약관 동의"
@@ -48,7 +50,7 @@ function SignupTermsPage({ navigate }) {
           }
           content={serviceTerms}
         />
-
+        <div className="blank-space"></div>
         <TermsSection
           title="개인정보 수집 및 이용 약관 동의"
           checked={privacyAgree}
@@ -57,6 +59,7 @@ function SignupTermsPage({ navigate }) {
           }
           content={privacyTerms}
         />
+        <div className="title-line-thin"></div>
 
         <div className="button-group">
           <button

@@ -15,12 +15,14 @@ function TermsSection({
             checked={checked}
             onChange={onChange}
           />
+          <span className="checkbox-custom" aria-hidden="true" />
           동의합니다.
         </label>
       </div>
-
       <div className="terms-content">
-        <pre>{content}</pre>
+        <div className="terms-content-inner">
+          <pre>{content}</pre>
+        </div>
       </div>
     </section>
   );
