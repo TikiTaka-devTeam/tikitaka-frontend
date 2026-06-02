@@ -94,17 +94,25 @@ function ProfessorSpacePage() {
   const tabs = [
     {
       label: "강의",
+      value: "lecture",
       active: true,
-      disabled: false,
-      onClick: () => {},
     },
     {
       label: "멤버",
+      value: "members",
       active: false,
-      disabled: true,
-      onClick: undefined,
     },
   ];
+
+  const handleTabChange = (value) => {
+    if (value === "lecture") {
+      return;
+    }
+
+    if (value === "members") {
+      navigate(`/spaces/${spaceId}/members`);
+    }
+  };
 
   const handleBack = () => {
     navigate("/dashboard?section=spaces");
@@ -211,7 +219,7 @@ function ProfessorSpacePage() {
       <section className="professor-space-page__body">
         <div className="professor-space-page__top-row">
           <div className="professor-space-page__tabs">
-            <ModeTabs items={tabs} />
+            <ModeTabs items={tabs} onChange={handleTabChange} />
           </div>
 
           <button

@@ -1,0 +1,517 @@
+@font-face {
+  font-family: "Pretendard";
+  src: url("../../../assets/fonts/PretendardVariable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../../../assets/fonts/Inter-VariableFont_opsz,wght.ttf")
+    format("truetype");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+.professor-space-member-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #f3f4fa;
+  color: #212326;
+  font-family: "Pretendard", "Inter", sans-serif;
+  overflow-x: hidden;
+}
+
+.professor-space-member-page__hero {
+  position: relative;
+  height: 281px;
+  color: #ffffff;
+}
+
+.professor-space-member-page__back-button {
+  position: absolute;
+  top: 32px;
+  left: 20px;
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.professor-space-member-page__back-button img {
+  display: block;
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+}
+
+.professor-space-member-page__hero-text {
+  position: absolute;
+  left: 40px;
+  bottom: 26px;
+}
+
+.professor-space-member-page__semester {
+  margin: 0 0 4px 5px;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+.professor-space-member-page__title {
+  margin: 0;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.04em;
+}
+
+.professor-space-member-page__body {
+  height: calc(100vh - 281px);
+  min-height: 564px;
+  padding-top: 23.5px;
+  padding-left: 39px;
+  padding-right: 37px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.professor-space-member-page__body::-webkit-scrollbar {
+  width: 11px;
+}
+
+.professor-space-member-page__body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.professor-space-member-page__body::-webkit-scrollbar-thumb {
+  width: 6px;
+  border-radius: 15px;
+  background: #979797;
+  border: 2.5px solid transparent;
+  background-clip: content-box;
+}
+
+.professor-space-member-page__top-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 0 0 17.5px 0;
+  padding: 0;
+}
+
+.professor-space-member-page__tabs {
+  margin: 0;
+  padding: 0;
+}
+
+.professor-space-member-page .mode-tabs {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 0;
+  padding: 0;
+}
+
+.professor-space-member-page .mode-tabs__item {
+  width: 105px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid #2563eb;
+  background: #ffffff;
+  color: #2563eb;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.professor-space-member-page .mode-tabs__item.is-active {
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.professor-space-member-page .mode-tabs__item:disabled {
+  cursor: default;
+}
+
+.professor-space-member-page__megaphone-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #2563eb;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.professor-space-member-page__megaphone-button img {
+  display: block;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.professor-space-member-page__content {
+  display: flex;
+  align-items: flex-start;
+  gap: 41px;
+  width: 100%;
+  padding-bottom: 24px;
+}
+
+.professor-space-member-page__member-panel,
+.professor-space-member-page__approval-panel {
+  height: 464px;
+  border: 1px solid #e6e7e9;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+
+.professor-space-member-page__member-panel {
+  flex: 0 0 354px;
+}
+
+.professor-space-member-page__approval-panel {
+  flex: 1 1 auto;
+  min-width: 660px;
+}
+
+.professor-space-member-page__panel-header {
+  position: relative;
+  height: 76px;
+}
+
+.professor-space-member-page__panel-header h2 {
+  position: absolute;
+  top: 34px;
+  left: 40px;
+  margin: 0;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  color: #212326;
+  letter-spacing: -0.04em;
+}
+
+.professor-space-member-page__reload-button {
+  position: absolute;
+  top: 43px;
+  right: 32px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.professor-space-member-page__reload-button img {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.professor-space-member-page__divider {
+  height: 1px;
+  margin: 0 28px 0 40px;
+  background: #d4d4d4;
+}
+
+.professor-space-member-page__member-list {
+  height: 370px;
+  padding: 12px 10px 18px 59px;
+  overflow-y: auto;
+}
+
+.professor-space-member-page__member-list::-webkit-scrollbar,
+.professor-space-member-page__pending-list::-webkit-scrollbar {
+  width: 10px;
+}
+
+.professor-space-member-page__member-list::-webkit-scrollbar-track,
+.professor-space-member-page__pending-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.professor-space-member-page__member-list::-webkit-scrollbar-thumb,
+.professor-space-member-page__pending-list::-webkit-scrollbar-thumb {
+  width: 6px;
+  border-radius: 15px;
+  background: #979797;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.professor-space-member-page__member-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 42px;
+}
+
+.professor-space-member-page__member-row
+  + .professor-space-member-page__member-row {
+  margin-top: 16px;
+}
+
+.professor-space-member-page__profile-image {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  overflow: hidden;
+  border: 1px solid #d4d4d4;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.professor-space-member-page__profile-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.professor-space-member-page__member-info {
+  min-width: 0;
+  margin-left: 31px;
+}
+
+.professor-space-member-page__member-name {
+  margin: 0;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #212326;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.professor-space-member-page__student-number {
+  margin: 4px 0 0;
+  font-family: "Inter", "Pretendard", sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #979797;
+}
+
+.professor-space-member-page__message-button,
+.professor-space-member-page__deny-button,
+.professor-space-member-page__approve-button {
+  width: 80px;
+  height: 26px;
+  padding: 0;
+  border-radius: 8px;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 13.5px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.professor-space-member-page__message-button {
+  margin-left: auto;
+  border: 1px solid #2766ec;
+  background: #2766ec;
+  color: #ffffff;
+  cursor: default;
+}
+
+.professor-space-member-page__approval-content {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) 391px;
+  height: 370px;
+}
+
+.professor-space-member-page__approval-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 137px;
+  text-align: center;
+}
+
+.professor-space-member-page__approval-summary p {
+  margin: 0;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #212326;
+  letter-spacing: -0.04em;
+}
+
+.professor-space-member-page__approval-summary p span {
+  color: #2766ec;
+}
+
+.professor-space-member-page__approval-summary strong {
+  display: block;
+  margin-top: 8px;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #979797;
+  letter-spacing: -0.03em;
+}
+
+.professor-space-member-page__pending-list {
+  height: 370px;
+  padding: 22px 7px 18px 0;
+  overflow-y: auto;
+}
+
+.professor-space-member-page__pending-row {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  padding-right: 42px;
+}
+
+.professor-space-member-page__pending-row
+  + .professor-space-member-page__pending-row {
+  margin-top: 12px;
+}
+
+.professor-space-member-page__pending-row
+  .professor-space-member-page__member-info {
+  width: 86px;
+  margin-left: 17px;
+}
+
+.professor-space-member-page__approval-buttons {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-left: auto;
+}
+
+.professor-space-member-page__deny-button {
+  border: 1px solid #2766ec;
+  background: #ffffff;
+  color: #2766ec;
+  cursor: pointer;
+}
+
+.professor-space-member-page__approve-button {
+  border: 1px solid #2766ec;
+  background: #2766ec;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.professor-space-member-page__deny-button:disabled,
+.professor-space-member-page__approve-button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.professor-space-member-page__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 260px;
+  padding-right: 49px;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #979797;
+}
+
+.professor-space-member-page__empty--pending {
+  height: 320px;
+  padding-right: 42px;
+}
+
+.professor-space-member-page__state {
+  padding-top: 150px;
+  text-align: center;
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #777777;
+}
+
+@media (max-width: 1100px) {
+  .professor-space-member-page__content {
+    flex-direction: column;
+  }
+
+  .professor-space-member-page__member-panel,
+  .professor-space-member-page__approval-panel {
+    width: 100%;
+    min-width: 0;
+    flex: none;
+  }
+
+  .professor-space-member-page__approval-content {
+    grid-template-columns: 1fr 391px;
+  }
+}
+
+@media (max-width: 760px) {
+  .professor-space-member-page__hero {
+    height: 240px;
+  }
+
+  .professor-space-member-page__body {
+    height: calc(100vh - 240px);
+    min-height: calc(100vh - 240px);
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .professor-space-member-page__hero-text {
+    left: 40px;
+    bottom: 24px;
+  }
+
+  .professor-space-member-page__semester {
+    font-size: 18px;
+  }
+
+  .professor-space-member-page__title {
+    font-size: 28px;
+  }
+
+  .professor-space-member-page__approval-panel {
+    height: auto;
+    min-height: 464px;
+  }
+
+  .professor-space-member-page__approval-content {
+    display: block;
+    height: auto;
+  }
+
+  .professor-space-member-page__approval-summary {
+    height: 180px;
+    padding-top: 60px;
+  }
+
+  .professor-space-member-page__pending-list {
+    height: 300px;
+    padding-left: 40px;
+  }
+}
