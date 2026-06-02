@@ -346,8 +346,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding-bottom: 5px;
+  justify-content: flex-start;
+  padding-top: 137px;
   text-align: center;
 }
 
@@ -357,7 +357,7 @@
   font-size: 24px;
   font-weight: 700;
   line-height: 1.35;
-  color: #000000;
+  color: #212326;
   letter-spacing: -0.04em;
 }
 
@@ -507,6 +507,7 @@
 
   .professor-space-member-page__approval-summary {
     height: 180px;
+    padding-top: 60px;
   }
 
   .professor-space-member-page__pending-list {
