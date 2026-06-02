@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ModeTabs from "../../../components/common/ModeTabs.jsx";
 import DashboardHeader from "../components/DashboardHeader.jsx";
 import MySpacesSection from "../components/MySpacesSection.jsx";
@@ -23,6 +24,7 @@ const emptyProfile = {
 };
 
 function DashboardPage() {
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState(DASHBOARD_SECTION);
   const [profile, setProfile] = useState(emptyProfile);
   const [nextSpace, setNextSpace] = useState(null);
@@ -92,6 +94,16 @@ function DashboardPage() {
     }
   }
 
+  function handleSelectSpace(space) {
+    const targetSpaceId = space?.space_id ?? space?.spaceId;
+
+    if (!targetSpaceId) {
+      return;
+    }
+
+    navigate(`/spaces/${targetSpaceId}`);
+  }
+
   const tabItems = dashboardTabs.map((tab) => ({
     ...tab,
     active: tab.value === activeSection,
@@ -148,7 +160,7 @@ function DashboardPage() {
           isLoading={isLoadingMySpaces}
           errorMessage={mySpacesError}
           onRetry={loadMySpaces}
-          onSelectSpace={() => {}}
+          onSelectSpace={handleSelectSpace}
           ownerName={profile.name}
           userRole={profile.role}
           onSpaceCreated={(space) => setMySpaces((prevSpaces) => [space, ...prevSpaces])}
