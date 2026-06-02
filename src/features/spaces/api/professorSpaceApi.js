@@ -9,11 +9,6 @@ export async function createSpaceDocument(spaceId, { title, file }) {
   const response = await apiClient.post(
     `/spaces/${spaceId}/documents`,
     formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    },
   );
 
   return response.data;

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ModeTabs from "../../../components/common/ModeTabs.jsx";
 import leftArrowIcon from "../../../assets/icons/left_arrow.png";
@@ -6,6 +6,7 @@ import megaphoneIcon from "../../../assets/icons/megaphone.png";
 import plusIcon from "../../../assets/icons/plus.png";
 import { getMySpaces, getSpaceDocuments } from "../api/spaceApi";
 import { createSpaceDocument } from "../api/professorSpaceApi";
+import LectureUploadModal from "../components/LectureUploadModal.jsx";
 import "../styles/professor-space-page.css";
 
 function formatDate(value) {
@@ -32,7 +33,6 @@ function buildGradient(color) {
 function ProfessorSpacePage() {
   const { spaceId } = useParams();
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
 
   const [space, setSpace] = useState(null);
   const [documents, setDocuments] = useState([]);
@@ -40,6 +40,7 @@ function ProfessorSpacePage() {
   const [uploading, setUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [openedMenuId, setOpenedMenuId] = useState("");
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   const headerBackground = useMemo(() => {
     return buildGradient(space?.color);
@@ -115,32 +116,29 @@ function ProfessorSpacePage() {
 
   const handleCreateBoxClick = () => {
     if (uploading) return;
-    fileInputRef.current?.click();
+    setIsUploadModalOpen(true);
   };
 
-  const handleFileChange = async (event) => {
-    const file = event.target.files?.[0];
+  const handleCloseUploadModal = () => {
+    if (uploading) return;
+    setIsUploadModalOpen(false);
+  };
 
-    if (!file || !spaceId) {
-      return;
-    }
-
-    const defaultTitle = file.name.replace(/\.[^/.]+$/, "");
-    const title = window.prompt("강의자료 제목을 입력하세요.", defaultTitle);
-
-    event.target.value = "";
-
-    if (!title) {
+  const handleUploadLecture = async ({ title, file }) => {
+    if (!spaceId) {
+      alert("강의 정보를 찾을 수 없습니다.");
       return;
     }
 
     try {
       setUploading(true);
+
       await createSpaceDocument(spaceId, {
         title,
         file,
       });
 
+      setIsUploadModalOpen(false);
       await loadProfessorSpacePage();
     } catch (error) {
       console.error(error);
@@ -159,6 +157,15 @@ function ProfessorSpacePage() {
       예시:
       navigate(`/professor/documents/${document.document_id}`);
     */
+  };
+
+  const handleDocumentKeyDown = (event, document) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+    handleDocumentClick(document);
   };
 
   const handleMenuClick = (event, documentId) => {
@@ -217,14 +224,6 @@ function ProfessorSpacePage() {
           </button>
         </div>
 
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="application/pdf"
-          className="professor-space-page__file-input"
-          onChange={handleFileChange}
-        />
-
         {loading && (
           <div className="professor-space-page__state">
             강의자료를 불러오는 중입니다.
@@ -258,11 +257,13 @@ function ProfessorSpacePage() {
             </button>
 
             {documents.map((document) => (
-              <button
+              <div
                 key={document.document_id}
-                type="button"
                 className="professor-space-page__document-card"
+                role="button"
+                tabIndex={0}
                 onClick={() => handleDocumentClick(document)}
+                onKeyDown={(event) => handleDocumentKeyDown(event, document)}
               >
                 <div className="professor-space-page__thumbnail">
                   {document.thumbnail_url ? (
@@ -307,11 +308,19 @@ function ProfessorSpacePage() {
                 <p className="professor-space-page__document-date">
                   {formatDate(document.uploaded_at)}
                 </p>
-              </button>
+              </div>
             ))}
           </div>
         )}
       </section>
+
+      {isUploadModalOpen && (
+        <LectureUploadModal
+          uploading={uploading}
+          onClose={handleCloseUploadModal}
+          onSubmit={handleUploadLecture}
+        />
+      )}
     </main>
   );
 }
