@@ -1,15 +1,8 @@
-function getCardHeroStyle(color) {
-  if (!color) {
-    return undefined;
-  }
-
-  return {
-    background: `linear-gradient(115deg, ${color} 0%, rgba(255, 255, 255, 0.18) 100%)`,
-  };
-}
+import SpacePreviewCard from "./SpacePreviewCard.jsx";
 
 function MySpaceCard({ space, onSelect }) {
-  const footer = [space.description, space.professor_name].filter(Boolean).join(" - ");
+  const title = space.nickname || space.name || "스페이스";
+  const subtitle = [space.name, space.professor_name].filter(Boolean).join(" - ");
 
   return (
     <button
@@ -17,14 +10,16 @@ function MySpaceCard({ space, onSelect }) {
       className="my-space-card"
       onClick={() => onSelect?.(space)}
     >
-      <div className="my-space-card__hero" style={getCardHeroStyle(space.color)}>
-        <div className="my-space-card__meta">{space.semester}</div>
-        <strong>{space.name}</strong>
-      </div>
-
-      <div className="my-space-card__footer">
-        <p>{footer || space.nickname || "스페이스 열기"}</p>
-      </div>
+      <SpacePreviewCard
+        variant="list"
+        semester={space.semester || "2026-1"}
+        title={title}
+        subtitle={subtitle || "스페이스 열기"}
+        gradient={space.gradient}
+        startColor={space.startColor}
+        endColor={space.endColor}
+        color={space.color}
+      />
     </button>
   );
 }

@@ -98,9 +98,7 @@ function DashboardPage() {
   }));
 
   const greeting =
-    activeSection === SPACES_SECTION
-      ? `반갑습니다, ${profile.name}님`
-      : "어서오세요,";
+    activeSection === SPACES_SECTION ? `반갑습니다, ${profile.name}님` : "어서 오세요!";
 
   return (
     <main className="dashboard-page">
@@ -151,6 +149,9 @@ function DashboardPage() {
           errorMessage={mySpacesError}
           onRetry={loadMySpaces}
           onSelectSpace={() => {}}
+          ownerName={profile.name}
+          userRole={profile.role}
+          onSpaceCreated={(space) => setMySpaces((prevSpaces) => [space, ...prevSpaces])}
         />
       )}
     </main>
