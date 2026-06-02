@@ -165,10 +165,6 @@
   object-fit: contain;
 }
 
-.professor-space-page__file-input {
-  display: none;
-}
-
 .professor-space-page__documents {
   display: grid;
   grid-template-columns: repeat(auto-fill, 237px);
