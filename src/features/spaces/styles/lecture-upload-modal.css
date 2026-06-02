@@ -20,54 +20,89 @@
 }
 
 .lecture-upload-modal__visual {
+  position: relative;
   width: 292px;
   height: 646px;
   flex: 0 0 292px;
+  overflow: hidden;
+  background: #0a0a2e;
+}
+
+.lecture-upload-modal__visual::before {
+  content: "";
+  position: absolute;
+  inset: -35%;
   background:
     radial-gradient(
-      circle at 78% 30%,
-      rgba(15, 118, 110, 0.45),
-      transparent 18%
-    ),
-    radial-gradient(
-      circle at 36% 62%,
-      rgba(49, 46, 129, 0.65),
+      circle at 32% 28%,
+      rgba(42, 27, 110, 0.95),
       transparent 22%
     ),
-    linear-gradient(
-      145deg,
-      #0a0a2e 9%,
-      #2a1b6e 26%,
-      #120d3e 37%,
-      #1e3a8a 59%,
-      #0f766e 74%,
-      #312e81 91%
+    radial-gradient(circle at 68% 32%, rgba(18, 13, 62, 0.95), transparent 24%),
+    radial-gradient(
+      circle at 74% 66%,
+      rgba(15, 118, 110, 0.9),
+      transparent 23%
+    ),
+    radial-gradient(
+      circle at 34% 72%,
+      rgba(49, 46, 129, 0.95),
+      transparent 25%
+    ),
+    conic-gradient(
+      from 0deg,
+      #0a0a2e 0deg,
+      #2a1b6e 70deg,
+      #120d3e 130deg,
+      #1e3a8a 205deg,
+      #0f766e 270deg,
+      #312e81 330deg,
+      #0a0a2e 360deg
     );
-  background-size: 180% 180%;
-  animation: lectureGradientMove 8s ease-in-out infinite alternate;
+  filter: blur(18px);
+  transform-origin: center;
+  animation: lectureGradientMove 5s linear infinite;
+}
+
+.lecture-upload-modal__visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 45%,
+    transparent 0%,
+    rgba(10, 10, 46, 0.08) 42%,
+    rgba(10, 10, 46, 0.28) 100%
+  );
+  pointer-events: none;
 }
 
 @keyframes lectureGradientMove {
   0% {
-    background-position: 0% 30%;
+    transform: rotate(0deg) scale(1.08);
+  }
+
+  50% {
+    transform: rotate(180deg) scale(1.18);
   }
 
   100% {
-    background-position: 100% 70%;
+    transform: rotate(360deg) scale(1.08);
   }
 }
 
 .lecture-upload-modal__content {
   position: relative;
-  width: 604px;
+  width: 599px;
   height: 646px;
-  padding: 40px 27px 22px 50px;
+  margin-right: 5px;
+  padding: 42px 23px 76px 31px;
   overflow-y: auto;
   color: #0d1a33;
 }
 
 .lecture-upload-modal__content::-webkit-scrollbar {
-  width: 11px;
+  width: 6px;
 }
 
 .lecture-upload-modal__content::-webkit-scrollbar-track {
@@ -75,27 +110,23 @@
 }
 
 .lecture-upload-modal__content::-webkit-scrollbar-thumb {
-  width: 6px;
   border-radius: 15px;
   background: #979797;
-  border: 2.5px solid transparent;
-  background-clip: content-box;
 }
 
 .lecture-upload-modal__close-button {
   position: absolute;
-  top: 22px;
-  right: 29px;
-  width: 25px;
-  height: 25px;
+  top: 26px;
+  right: 27px;
+  width: 16px;
+  height: 16px;
   padding: 0;
   border: 0;
-  background: transparent;
-  color: #0d1a33;
-  font-family: "Inter", "Tikitaka UI", sans-serif;
-  font-size: 32px;
-  font-weight: 300;
-  line-height: 20px;
+  background: transparent url("../../../assets/icons/big_remove.png") center /
+    16px 16px no-repeat;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
   cursor: pointer;
 }
 
@@ -114,7 +145,7 @@
 }
 
 .lecture-upload-modal__field {
-  margin: 0;
+  margin-left: 19px;
 }
 
 .lecture-upload-modal__field + .lecture-upload-modal__field {
@@ -215,7 +246,7 @@
   display: block;
   width: 42px;
   height: 42px;
-  margin: 0 0 6px;
+  margin: 0 0 2px;
   object-fit: contain;
 }
 
@@ -261,7 +292,7 @@
 .lecture-upload-modal__file-row {
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 16px;
 }
 
 .lecture-upload-modal__file-name {
@@ -282,16 +313,15 @@
 }
 
 .lecture-upload-modal__remove-file-button {
-  width: 20px;
-  height: 40px;
+  width: 16px;
+  height: 16px;
   padding: 0;
   border: 0;
-  background: transparent;
-  color: #0d1a33;
-  font-family: "Inter", "Tikitaka UI", sans-serif;
-  font-size: 26px;
-  font-weight: 300;
-  line-height: 1;
+  background: transparent url("../../../assets/icons/remove.png") center / 16px
+    16px no-repeat;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
   cursor: pointer;
 }
 
@@ -314,17 +344,18 @@
 }
 
 .lecture-upload-modal__message {
-  margin: 10px 0 0;
+  margin: 10px 0 0 19px;
   color: #ff383c;
   font-size: 13px;
   font-weight: 500;
 }
 
 .lecture-upload-modal__bottom-row {
+  position: absolute;
+  right: 23px;
+  bottom: 21px;
   display: flex;
   justify-content: flex-end;
-  padding-right: 0;
-  margin-top: 19px;
 }
 
 @media (max-width: 960px) {
@@ -338,7 +369,7 @@
   }
 
   .lecture-upload-modal__content {
-    width: calc(100% - 220px);
+    width: calc(100% - 225px);
   }
 }
 
@@ -353,9 +384,13 @@
   }
 
   .lecture-upload-modal__content {
-    width: 100%;
+    width: calc(100% - 5px);
     height: 100%;
-    padding: 40px 24px 24px;
+    padding: 42px 24px 76px 31px;
+  }
+
+  .lecture-upload-modal__field {
+    margin-left: 19px;
   }
 
   .lecture-upload-modal__title-row {
@@ -367,10 +402,11 @@
   .lecture-upload-modal__drop-zone,
   .lecture-upload-modal__file-name,
   .lecture-upload-modal__empty-file {
-    width: 100%;
+    width: calc(100% - 19px);
   }
 
   .lecture-upload-modal__bottom-row {
-    justify-content: flex-start;
+    right: 24px;
+    bottom: 21px;
   }
 }
