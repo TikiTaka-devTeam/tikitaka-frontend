@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "../features/auth/pages/LoginPage.jsx";
+import SignupInformPage from "../features/auth/pages/SignupInformPage.jsx";
 import SignupTermsPage from "../features/auth/pages/SignupTermsPage.jsx";
 import DashboardPage from "../features/dashboard/pages/DashboardPage.jsx";
 import StudentSpacePage from "../features/spaces/pages/StudentSpacePage.jsx";
@@ -25,6 +26,17 @@ function App() {
             <Navigate to="/dashboard" replace />
           ) : (
             <SignupTermsPage />
+          )
+        }
+      />
+
+      <Route
+        path="/signup-inform"
+        element={
+          accessToken ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <SignupInformPage />
           )
         }
       />
