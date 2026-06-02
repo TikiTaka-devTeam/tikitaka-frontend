@@ -1,7 +1,7 @@
 .space-preview-card {
   overflow: hidden;
   border: 1px solid rgba(211, 214, 224, 0.94);
-  border-radius: 16px;
+  border-radius: 12px;
   background: var(--surface);
   box-shadow: var(--shadow);
 }
@@ -39,10 +39,11 @@
 
 .space-preview-card--list {
   width: 100%;
+  height: 200px;
 }
 
 .space-preview-card--list .space-preview-card__hero {
-  min-height: 176px;
+  min-height: 145px;
   padding: 20px 18px;
 }
 
@@ -57,7 +58,7 @@
 }
 
 .space-preview-card--list .space-preview-card__footer {
-  min-height: 54px;
+  min-height: 55px;
   padding: 14px 18px;
 }
 

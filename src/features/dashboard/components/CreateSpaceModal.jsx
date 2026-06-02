@@ -5,7 +5,8 @@ import {
   buildSpaceGradient,
   getSpaceThemeById,
 } from "../data/spaceThemes.js";
-import SpacePreviewCard from "./SpacePreviewCard.jsx";
+import SpaceModalPreviewPane from "./SpaceModalPreviewPane.jsx";
+import SpaceModalShell from "./SpaceModalShell.jsx";
 import "../styles/create-space-modal.css";
 
 const DAY_OPTIONS = [
@@ -71,20 +72,6 @@ function formatDisplayTime(value) {
   return `${hour}:${minute} ${period}`;
 }
 
-function CloseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        d="M6 6l12 12M18 6L6 18"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
 function FieldLabel({ children, required = false }) {
   return (
     <span className="create-space-modal__field-label">
@@ -94,14 +81,7 @@ function FieldLabel({ children, required = false }) {
   );
 }
 
-function TimePickerField({
-  id,
-  value,
-  onChange,
-  isOpen,
-  onOpen,
-  onClose,
-}) {
+function TimePickerField({ id, value, onChange, isOpen, onOpen, onClose }) {
   const rootRef = useRef(null);
   const { hour, minute, period } = toTimeParts(value);
 
@@ -124,14 +104,14 @@ function TimePickerField({
   }, [isOpen, onClose]);
 
   function updateTimePart(partName, nextValue) {
-    const nextParts = {
-      hour,
-      minute,
-      period,
-      [partName]: nextValue,
-    };
-
-    onChange(toMilitaryTime(nextParts));
+    onChange(
+      toMilitaryTime({
+        hour,
+        minute,
+        period,
+        [partName]: nextValue,
+      }),
+    );
   }
 
   return (
@@ -148,13 +128,20 @@ function TimePickerField({
       </button>
 
       {isOpen ? (
-        <div id={id} className="create-space-modal__time-picker" role="dialog" aria-label="시간 선택">
+        <div
+          id={id}
+          className="create-space-modal__time-picker"
+          role="dialog"
+          aria-label="시간 선택"
+        >
           <div className="create-space-modal__time-column">
             {HOUR_OPTIONS.map((hourOption) => (
               <button
                 key={hourOption}
                 type="button"
-                className={`create-space-modal__time-option ${hourOption === hour ? "is-selected" : ""}`}
+                className={`create-space-modal__time-option ${
+                  hourOption === hour ? "is-selected" : ""
+                }`}
                 onClick={() => updateTimePart("hour", hourOption)}
               >
                 {hourOption}
@@ -167,7 +154,9 @@ function TimePickerField({
               <button
                 key={minuteOption}
                 type="button"
-                className={`create-space-modal__time-option ${minuteOption === minute ? "is-selected" : ""}`}
+                className={`create-space-modal__time-option ${
+                  minuteOption === minute ? "is-selected" : ""
+                }`}
                 onClick={() => updateTimePart("minute", minuteOption)}
               >
                 {minuteOption}
@@ -180,7 +169,9 @@ function TimePickerField({
               <button
                 key={periodOption}
                 type="button"
-                className={`create-space-modal__time-option ${periodOption === period ? "is-selected" : ""}`}
+                className={`create-space-modal__time-option ${
+                  periodOption === period ? "is-selected" : ""
+                }`}
                 onClick={() => updateTimePart("period", periodOption)}
               >
                 {periodOption}
@@ -206,31 +197,27 @@ function CreateSpaceModal({ isOpen, onClose, onCreate, ownerName = "" }) {
     }
 
     function handleKeyDown(event) {
-      if (event.key === "Escape") {
-        if (activeTimePicker) {
-          setActiveTimePicker(null);
-          return;
-        }
-
-        onClose?.();
+      if (event.key !== "Escape") {
+        return;
       }
+
+      if (activeTimePicker) {
+        setActiveTimePicker(null);
+        return;
+      }
+
+      onClose?.();
     }
 
     window.addEventListener("keydown", handleKeyDown);
 
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeTimePicker, isOpen, onClose]);
 
   const selectedTheme = useMemo(
     () => getSpaceThemeById(formState.themeId),
     [formState.themeId],
   );
-
-  if (!isOpen) {
-    return null;
-  }
 
   function updateField(fieldName, value) {
     setFormState((prevState) => ({
@@ -338,45 +325,35 @@ function CreateSpaceModal({ isOpen, onClose, onCreate, ownerName = "" }) {
     }
   }
 
-  const previewTitle = formState.name.trim() || "Space 이름";
-  const previewSubtitle = `${formState.nickname.trim() || "Space 별명"} - ${ownerName || "사용자"}`;
+  const preview = {
+    semester: formState.semester.trim() || "2026-1",
+    title: formState.name.trim() || "Space 이름",
+    subtitle: `${formState.nickname.trim() || "Space 별명"} - ${ownerName || "사용자"}`,
+    startColor: selectedTheme.startColor,
+    endColor: selectedTheme.endColor,
+  };
 
   return (
-    <div
-      className="create-space-modal"
-      role="presentation"
-      onClick={(event) => {
-        if (event.target === event.currentTarget) {
-          onClose?.();
-        }
-      }}
-    >
-      <div
-        className="create-space-modal__panel"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="create-space-title"
-      >
-        <button
-          type="button"
-          className="create-space-modal__close"
-          onClick={onClose}
-          aria-label="닫기"
+    <SpaceModalShell
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Space 생성"
+      titleId="create-space-title"
+      overlayClassName="create-space-modal"
+      panelClassName="create-space-modal__panel"
+      leftClassName="create-space-modal__preview-column"
+      rightClassName="create-space-modal__body"
+      leftContent={
+        <SpaceModalPreviewPane
+          tone="neutral"
+          preview={preview}
+          className="create-space-modal__preview-pane"
         >
-          <CloseIcon />
-        </button>
-
-        <div className="create-space-modal__preview-column">
-          <SpacePreviewCard
-            variant="preview"
-            semester={formState.semester.trim() || "2026-1"}
-            title={previewTitle}
-            subtitle={previewSubtitle}
-            startColor={selectedTheme.startColor}
-            endColor={selectedTheme.endColor}
-          />
-
-          <div className="create-space-modal__theme-grid" role="list" aria-label="색상 테마 선택">
+          <div
+            className="create-space-modal__theme-grid"
+            role="list"
+            aria-label="색상 테마 선택"
+          >
             {SPACE_THEME_PRESETS.map((theme) => {
               const isSelected = theme.id === formState.themeId;
 
@@ -386,7 +363,9 @@ function CreateSpaceModal({ isOpen, onClose, onCreate, ownerName = "" }) {
                   type="button"
                   role="listitem"
                   className={`create-space-modal__theme-swatch ${isSelected ? "is-selected" : ""}`}
-                  style={{ background: buildSpaceGradient(theme.startColor, theme.endColor) }}
+                  style={{
+                    background: buildSpaceGradient(theme.startColor, theme.endColor),
+                  }}
                   onClick={() => updateField("themeId", theme.id)}
                   aria-pressed={isSelected}
                   aria-label={`${theme.id} 테마`}
@@ -394,123 +373,135 @@ function CreateSpaceModal({ isOpen, onClose, onCreate, ownerName = "" }) {
               );
             })}
           </div>
-        </div>
+        </SpaceModalPreviewPane>
+      }
+    >
+      <form className="create-space-modal__form" onSubmit={handleSubmit}>
+        <div className="create-space-modal__scroll">
+          <label className="create-space-modal__field">
+            <FieldLabel required>Space 이름</FieldLabel>
+            <input
+              type="text"
+              value={formState.name}
+              onChange={(event) => handleNameChange(event.target.value)}
+            />
+          </label>
 
-        <form className="create-space-modal__form" onSubmit={handleSubmit}>
-          <div className="create-space-modal__scroll">
-            <h2 id="create-space-title">Space 생성</h2>
+          <label className="create-space-modal__field">
+            <FieldLabel>Space 별명</FieldLabel>
+            <input
+              type="text"
+              value={formState.nickname}
+              onChange={(event) => handleNicknameChange(event.target.value)}
+            />
+          </label>
 
-            <label className="create-space-modal__field">
-              <FieldLabel required>Space 이름</FieldLabel>
-              <input
-                type="text"
-                value={formState.name}
-                onChange={(event) => handleNameChange(event.target.value)}
-              />
-            </label>
+          <label className="create-space-modal__field">
+            <FieldLabel required>학기</FieldLabel>
+            <input
+              type="text"
+              value={formState.semester}
+              onChange={(event) => updateField("semester", event.target.value)}
+            />
+          </label>
 
-            <label className="create-space-modal__field">
-              <FieldLabel>Space 별명</FieldLabel>
-              <input
-                type="text"
-                value={formState.nickname}
-                onChange={(event) => handleNicknameChange(event.target.value)}
-              />
-            </label>
+          <div className="create-space-modal__field-group">
+            <FieldLabel required>정규 세션</FieldLabel>
 
-            <label className="create-space-modal__field">
-              <FieldLabel required>학기</FieldLabel>
-              <input
-                type="text"
-                value={formState.semester}
-                onChange={(event) => updateField("semester", event.target.value)}
-              />
-            </label>
-
-            <div className="create-space-modal__field-group">
-              <FieldLabel required>정규 세션</FieldLabel>
-
-              {formState.schedules.map((schedule, index) => (
-                <div key={schedule.id} className="create-space-modal__session-card">
-                  <div className="create-space-modal__days">
-                    {DAY_OPTIONS.map((dayOption) => (
-                      <button
-                        key={dayOption.value}
-                        type="button"
-                        className={`create-space-modal__day-chip ${schedule.day === dayOption.value ? "is-active" : ""}`}
-                        onClick={() => updateSchedule(schedule.id, "day", dayOption.value)}
-                      >
-                        {dayOption.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="create-space-modal__time-row">
-                    <TimePickerField
-                      id={`${schedule.id}-start-time-picker`}
-                      value={schedule.start_time}
-                      isOpen={
-                        activeTimePicker?.scheduleId === schedule.id &&
-                        activeTimePicker?.fieldName === "start_time"
-                      }
-                      onOpen={() =>
-                        setActiveTimePicker({
-                          scheduleId: schedule.id,
-                          fieldName: "start_time",
-                        })
-                      }
-                      onClose={() => setActiveTimePicker(null)}
-                      onChange={(nextValue) => updateSchedule(schedule.id, "start_time", nextValue)}
-                    />
-
-                    <span className="create-space-modal__time-separator">~</span>
-
-                    <TimePickerField
-                      id={`${schedule.id}-end-time-picker`}
-                      value={schedule.end_time}
-                      isOpen={
-                        activeTimePicker?.scheduleId === schedule.id &&
-                        activeTimePicker?.fieldName === "end_time"
-                      }
-                      onOpen={() =>
-                        setActiveTimePicker({
-                          scheduleId: schedule.id,
-                          fieldName: "end_time",
-                        })
-                      }
-                      onClose={() => setActiveTimePicker(null)}
-                      onChange={(nextValue) => updateSchedule(schedule.id, "end_time", nextValue)}
-                    />
-                  </div>
-
-                  {index > 0 ? (
+            {formState.schedules.map((schedule, index) => (
+              <div key={schedule.id} className="create-space-modal__session-card">
+                <div className="create-space-modal__days">
+                  {DAY_OPTIONS.map((dayOption) => (
                     <button
+                      key={dayOption.value}
                       type="button"
-                      className="create-space-modal__remove-session"
-                      onClick={() => removeSchedule(schedule.id)}
+                      className={`create-space-modal__day-chip ${
+                        schedule.day === dayOption.value ? "is-active" : ""
+                      }`}
+                      onClick={() => updateSchedule(schedule.id, "day", dayOption.value)}
                     >
-                      세션 삭제
+                      {dayOption.label}
                     </button>
-                  ) : null}
+                  ))}
                 </div>
-              ))}
 
-              <button type="button" className="create-space-modal__add-session" onClick={addSchedule}>
-                + 추가
-              </button>
-            </div>
+                <div className="create-space-modal__time-row">
+                  <TimePickerField
+                    id={`${schedule.id}-start-time-picker`}
+                    value={schedule.start_time}
+                    isOpen={
+                      activeTimePicker?.scheduleId === schedule.id &&
+                      activeTimePicker?.fieldName === "start_time"
+                    }
+                    onOpen={() =>
+                      setActiveTimePicker({
+                        scheduleId: schedule.id,
+                        fieldName: "start_time",
+                      })
+                    }
+                    onClose={() => setActiveTimePicker(null)}
+                    onChange={(nextValue) =>
+                      updateSchedule(schedule.id, "start_time", nextValue)
+                    }
+                  />
 
-            {errorMessage ? <p className="create-space-modal__error">{errorMessage}</p> : null}
+                  <span className="create-space-modal__time-separator">~</span>
 
-            <div className="create-space-modal__footer">
-              <button type="submit" className="create-space-modal__submit" disabled={isSubmitting}>
-                {isSubmitting ? "저장 중..." : "저장"}
-              </button>
-            </div>
+                  <TimePickerField
+                    id={`${schedule.id}-end-time-picker`}
+                    value={schedule.end_time}
+                    isOpen={
+                      activeTimePicker?.scheduleId === schedule.id &&
+                      activeTimePicker?.fieldName === "end_time"
+                    }
+                    onOpen={() =>
+                      setActiveTimePicker({
+                        scheduleId: schedule.id,
+                        fieldName: "end_time",
+                      })
+                    }
+                    onClose={() => setActiveTimePicker(null)}
+                    onChange={(nextValue) =>
+                      updateSchedule(schedule.id, "end_time", nextValue)
+                    }
+                  />
+                </div>
+
+                {index > 0 ? (
+                  <button
+                    type="button"
+                    className="create-space-modal__remove-session"
+                    onClick={() => removeSchedule(schedule.id)}
+                  >
+                    세션 삭제
+                  </button>
+                ) : null}
+              </div>
+            ))}
+
+            <button
+              type="button"
+              className="create-space-modal__add-session"
+              onClick={addSchedule}
+            >
+              + 추가
+            </button>
           </div>
-        </form>
-      </div>
-    </div>
+
+          {errorMessage ? <p className="create-space-modal__error">{errorMessage}</p> : null}
+
+          <div className="create-space-modal__footer">
+            <button
+              type="submit"
+              className="create-space-modal__submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "저장 중..." : "저장"}
+            </button>
+          </div>
+        </div>
+      </form>
+    </SpaceModalShell>
   );
 }
 

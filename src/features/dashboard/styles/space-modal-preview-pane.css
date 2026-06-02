@@ -1,0 +1,33 @@
+.space-modal-preview-pane {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 100%;
+  padding: 73px 36px 36px;
+  overflow: hidden;
+}
+
+.space-modal-preview-pane--neutral {
+  background: #eff0f2;
+}
+
+.space-modal-preview-pane--gradient {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(110, 174, 248, 0.28), transparent 42%),
+    linear-gradient(160deg, #27497a 0%, #2b3f7f 52%, #2f2679 100%);
+}
+
+.space-modal-preview-pane__card {
+  box-shadow: 0 14px 28px rgba(21, 33, 74, 0.18);
+}
+
+.space-modal-preview-pane__extra {
+  width: 100%;
+}
+
+@media (max-width: 920px) {
+  .space-modal-preview-pane {
+    min-height: 220px;
+    padding-bottom: 20px;
+  }
+}
