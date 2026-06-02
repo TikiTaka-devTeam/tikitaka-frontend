@@ -1,0 +1,156 @@
+.signup-complete-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 24px;
+  background: #ffffff;
+}
+
+.signup-complete-card {
+  width: min(100%, 730px);
+  background: #ffffff;
+}
+
+.signup-complete-card h1 {
+  margin: 18px 0 7px;
+  color: #212326;
+  font-family: "Tikitaka UI", Pretendard, sans-serif;
+  font-size: 32px;
+  font-weight: 900;
+  font-variation-settings: "wght" 900;
+  line-height: 38px;
+}
+
+.signup-complete-title-line {
+  width: 100%;
+  height: 3px;
+  margin-bottom: 32px;
+  background: #212326;
+}
+
+.signup-complete-card .signup-stepper {
+  margin-bottom: 29px;
+}
+
+.signup-complete-card .step-track {
+  width: 100%;
+}
+
+.signup-complete-card .step-track-item {
+  flex: 1;
+}
+
+.signup-complete-card .step-track-item:last-child {
+  flex: 0;
+}
+
+.signup-complete-card .step-connector {
+  width: 100%;
+}
+
+.signup-complete-card .step-labels {
+  width: 100%;
+  justify-content: space-between;
+  gap: 0;
+}
+
+.signup-complete-section-title {
+  margin: 0 0 14px;
+  color: #212326;
+  font-family: "Tikitaka UI", Pretendard, sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  font-variation-settings: "wght" 900;
+  line-height: 24px;
+}
+
+.signup-complete-section-line,
+.signup-complete-bottom-line {
+  width: 100%;
+  height: 1px;
+  background: #212326;
+}
+
+.signup-complete-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 68px 0 50px;
+}
+
+.signup-complete-profile {
+  width: 250px;
+  height: 250px;
+  overflow: hidden;
+  border: 2px solid #e6e7e9;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.signup-complete-profile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.signup-complete-message {
+  margin-top: 74px;
+  text-align: center;
+  color: #212326;
+  font-family: "Tikitaka UI", Pretendard, sans-serif;
+}
+
+.signup-complete-message strong {
+  display: block;
+  margin-bottom: 13px;
+  font-size: 30px;
+  font-weight: 900;
+  font-variation-settings: "wght" 900;
+  line-height: 36px;
+}
+
+.signup-complete-message p {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 400;
+  font-variation-settings: "wght" 400;
+  line-height: 28px;
+}
+
+.signup-complete-login-button {
+  width: 250px;
+  height: 40px;
+  margin-top: 39px;
+  border: 0;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #ffffff;
+  font-family: "Tikitaka UI", Pretendard, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  font-variation-settings: "wght" 700;
+  line-height: 24px;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .signup-complete-page {
+    padding: 24px 16px;
+  }
+
+  .signup-complete-profile {
+    width: 190px;
+    height: 190px;
+  }
+
+  .signup-complete-content {
+    padding-top: 48px;
+  }
+
+  .signup-complete-message {
+    margin-top: 48px;
+  }
+}

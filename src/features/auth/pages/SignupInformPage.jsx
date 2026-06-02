@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import SignupStepper from "../components/SignupStepper.jsx";
-import { signup } from "../api/auth.api.js";
+import { checkEmailDuplicate, signup, createProfileImage } from "../api/auth.api.js";
 
 import addImgIcon from "../../../assets/icons/addImg.svg";
 import hidePasswordIcon from "../../../assets/icons/HidePassword.svg";
@@ -74,17 +74,56 @@ function formatVerificationTime(seconds) {
   return `${minutes}:${remainingSeconds}`;
 }
 
+function getIsDuplicateEmail(data) {
+  if (data === true) {
+    return true;
+  }
+
+  if (typeof data?.duplicated === "boolean") {
+    return data.duplicated;
+  }
+
+  if (typeof data?.duplicate === "boolean") {
+    return data.duplicate;
+  }
+
+  if (typeof data?.exists === "boolean") {
+    return data.exists;
+  }
+
+  if (typeof data?.available === "boolean") {
+    return !data.available;
+  }
+
+  return false;
+}
+
+function isDuplicateEmailError(error) {
+  const status = error.response?.status;
+  const message = error.response?.data?.message || "";
+
+  return (
+    status === 409 ||
+    message.includes("중복") ||
+    message.toLowerCase().includes("already") ||
+    message.toLowerCase().includes("exist")
+  );
+}
+
 function SignupInformPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState(initialForm);
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [emailChecked, setEmailChecked] = useState(false);
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState("");
   const [phoneCodeSent, setPhoneCodeSent] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [verificationTimeLeft, setVerificationTimeLeft] = useState(
     VERIFICATION_TIME_LIMIT,
   );
+  const [selectedProfileFile, setSelectedProfileFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -95,6 +134,7 @@ function SignupInformPage() {
     () =>
       form.name.trim() &&
       form.email.trim() &&
+      emailChecked &&
       form.password &&
       passwordsMatch &&
       form.phoneNumber.trim() &&
@@ -102,7 +142,7 @@ function SignupInformPage() {
       form.univ &&
       form.major.trim() &&
       form.memberIdNumber.trim(),
-    [form, passwordsMatch],
+    [emailChecked, form, passwordsMatch],
   );
 
   useEffect(() => {
@@ -130,6 +170,7 @@ function SignupInformPage() {
 
     if (name === "email") {
       setEmailChecked(false);
+      setEmailErrorMessage("");
     }
 
     if (name === "phoneNumber") {
@@ -139,14 +180,39 @@ function SignupInformPage() {
     }
   };
 
-  const handleEmailCheck = () => {
-    if (!form.email.trim()) {
-      setErrorMessage("이메일을 입력해주세요.");
+  const handleEmailCheck = async () => {
+    const email = form.email.trim();
+
+    if (!email) {
+      setEmailChecked(false);
+      setEmailErrorMessage("이메일을 입력해주세요.");
       return;
     }
 
-    setEmailChecked(true);
-    setErrorMessage("");
+    setIsCheckingEmail(true);
+    setEmailChecked(false);
+    setEmailErrorMessage("");
+
+    try {
+      const response = await checkEmailDuplicate(email);
+
+      if (getIsDuplicateEmail(response.data)) {
+        setEmailErrorMessage("이미 사용 중인 이메일입니다.");
+        return;
+      }
+
+      setEmailChecked(true);
+      setErrorMessage("");
+    } catch (error) {
+      if (isDuplicateEmailError(error)) {
+        setEmailErrorMessage("이미 사용 중인 이메일입니다.");
+        return;
+      }
+
+      setEmailErrorMessage("중복된 이메일입니다.");
+    } finally {
+      setIsCheckingEmail(false);
+    }
   };
 
   const handleSendCode = () => {
@@ -219,6 +285,15 @@ function SignupInformPage() {
     setErrorMessage("");
 
     try {
+      let profileUrlToSend = null;
+
+      if (selectedProfileFile) {
+        const uploadResult =
+          await createProfileImage(selectedProfileFile);
+
+        profileUrlToSend = uploadResult.profileUrl;
+      }
+
       await signup({
         email: form.email.trim(),
         password: form.password,
@@ -228,12 +303,23 @@ function SignupInformPage() {
         role: form.role,
         phoneNumber: formatPhoneNumber(form.phonePrefix, form.phoneNumber),
         memberIdNumber: form.memberIdNumber.trim(),
-        profileUrl: form.profileUrl || null,
+        profileUrl: profileUrlToSend,
       });
 
-      alert("회원가입이 완료되었습니다.");
-      navigate("/login", { replace: true });
+      navigate("/signup-complete", {
+        replace: true,
+        state: {
+          name: form.name.trim(),
+          profileUrl: form.profileUrl,
+        },
+      });
     } catch (error) {
+      if (isDuplicateEmailError(error)) {
+        setEmailChecked(false);
+        setEmailErrorMessage("이미 사용 중인 이메일입니다.");
+        return;
+      }
+
       const message =
         error.response?.data?.message ||
         "회원가입에 실패했습니다. 입력 정보를 확인해주세요.";
@@ -280,11 +366,17 @@ function SignupInformPage() {
                   emailChecked ? "is-done" : ""
                 }`}
                 type="button"
+                disabled={isCheckingEmail}
                 onClick={handleEmailCheck}
               >
-                {emailChecked ? "완료" : "중복 확인"}
+                {isCheckingEmail ? "확인 중" : emailChecked ? "완료" : "중복 확인"}
               </button>
             </div>
+            {emailErrorMessage && (
+              <p className="signup-inform-field-error">
+                {emailErrorMessage}
+              </p>
+            )}
           </label>
 
           <label className="signup-inform-field">
@@ -295,7 +387,7 @@ function SignupInformPage() {
                 type={showPassword ? "text" : "password"}
                 value={form.password}
                 onChange={handleChange}
-                placeholder="비밀번호를 입력해주세요."
+                placeholder="비밀번호를 입력해주세요. (8자 이상)"
               />
               <button
                 type="button"

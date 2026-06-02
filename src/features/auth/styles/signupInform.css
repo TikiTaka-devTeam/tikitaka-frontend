@@ -113,6 +113,16 @@
   gap: 14px;
 }
 
+.signup-inform-field-error {
+  margin: 5px 0 0;
+  color: #e11d48;
+  font-family: "Tikitaka UI", Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  font-variation-settings: "wght" 400;
+  line-height: 14px;
+}
+
 .signup-inform-password {
   display: flex;
   align-items: center;
@@ -232,6 +242,11 @@
 
 .signup-inform-action.is-done {
   background: #d1d5db;
+}
+
+.signup-inform-action:disabled {
+  cursor: wait;
+  opacity: 0.75;
 }
 
 .signup-inform-role-row {
