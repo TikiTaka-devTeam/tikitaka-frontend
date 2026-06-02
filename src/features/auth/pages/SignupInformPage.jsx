@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import SignupStepper from "../components/SignupStepper.jsx";
 import { signup } from "../api/auth.api.js";
 
+import addImgIcon from "../../../assets/icons/addImg.svg";
 import hidePasswordIcon from "../../../assets/icons/HidePassword.svg";
 import watchPasswordIcon from "../../../assets/icons/WatchPassword.svg";
 import "../styles/signupInform.css";
@@ -51,6 +52,7 @@ const initialForm = {
   univ: "",
   major: "",
   memberIdNumber: "",
+  profileUrl: "",
 };
 
 const VERIFICATION_TIME_LIMIT = 300;
@@ -174,6 +176,37 @@ function SignupInformPage() {
     setErrorMessage("");
   };
 
+  const handleProfileImageChange = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setErrorMessage("이미지 파일만 업로드할 수 있습니다.");
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setForm((prev) => ({
+          ...prev,
+          profileUrl: reader.result,
+        }));
+        setErrorMessage("");
+      }
+    };
+
+    reader.onerror = () => {
+      setErrorMessage("프로필 사진을 불러오지 못했습니다.");
+    };
+
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -195,6 +228,7 @@ function SignupInformPage() {
         role: form.role,
         phoneNumber: formatPhoneNumber(form.phonePrefix, form.phoneNumber),
         memberIdNumber: form.memberIdNumber.trim(),
+        profileUrl: form.profileUrl || null,
       });
 
       alert("회원가입이 완료되었습니다.");
@@ -428,8 +462,28 @@ function SignupInformPage() {
           </label>
 
           <div className="signup-inform-profile">
-            <strong>프로필 사진 (선택)</strong>
-            <p>로그인 후 다시 선택할 수 있습니다.</p>
+            <div className="signup-inform-profile-copy">
+              <strong>프로필 사진 (선택)</strong>
+              <p>로그인 후 다시 선택할 수 있습니다.</p>
+            </div>
+            <div className="signup-inform-profile-uploader">
+              <div className="signup-inform-profile-preview">
+                {form.profileUrl && (
+                  <img src={form.profileUrl} alt="선택한 프로필 사진" />
+                )}
+              </div>
+              <label
+                className="signup-inform-profile-button"
+                aria-label="프로필 사진 추가"
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfileImageChange}
+                />
+                <img src={addImgIcon} alt="" />
+              </label>
+            </div>
           </div>
         </div>
 
