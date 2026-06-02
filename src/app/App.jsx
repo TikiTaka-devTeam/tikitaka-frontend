@@ -6,6 +6,7 @@ import SignupTermsPage from "../features/auth/pages/SignupTermsPage.jsx";
 import DashboardPage from "../features/dashboard/pages/DashboardPage.jsx";
 import StudentSpacePage from "../features/spaces/pages/StudentSpacePage.jsx";
 import ProfessorSpacePage from "../features/spaces/pages/ProfessorSpacePage.jsx";
+import ProfessorSpaceMemberPage from "../features/spaces/pages/ProfessorSpaceMemberPage.jsx";
 
 function App() {
   const accessToken = localStorage.getItem("tikitaka_access_token");
@@ -69,6 +70,22 @@ function App() {
             <ProfessorSpacePage />
           ) : (
             <Navigate to="/dashboard" replace />
+          )
+        }
+      />
+
+      <Route
+        path="/spaces/:spaceId/members"
+        element={
+          accessToken && user?.role === "PROFESSOR" ? (
+            <ProfessorSpaceMemberPage />
+          ) : accessToken && user?.role === "STUDENT" ? (
+            <Navigate
+              to={`/spaces/${window.location.pathname.split("/")[2]}`}
+              replace
+            />
+          ) : (
+            <Navigate to="/login" replace />
           )
         }
       />
