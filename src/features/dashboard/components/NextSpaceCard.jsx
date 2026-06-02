@@ -13,7 +13,7 @@ function NextSpaceCard({ nextSpace }) {
     return (
       <article className="next-space-card">
         <div className="next-space-card__empty">
-          <p>예정된 다음 강의가 없습니다.</p>
+          <p>{"\uC624\uB298\uC740 \uAC15\uC758\uAC00 \uC5C6\uB124\uC694."}</p>
         </div>
       </article>
     );
@@ -28,9 +28,7 @@ function NextSpaceCard({ nextSpace }) {
       </div>
 
       <div className="next-space-card__footer">
-        <p>
-          {[nextSpace.nickname, nextSpace.professor_name].filter(Boolean).join(" · ")}
-        </p>
+        <p>{[nextSpace.nickname, nextSpace.professor_name].filter(Boolean).join(" - ")}</p>
       </div>
     </article>
   );
