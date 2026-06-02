@@ -101,8 +101,8 @@ function ProfessorSpacePage() {
     {
       label: "멤버",
       active: false,
-      disabled: true,
-      onClick: undefined,
+      disabled: false,
+      onClick: () => navigate(`/spaces/${spaceId}/members`),
     },
   ];
 
