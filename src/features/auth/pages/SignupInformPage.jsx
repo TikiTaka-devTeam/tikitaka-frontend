@@ -11,6 +11,32 @@ import "../styles/signupInform.css";
 const campusOptions = [
   "단국대학교 죽전캠퍼스",
   "단국대학교 천안캠퍼스",
+  "서울대학교",
+  "연세대학교",
+  "고려대학교",
+  "성균관대학교",
+  "한양대학교",
+  "중앙대학교",
+  "경희대학교",
+  "한국외국어대학교",
+  "서울시립대학교",
+  "숭실대학교",
+  "인하대학교",
+  "건국대학교",
+  "동국대학교",
+  "홍익대학교",
+  "서강대학교",
+  "이화여자대학교",
+  "숙명여자대학교",
+  "세종대학교",
+  "광운대학교",
+  "국민대학교",
+  "상명대학교",
+  "가천대학교",
+  "명지대학교",
+  "인제대학교",
+  "안양대학교",
+  "수원대학교"
 ];
 
 const initialForm = {
@@ -254,6 +280,8 @@ function SignupInformPage() {
                 onChange={handleChange}
               >
                 <option value="010">010</option>
+                <option value="011">011</option>
+                <option value="016">016</option>
               </select>
               <input
                 name="phoneNumber"

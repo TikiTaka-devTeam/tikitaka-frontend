@@ -42,7 +42,7 @@
 
 .signup-inform-field {
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: 13px;
 }
 
 .signup-inform-field > span,
@@ -156,7 +156,6 @@
 .signup-inform-code {
   grid-template-columns: minmax(0, 1fr) 95px;
   margin-top: 10px;
-  padding-left: 101px;
 }
 
 .signup-inform-action {
