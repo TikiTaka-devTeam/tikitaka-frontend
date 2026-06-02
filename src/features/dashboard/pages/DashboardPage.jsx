@@ -150,6 +150,7 @@ function DashboardPage() {
           onRetry={loadMySpaces}
           onSelectSpace={() => {}}
           ownerName={profile.name}
+          userRole={profile.role}
           onSpaceCreated={(space) => setMySpaces((prevSpaces) => [space, ...prevSpaces])}
         />
       )}

@@ -220,7 +220,8 @@
 .my-spaces-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  column-gap: 13px;
+  row-gap: 21px;
 }
 
 .my-spaces-empty {
@@ -250,6 +251,7 @@
 
 .section-title {
   margin-bottom: 10px;
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
   font-size: 20px;
   font-weight: 700;
   line-height: 1.2;
@@ -261,6 +263,7 @@
 }
 
 .section-title--dark {
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
   font-size: 20px;
   font-weight: 700;
   line-height: 1.2;

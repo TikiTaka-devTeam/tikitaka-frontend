@@ -1,13 +1,20 @@
 import { Fragment, useMemo, useState } from "react";
 import { createSpace } from "../api/dashboard.api.js";
 import CreateSpaceModal from "./CreateSpaceModal.jsx";
+import JoinSpaceModal from "./JoinSpaceModal.jsx";
 import MySpaceCard from "./MySpaceCard.jsx";
 
 function SearchIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M16 16l4 4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path
+        d="M16 16l4 4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -48,9 +55,11 @@ function MySpacesSection({
   onSelectSpace,
   ownerName,
   onSpaceCreated,
+  userRole,
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
 
   const filteredSpaces = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -75,6 +84,15 @@ function MySpacesSection({
     onSpaceCreated?.(createdSpace);
   }
 
+  function handleOpenPrimaryModal() {
+    if (userRole === "STUDENT") {
+      setIsJoinModalOpen(true);
+      return;
+    }
+
+    setIsCreateModalOpen(true);
+  }
+
   return (
     <Fragment>
       <section className="my-spaces-section">
@@ -83,7 +101,7 @@ function MySpacesSection({
             type="button"
             className="my-spaces-toolbar__create"
             aria-label="스페이스 추가"
-            onClick={() => setIsCreateModalOpen(true)}
+            onClick={handleOpenPrimaryModal}
           >
             <PlusIcon />
           </button>
@@ -126,7 +144,11 @@ function MySpacesSection({
           <div className="my-spaces-grid">
             {filteredSpaces.length === 0 ? (
               <div className="my-spaces-empty">
-                <p>{searchQuery ? "검색 결과가 없습니다." : "참여 중인 스페이스가 없습니다."}</p>
+                <p>
+                  {searchQuery
+                    ? "검색 결과가 없습니다."
+                    : "참여 중인 스페이스가 없습니다."}
+                </p>
               </div>
             ) : (
               filteredSpaces.map((space) => (
@@ -142,6 +164,12 @@ function MySpacesSection({
         onClose={() => setIsCreateModalOpen(false)}
         onCreate={handleCreateSpace}
         ownerName={ownerName}
+      />
+
+      <JoinSpaceModal
+        isOpen={isJoinModalOpen}
+        onClose={() => setIsJoinModalOpen(false)}
+        onSubmit={() => {}}
       />
     </Fragment>
   );
