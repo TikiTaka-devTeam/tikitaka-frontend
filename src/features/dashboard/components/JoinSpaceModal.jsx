@@ -7,23 +7,6 @@ import SpaceModalPreviewPane from "./SpaceModalPreviewPane.jsx";
 import SpaceModalShell from "./SpaceModalShell.jsx";
 import "../styles/join-space-modal.css";
 
-const MOCK_FOUND_SPACES = {
-  "26SY2A8": {
-    name: "운영체제1분반(CE)",
-    nickname: "운체",
-    semester: "2026-1",
-    professorName: "김승훈",
-    sessions: ["월 10:30 - 12:00 / 수 13:30 - 15:00"],
-  },
-  "SPACE01": {
-    name: "데이터분석과시각화",
-    nickname: "데분시",
-    semester: "2026-1",
-    professorName: "이건석",
-    sessions: ["화 09:00 - 10:30"],
-  },
-};
-
 function FieldLabel({ children, required = false }) {
   return (
     <span className="join-space-modal__field-label">
@@ -44,18 +27,12 @@ function normalizeLookupResult(spaceCode, result) {
     nickname: result.nickname ?? "",
     semester: result.semester ?? "",
     professorName: result.professorName ?? result.professor_name ?? "",
-    sessions: Array.isArray(result.sessions) ? result.sessions : [],
+    sessions: Array.isArray(result.sessions)
+      ? result.sessions
+      : Array.isArray(result.schedules)
+        ? result.schedules
+        : [],
   };
-}
-
-function resolveMockLookup(spaceCode) {
-  const normalizedCode = spaceCode.trim().toUpperCase();
-
-  if (!normalizedCode) {
-    return null;
-  }
-
-  return normalizeLookupResult(normalizedCode, MOCK_FOUND_SPACES[normalizedCode]);
 }
 
 function JoinSpaceModal({ isOpen, onClose, onSubmit, onLookup }) {
@@ -63,6 +40,7 @@ function JoinSpaceModal({ isOpen, onClose, onSubmit, onLookup }) {
   const [lookupState, setLookupState] = useState("idle");
   const [foundSpace, setFoundSpace] = useState(null);
   const [isFinding, setIsFinding] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const defaultTheme = useMemo(
     () => getSpaceThemeById(DEFAULT_SPACE_THEME_ID),
     [],
@@ -73,6 +51,7 @@ function JoinSpaceModal({ isOpen, onClose, onSubmit, onLookup }) {
     setLookupState("idle");
     setFoundSpace(null);
     setIsFinding(false);
+    setIsSubmitting(false);
   }
 
   const handleClose = useCallback(() => {
@@ -110,9 +89,7 @@ function JoinSpaceModal({ isOpen, onClose, onSubmit, onLookup }) {
     setIsFinding(true);
 
     try {
-      const result = onLookup
-        ? await onLookup(normalizedCode)
-        : resolveMockLookup(normalizedCode);
+      const result = await onLookup?.(normalizedCode);
 
       const normalizedResult = normalizeLookupResult(normalizedCode, result);
 
@@ -141,17 +118,35 @@ function JoinSpaceModal({ isOpen, onClose, onSubmit, onLookup }) {
     }
   }
 
-  function handleSubmit(event) {
-    event.preventDefault();
-
-    if (!foundSpace) {
+  function handleCodeKeyDown(event) {
+    if (event.key !== "Enter" || isFindButtonDisabled) {
       return;
     }
 
-    onSubmit?.({
-      spaceCode: spaceCode.trim().toUpperCase(),
-      space: foundSpace,
-    });
+    event.preventDefault();
+    handleFind(event);
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    if (!foundSpace || isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await onSubmit?.({
+        spaceCode: spaceCode.trim().toUpperCase(),
+        space: foundSpace,
+      });
+      handleClose();
+    } catch {
+      // Parent handler surfaces request failures to the user.
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const preview =
@@ -165,12 +160,14 @@ function JoinSpaceModal({ isOpen, onClose, onSubmit, onLookup }) {
           gradient: defaultTheme.gradient,
         }
       : null;
+  const isFindButtonDisabled =
+    !spaceCode.trim() || isFinding || lookupState !== "idle";
 
   return (
     <SpaceModalShell
       isOpen={isOpen}
       onClose={handleClose}
-      title="Space 참가"
+      title={"Space \uCC38\uAC00"}
       titleId="join-space-modal-title"
       overlayClassName="join-space-modal"
       panelClassName="join-space-modal__panel"
@@ -186,64 +183,74 @@ function JoinSpaceModal({ isOpen, onClose, onSubmit, onLookup }) {
     >
       <form className="join-space-modal__content" onSubmit={handleSubmit}>
         <div className="join-space-modal__scroll">
-          <label className="join-space-modal__field">
-            <FieldLabel required>Space 코드</FieldLabel>
+          <div className="join-space-modal__code-row">
+            <div className="join-space-modal__code-field">
+              <FieldLabel required>{"Space \uCF54\uB4DC"}</FieldLabel>
 
-            <div className="join-space-modal__code-row">
               <input
+                className="join-space-modal__code-input"
                 type="text"
                 value={spaceCode}
                 onChange={handleCodeChange}
+                onKeyDown={handleCodeKeyDown}
                 autoComplete="off"
                 spellCheck="false"
                 placeholder=""
               />
-
-              <button
-                type="button"
-                className="join-space-modal__find-button"
-                disabled={!spaceCode.trim() || isFinding}
-                onClick={handleFind}
-              >
-                {isFinding ? "찾는 중..." : "찾기"}
-              </button>
             </div>
-          </label>
+
+            <button
+              type="button"
+              className="join-space-modal__find-button"
+              disabled={isFindButtonDisabled}
+              onClick={handleFind}
+            >
+              {isFinding ? "\uCC3E\uB294 \uC911..." : "\uCC3E\uAE30"}
+            </button>
+          </div>
 
           {lookupState === "not-found" ? (
             <p className="join-space-modal__helper join-space-modal__helper--error">
-              Space를 찾지 못했어요. 코드를 다시 확인해주세요.
+              {"Space\uB97C \uCC3E\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4. \uCF54\uB4DC\uB97C \uB2E4\uC2DC \uD655\uC778\uD574\uC8FC\uC138\uC694."}
             </p>
           ) : null}
 
           {lookupState === "found" && foundSpace ? (
             <>
-              <p className="join-space-modal__helper">Space를 찾았어요!</p>
+              <p className="join-space-modal__helper">
+                {"Space\uB97C \uCC3E\uC558\uC2B5\uB2C8\uB2E4!"}
+              </p>
 
               <div className="join-space-modal__details">
                 <label className="join-space-modal__field">
-                  <FieldLabel>Space 이름</FieldLabel>
-                  <input type="text" value={foundSpace.name} readOnly />
+                  <FieldLabel>{"Space \uC774\uB984"}</FieldLabel>
+                  <input type="text" value={foundSpace.name} disabled />
                 </label>
 
                 <label className="join-space-modal__field">
-                  <FieldLabel>학기</FieldLabel>
-                  <input type="text" value={foundSpace.semester} readOnly />
+                  <FieldLabel>{"\uD559\uAE30"}</FieldLabel>
+                  <input type="text" value={foundSpace.semester} disabled />
                 </label>
 
                 <label className="join-space-modal__field">
-                  <FieldLabel>정규 세션</FieldLabel>
+                  <FieldLabel>{"\uC218\uC5C5 \uC138\uC158"}</FieldLabel>
                   <input
                     type="text"
                     value={foundSpace.sessions.join(" / ")}
-                    readOnly
+                    disabled
                   />
                 </label>
               </div>
 
               <div className="join-space-modal__footer">
-                <button type="submit" className="join-space-modal__submit">
-                  Space 참가 요청하기
+                <button
+                  type="submit"
+                  className="join-space-modal__submit"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting
+                    ? "\uC694\uCCAD \uBCF4\uB0B4\uB294 \uC911..."
+                    : "Space \uCC38\uC5EC \uC694\uCCAD\uD558\uAE30"}
                 </button>
               </div>
             </>

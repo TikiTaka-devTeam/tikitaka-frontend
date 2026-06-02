@@ -16,6 +16,28 @@ const DAY_LABELS = {
 
 const DASHBOARD_COLOR_PALETTE = ["#5544D8", "#2350B2", "#2766EC", "#22C55E", "#E67E7E"];
 
+function formatLookupDay(day) {
+  const dayMap = {
+    MONDAY: "월",
+    TUESDAY: "화",
+    WEDNESDAY: "수",
+    THURSDAY: "목",
+    FRIDAY: "금",
+    SATURDAY: "토",
+    SUNDAY: "일",
+  };
+
+  return dayMap[day] ?? day ?? "";
+}
+
+function formatLookupTimeRange(schedule) {
+  const startTime = schedule?.start_time ?? schedule?.startTime ?? "";
+  const endTime = schedule?.end_time ?? schedule?.endTime ?? "";
+  const day = formatLookupDay(schedule?.day);
+
+  return `${day} ${startTime} - ${endTime}`.trim();
+}
+
 function getColorBySpaceId(spaceId) {
   if (!spaceId) {
     return DASHBOARD_COLOR_PALETTE[0];
@@ -52,6 +74,10 @@ function mapColorizedSpaces(spaces) {
 
   return spaces.map((space) => ({
     ...space,
+    space_id: space.space_id ?? space.spaceId ?? "",
+    professor_name: space.professor_name ?? space.professorName ?? "",
+    last_accessed_at: space.last_accessed_at ?? space.lastAccessedAt ?? "",
+    nickname: space.nickname || space.name || "",
     color: space.color || getColorBySpaceId(space.space_id ?? space.spaceId),
   }));
 }
@@ -90,10 +116,19 @@ function mapNextSpace(nextSpace, colorBySpaceId) {
   }
 
   const spaceId = nextSpace.space_id ?? nextSpace.spaceId;
+  const startTime = nextSpace.start_time ?? nextSpace.startTime;
+  const professorName = nextSpace.professor_name ?? nextSpace.professorName;
+  const spaceName = nextSpace.space_name ?? nextSpace.spaceName;
+  const remainTime = nextSpace.remain_time ?? nextSpace.remainTime;
 
   return {
     ...nextSpace,
     space_id: spaceId,
+    space_name: spaceName,
+    start_time: startTime,
+    professor_name: professorName,
+    remain_time: remainTime,
+    nickname: nextSpace.nickname || spaceName || "",
     color: colorBySpaceId[spaceId] ?? getColorBySpaceId(spaceId),
   };
 }
@@ -172,5 +207,40 @@ export async function createSpace(payload) {
     gradient:
       payload.gradient ??
       (theme ? buildSpaceGradient(theme.startColor, theme.endColor) : undefined),
+  };
+}
+
+export async function lookupSpaceByCode(spaceCode) {
+  const response = await apiClient.get("/spaces/lookup", {
+    params: {
+      space_code: spaceCode,
+    },
+  });
+
+  const foundSpace = response.data ?? {};
+  const schedules = Array.isArray(foundSpace.schedules) ? foundSpace.schedules : [];
+
+  return {
+    code: foundSpace.space_code ?? foundSpace.spaceCode ?? spaceCode,
+    name: foundSpace.name ?? "",
+    nickname: foundSpace.nickname ?? "",
+    semester: foundSpace.semester ?? "",
+    professorName: foundSpace.professor_name ?? foundSpace.professorName ?? "",
+    sessions: schedules.map(formatLookupTimeRange).filter(Boolean),
+  };
+}
+
+export async function requestJoinSpace(spaceCode) {
+  const response = await apiClient.post("/spaces/join", {
+    space_code: spaceCode,
+  });
+
+  const joinedSpace = response.data ?? {};
+
+  return {
+    spaceMemberId: joinedSpace.space_member_id ?? joinedSpace.spaceMemberId ?? "",
+    spaceId: joinedSpace.space_id ?? joinedSpace.spaceId ?? "",
+    spaceName: joinedSpace.space_name ?? joinedSpace.spaceName ?? "",
+    validity: joinedSpace.validity ?? "",
   };
 }

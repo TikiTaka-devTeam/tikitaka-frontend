@@ -1,5 +1,9 @@
 import { Fragment, useMemo, useState } from "react";
-import { createSpace } from "../api/dashboard.api.js";
+import {
+  createSpace,
+  lookupSpaceByCode,
+  requestJoinSpace,
+} from "../api/dashboard.api.js";
 import CreateSpaceModal from "./CreateSpaceModal.jsx";
 import JoinSpaceModal from "./JoinSpaceModal.jsx";
 import MySpaceCard from "./MySpaceCard.jsx";
@@ -82,6 +86,23 @@ function MySpacesSection({
     });
 
     onSpaceCreated?.(createdSpace);
+  }
+
+  async function handleJoinSpace(payload) {
+    try {
+      const joinedSpace = await requestJoinSpace(payload.spaceCode);
+      const joinedSpaceName = joinedSpace.spaceName || payload.space?.name || "Space";
+
+      alert(`${joinedSpaceName} 참여 요청을 보냈습니다.`);
+      setIsJoinModalOpen(false);
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message ??
+        "Space 참여 요청에 실패했습니다. 잠시 후 다시 시도해주세요.";
+
+      alert(errorMessage);
+      throw error;
+    }
   }
 
   function handleOpenPrimaryModal() {
@@ -169,7 +190,8 @@ function MySpacesSection({
       <JoinSpaceModal
         isOpen={isJoinModalOpen}
         onClose={() => setIsJoinModalOpen(false)}
-        onSubmit={() => {}}
+        onLookup={lookupSpaceByCode}
+        onSubmit={handleJoinSpace}
       />
     </Fragment>
   );
