@@ -24,7 +24,7 @@
 }
 
 .signup-inform-scroll {
-  max-height: 493px;
+  max-height: 488px;
   overflow-y: auto;
   padding: 0 34px 16px;
   scrollbar-color: #979797 transparent;
@@ -49,7 +49,7 @@
 .signup-inform-role-row > span {
   display: block;
   margin-bottom: 7px;
-  color: #212326;
+  color: #000000;
   font-family: "Tikitaka UI", Pretendard, sans-serif;
   font-size: 16px;
   font-weight: 600;
@@ -67,7 +67,7 @@
   border: 1px solid #e6e7e9;
   border-radius: 6px;
   background: #ffffff;
-  color: #212326;
+  color: #000000;
   font-family: "Tikitaka UI", Pretendard, sans-serif;
   font-size: 12px;
   font-weight: 400;
@@ -78,7 +78,18 @@
 .signup-inform-field input,
 .signup-inform-field select {
   width: 100%;
-  padding: 0 12px;
+  padding: 0 19px;
+}
+
+.signup-inform-field select,
+.signup-inform-phone select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 31px;
+  background-image: url("../../../assets/icons/Expand Arrow.svg");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 15px 15px;
 }
 
 .signup-inform-field input::placeholder,
@@ -143,8 +154,8 @@
 
 .signup-inform-phone select {
   width: 91px;
-  padding: 0 12px;
-  color: #979797;
+  padding: 0 31px 0 19px;
+  color: #000000;
 }
 
 .signup-inform-phone input,
@@ -156,6 +167,56 @@
 .signup-inform-code {
   grid-template-columns: minmax(0, 1fr) 95px;
   margin-top: 10px;
+}
+
+.signup-inform-verification {
+  margin-top: 10px;
+}
+
+.signup-inform-verification .signup-inform-code {
+  margin-top: 0;
+}
+
+.signup-inform-code-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  color: #212326;
+  font-family: "Tikitaka UI", Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  font-variation-settings: "wght" 400;
+  line-height: 14px;
+}
+
+.signup-inform-code-meta strong {
+  color: #ff0000;
+  font-weight: 400;
+  font-variation-settings: "wght" 400;
+}
+
+.signup-inform-code-meta button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #212326;
+  font-size: 12px;
+  font-weight: 700;
+  font-variation-settings: "wght" 700;
+  line-height: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.signup-inform-code-help {
+  margin: 8px 0 0;
+  color: #212326;
+  font-family: "Tikitaka UI", Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  font-variation-settings: "wght" 400;
+  line-height: 14px;
 }
 
 .signup-inform-action {
@@ -171,14 +232,13 @@
 
 .signup-inform-action.is-done {
   background: #d1d5db;
-  cursor: default;
 }
 
 .signup-inform-role-row {
   display: grid;
   grid-template-columns: 49px minmax(0, 1fr);
   align-items: center;
-  margin: 30px 0 23px;
+  margin: 30px 0 32px;
 }
 
 .signup-inform-role-row > span {

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import SignupStepper from "../components/SignupStepper.jsx";
@@ -47,11 +47,13 @@ const initialForm = {
   phonePrefix: "010",
   phoneNumber: "",
   verificationCode: "",
-  role: "STUDENT",
+  role: "",
   univ: "",
   major: "",
   memberIdNumber: "",
 };
+
+const VERIFICATION_TIME_LIMIT = 300;
 
 function formatPhoneNumber(prefix, number) {
   const digits = number.replace(/\D/g, "");
@@ -63,6 +65,13 @@ function formatPhoneNumber(prefix, number) {
   return `${prefix}-${digits}`;
 }
 
+function formatVerificationTime(seconds) {
+  const minutes = String(Math.floor(seconds / 60)).padStart(2, "0");
+  const remainingSeconds = String(seconds % 60).padStart(2, "0");
+
+  return `${minutes}:${remainingSeconds}`;
+}
+
 function SignupInformPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState(initialForm);
@@ -71,6 +80,9 @@ function SignupInformPage() {
   const [emailChecked, setEmailChecked] = useState(false);
   const [phoneCodeSent, setPhoneCodeSent] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
+  const [verificationTimeLeft, setVerificationTimeLeft] = useState(
+    VERIFICATION_TIME_LIMIT,
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -91,6 +103,18 @@ function SignupInformPage() {
     [form, passwordsMatch],
   );
 
+  useEffect(() => {
+    if (!phoneCodeSent || phoneVerified || verificationTimeLeft <= 0) {
+      return undefined;
+    }
+
+    const timerId = window.setInterval(() => {
+      setVerificationTimeLeft((prev) => Math.max(prev - 1, 0));
+    }, 1000);
+
+    return () => window.clearInterval(timerId);
+  }, [phoneCodeSent, phoneVerified, verificationTimeLeft]);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -109,6 +133,7 @@ function SignupInformPage() {
     if (name === "phoneNumber") {
       setPhoneVerified(false);
       setPhoneCodeSent(false);
+      setVerificationTimeLeft(VERIFICATION_TIME_LIMIT);
     }
   };
 
@@ -129,7 +154,14 @@ function SignupInformPage() {
     }
 
     setPhoneCodeSent(true);
+    setPhoneVerified(false);
+    setVerificationTimeLeft(VERIFICATION_TIME_LIMIT);
+    setForm((prev) => ({ ...prev, verificationCode: "" }));
     setErrorMessage("");
+  };
+
+  const handleExtendTime = () => {
+    setVerificationTimeLeft(VERIFICATION_TIME_LIMIT);
   };
 
   const handleVerifyCode = () => {
@@ -301,22 +333,38 @@ function SignupInformPage() {
               </button>
             </div>
             {phoneCodeSent && (
-              <div className="signup-inform-code">
-                <input
-                  name="verificationCode"
-                  value={form.verificationCode}
-                  onChange={handleChange}
-                  placeholder="인증번호를 입력해주세요."
-                />
-                <button
-                  className={`signup-inform-action ${
-                    phoneVerified ? "is-done" : ""
-                  }`}
-                  type="button"
-                  onClick={handleVerifyCode}
-                >
-                  {phoneVerified ? "인증 완료" : "인증번호 확인"}
-                </button>
+              <div className="signup-inform-verification">
+                <div className="signup-inform-code">
+                  <input
+                    name="verificationCode"
+                    value={form.verificationCode}
+                    onChange={handleChange}
+                    placeholder="인증번호를 입력해주세요."
+                  />
+                  <button
+                    className={`signup-inform-action ${
+                      phoneVerified ? "is-done" : ""
+                    }`}
+                    type="button"
+                    onClick={handleVerifyCode}
+                  >
+                    {phoneVerified ? "인증 완료" : "인증번호 확인"}
+                  </button>
+                </div>
+                <div className="signup-inform-code-meta">
+                  <span>
+                    입력대기시간 :{" "}
+                    <strong>
+                      {formatVerificationTime(verificationTimeLeft)}
+                    </strong>
+                  </span>
+                  <button type="button" onClick={handleExtendTime}>
+                    시간연장
+                  </button>
+                </div>
+                <p className="signup-inform-code-help">
+                  인증번호는 받은 시점으로부터 5분간만 유효합니다.
+                </p>
               </div>
             )}
           </div>
