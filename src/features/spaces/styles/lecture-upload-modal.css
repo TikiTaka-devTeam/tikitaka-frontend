@@ -20,74 +20,40 @@
 }
 
 .lecture-upload-modal__visual {
-  position: relative;
   width: 292px;
   height: 646px;
   flex: 0 0 292px;
-  overflow: hidden;
-  background: #0a0a2e;
-}
-
-.lecture-upload-modal__visual::before {
-  content: "";
-  position: absolute;
-  inset: -35%;
   background:
     radial-gradient(
-      circle at 32% 28%,
-      rgba(42, 27, 110, 0.95),
+      circle at 78% 30%,
+      rgba(15, 118, 110, 0.45),
+      transparent 18%
+    ),
+    radial-gradient(
+      circle at 36% 62%,
+      rgba(49, 46, 129, 0.65),
       transparent 22%
     ),
-    radial-gradient(circle at 68% 32%, rgba(18, 13, 62, 0.95), transparent 24%),
-    radial-gradient(
-      circle at 74% 66%,
-      rgba(15, 118, 110, 0.9),
-      transparent 23%
-    ),
-    radial-gradient(
-      circle at 34% 72%,
-      rgba(49, 46, 129, 0.95),
-      transparent 25%
-    ),
-    conic-gradient(
-      from 0deg,
-      #0a0a2e 0deg,
-      #2a1b6e 70deg,
-      #120d3e 130deg,
-      #1e3a8a 205deg,
-      #0f766e 270deg,
-      #312e81 330deg,
-      #0a0a2e 360deg
+    linear-gradient(
+      145deg,
+      #0a0a2e 9%,
+      #2a1b6e 26%,
+      #120d3e 37%,
+      #1e3a8a 59%,
+      #0f766e 74%,
+      #312e81 91%
     );
-  filter: blur(18px);
-  transform-origin: center;
-  animation: lectureGradientMove 5s linear infinite;
-}
-
-.lecture-upload-modal__visual::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at 50% 45%,
-    transparent 0%,
-    rgba(10, 10, 46, 0.08) 42%,
-    rgba(10, 10, 46, 0.28) 100%
-  );
-  pointer-events: none;
+  background-size: 180% 180%;
+  animation: lectureGradientMove 4s ease-in-out infinite alternate;
 }
 
 @keyframes lectureGradientMove {
   0% {
-    transform: rotate(0deg) scale(1.08);
-  }
-
-  50% {
-    transform: rotate(180deg) scale(1.18);
+    background-position: 0% 30%;
   }
 
   100% {
-    transform: rotate(360deg) scale(1.08);
+    background-position: 100% 70%;
   }
 }
 
@@ -144,6 +110,11 @@
   letter-spacing: -0.04em;
 }
 
+/* 
+  content padding-left 31px
+  field margin-left 19px
+  => 왼쪽 일렁이는 영역 기준 50px
+*/
 .lecture-upload-modal__field {
   margin-left: 19px;
 }

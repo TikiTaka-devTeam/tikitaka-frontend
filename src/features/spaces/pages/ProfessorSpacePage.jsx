@@ -159,6 +159,15 @@ function ProfessorSpacePage() {
     */
   };
 
+  const handleDocumentKeyDown = (event, document) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+    handleDocumentClick(document);
+  };
+
   const handleMenuClick = (event, documentId) => {
     event.stopPropagation();
     setOpenedMenuId((prev) => (prev === documentId ? "" : documentId));
@@ -248,11 +257,13 @@ function ProfessorSpacePage() {
             </button>
 
             {documents.map((document) => (
-              <button
+              <div
                 key={document.document_id}
-                type="button"
                 className="professor-space-page__document-card"
+                role="button"
+                tabIndex={0}
                 onClick={() => handleDocumentClick(document)}
+                onKeyDown={(event) => handleDocumentKeyDown(event, document)}
               >
                 <div className="professor-space-page__thumbnail">
                   {document.thumbnail_url ? (
@@ -297,7 +308,7 @@ function ProfessorSpacePage() {
                 <p className="professor-space-page__document-date">
                   {formatDate(document.uploaded_at)}
                 </p>
-              </button>
+              </div>
             ))}
           </div>
         )}
