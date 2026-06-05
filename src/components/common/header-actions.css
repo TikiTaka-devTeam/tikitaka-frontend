@@ -53,16 +53,11 @@
 }
 
 .header-actions__avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #b6ff64, #7ed957);
-  color: #284525;
-  font-size: 0.72rem;
-  font-weight: 800;
+  color: #2d3552;
+  font-family: "Tikitaka UI", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .header-actions__avatar-image {
