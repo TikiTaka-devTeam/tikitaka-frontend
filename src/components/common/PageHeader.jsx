@@ -8,6 +8,7 @@ function PageHeader({
   isLoadingNotifications = false,
   notificationError = "",
   onNotificationRead,
+  avatarSrc = "",
   avatarLabel = "\uC0C8\uC2F9",
 }) {
   return (
@@ -19,6 +20,7 @@ function PageHeader({
         isLoadingNotifications={isLoadingNotifications}
         notificationError={notificationError}
         onNotificationRead={onNotificationRead}
+        avatarSrc={avatarSrc}
         avatarLabel={avatarLabel}
       />
     </header>

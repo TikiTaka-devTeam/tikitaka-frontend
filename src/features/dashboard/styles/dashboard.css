@@ -1,6 +1,8 @@
 .dashboard-page {
   min-height: 100vh;
-  padding: 56px 50px 40px;
+  width: min(100%, 1280px);
+  margin: 0 auto;
+  padding: 56px 50px 52px;
   background: var(--page-bg);
   color: var(--text-main);
 }
@@ -43,8 +45,8 @@
 
 .dashboard-overview {
   display: grid;
-  grid-template-columns: minmax(0, 662px) minmax(320px, 1fr);
-  column-gap: 76px;
+  grid-template-columns: minmax(0, 1fr) clamp(360px, 32vw, 460px);
+  column-gap: 40px;
   align-items: start;
   margin-top: 12px;
 }
@@ -58,7 +60,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 52px;
+  margin-bottom: 47px;
+}
+
+.welcome-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .welcome-block p,
@@ -71,15 +79,21 @@
 }
 
 .welcome-block p {
-  margin-bottom: 4px;
-  font-size: 1.05rem;
+  margin-bottom: 2px;
+  margin-left : 3px;
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+  font-size: 20px;
   font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0;
 }
 
 .welcome-block h1 {
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
   font-size: 40px;
-  line-height: 1.08;
+  line-height: 1.2;
   letter-spacing: -0.04em;
+  word-break: keep-all;
 }
 
 .welcome-block__title-main {
@@ -93,8 +107,8 @@
 .mode-tabs {
   display: flex;
   gap: 12px;
-  margin-top: 28px;
-  margin-bottom: 28px;
+  margin-top: 19.54px;
+  margin-bottom: 32px;
 }
 
 .mode-tabs__item {
@@ -504,13 +518,17 @@
 
 @media (max-width: 1200px) {
   .dashboard-page {
-    padding: 40px 28px 36px;
+    padding: 40px 51px 36px;
   }
 
   .dashboard-overview {
     grid-template-columns: 1fr;
     row-gap: 26px;
     column-gap: 0;
+  }
+
+  .welcome-block h1 {
+    font-size: 40px;
   }
 
   .my-spaces-grid {
@@ -527,8 +545,18 @@
     margin-bottom: 28px;
   }
 
+  .welcome-block p {
+    font-size: 16px;
+  }
+
   .welcome-block h1 {
     font-size: 40px;
+    line-height: 1.2;
+  }
+
+  .mode-tabs {
+    margin-top: 20px;
+    margin-bottom: 28px;
   }
 
   .section-title,
