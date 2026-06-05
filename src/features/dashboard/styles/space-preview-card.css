@@ -65,6 +65,7 @@
 .space-preview-card--list .space-preview-card__footer p {
   font-size: 12px;
   line-height: 1.45;
+  font-variation-settings: "wght" 600;
 }
 
 .space-preview-card--preview {
