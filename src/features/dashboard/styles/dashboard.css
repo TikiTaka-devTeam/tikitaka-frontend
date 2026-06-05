@@ -1,5 +1,7 @@
 .dashboard-page {
   min-height: 100vh;
+  width: min(100%, 1280px);
+  margin: 0 auto;
   padding: 56px 50px 40px;
   background: var(--page-bg);
   color: var(--text-main);
@@ -43,8 +45,8 @@
 
 .dashboard-overview {
   display: grid;
-  grid-template-columns: minmax(0, 662px) minmax(320px, 1fr);
-  column-gap: 76px;
+  grid-template-columns: minmax(0, 1fr) clamp(360px, 32vw, 460px);
+  column-gap: 40px;
   align-items: start;
   margin-top: 12px;
 }
