@@ -1,3 +1,5 @@
+import clockIcon from "../../../assets/icons/clock.svg";
+
 function getHeroStyle(color) {
   if (!color) {
     return undefined;
@@ -8,7 +10,21 @@ function getHeroStyle(color) {
   };
 }
 
-function NextSpaceCard({ nextSpace }) {
+function formatStartTime(value) {
+  if (!value) {
+    return "";
+  }
+
+  const [hour, minute] = String(value).split(":");
+
+  if (!hour || !minute) {
+    return String(value);
+  }
+
+  return `${Number(hour)}시 ${minute}분`;
+}
+
+function NextSpaceCard({ nextSpace, onSelect }) {
   if (!nextSpace) {
     return (
       <article className="next-space-card">
@@ -20,9 +36,16 @@ function NextSpaceCard({ nextSpace }) {
   }
 
   return (
-    <article className="next-space-card">
+    <button
+      type="button"
+      className="next-space-card"
+      onClick={() => onSelect?.(nextSpace)}
+    >
       <div className="next-space-card__hero" style={getHeroStyle(nextSpace.color)}>
-        <div className="next-space-card__time">{nextSpace.start_time}</div>
+        <div className="next-space-card__time">
+          <img src={clockIcon} alt="" aria-hidden="true" />
+          <span>{formatStartTime(nextSpace.start_time)}</span>
+        </div>
         <div className="next-space-card__meta">{nextSpace.semester}</div>
         <h2>{nextSpace.space_name}</h2>
       </div>
@@ -30,7 +53,7 @@ function NextSpaceCard({ nextSpace }) {
       <div className="next-space-card__footer">
         <p>{[nextSpace.nickname, nextSpace.professor_name].filter(Boolean).join(" - ")}</p>
       </div>
-    </article>
+    </button>
   );
 }
 
