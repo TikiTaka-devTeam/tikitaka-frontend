@@ -350,11 +350,17 @@
   right: 22px;
   display: inline-flex;
   align-items: center;
-  gap: 1px;
+  gap: 5px;
   font-size: 20px;
   font-weight: 700;
   line-height: 24px;
   letter-spacing: 0;
+}
+
+.next-space-card__time img {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
 }
 
 .next-space-card__meta {

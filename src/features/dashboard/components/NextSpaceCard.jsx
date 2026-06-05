@@ -1,3 +1,5 @@
+import clockIcon from "../../../assets/icons/clock.svg";
+
 function getHeroStyle(color) {
   if (!color) {
     return undefined;
@@ -6,6 +8,20 @@ function getHeroStyle(color) {
   return {
     background: `linear-gradient(135deg, ${color} 0%, rgba(255, 255, 255, 0.2) 180%)`,
   };
+}
+
+function formatStartTime(value) {
+  if (!value) {
+    return "";
+  }
+
+  const [hour, minute] = String(value).split(":");
+
+  if (!hour || !minute) {
+    return String(value);
+  }
+
+  return `${Number(hour)}시 ${minute}분`;
 }
 
 function NextSpaceCard({ nextSpace, onSelect }) {
@@ -26,7 +42,10 @@ function NextSpaceCard({ nextSpace, onSelect }) {
       onClick={() => onSelect?.(nextSpace)}
     >
       <div className="next-space-card__hero" style={getHeroStyle(nextSpace.color)}>
-        <div className="next-space-card__time">{nextSpace.start_time}</div>
+        <div className="next-space-card__time">
+          <img src={clockIcon} alt="" aria-hidden="true" />
+          <span>{formatStartTime(nextSpace.start_time)}</span>
+        </div>
         <div className="next-space-card__meta">{nextSpace.semester}</div>
         <h2>{nextSpace.space_name}</h2>
       </div>
