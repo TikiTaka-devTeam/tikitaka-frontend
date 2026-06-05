@@ -12,7 +12,7 @@ function formatLastAccessedAt(value) {
   return `${date.getMonth() + 1}.${date.getDate()} 최근 접속`;
 }
 
-function RecentSpacesList({ spaces }) {
+function RecentSpacesList({ spaces, onSelect }) {
   return (
     <section className="dashboard-section">
       <div className="section-title section-title--dark">최근 Spaces</div>
@@ -27,9 +27,11 @@ function RecentSpacesList({ spaces }) {
           const lastAccessedAt = formatLastAccessedAt(space.last_accessed_at);
 
           return (
-            <article
+            <button
               key={space.space_id}
+              type="button"
               className={`recent-space-item ${index < spaces.length - 1 ? "has-divider" : ""}`}
+              onClick={() => onSelect?.(space)}
             >
               <span
                 className="recent-space-item__accent"
@@ -39,7 +41,7 @@ function RecentSpacesList({ spaces }) {
                 <strong>{space.name}</strong>
                 <p>{[subline, lastAccessedAt].filter(Boolean).join(" · ")}</p>
               </div>
-            </article>
+            </button>
           );
         })}
       </div>

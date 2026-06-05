@@ -8,7 +8,7 @@ function getHeroStyle(color) {
   };
 }
 
-function NextSpaceCard({ nextSpace }) {
+function NextSpaceCard({ nextSpace, onSelect }) {
   if (!nextSpace) {
     return (
       <article className="next-space-card">
@@ -20,7 +20,11 @@ function NextSpaceCard({ nextSpace }) {
   }
 
   return (
-    <article className="next-space-card">
+    <button
+      type="button"
+      className="next-space-card"
+      onClick={() => onSelect?.(nextSpace)}
+    >
       <div className="next-space-card__hero" style={getHeroStyle(nextSpace.color)}>
         <div className="next-space-card__time">{nextSpace.start_time}</div>
         <div className="next-space-card__meta">{nextSpace.semester}</div>
@@ -30,7 +34,7 @@ function NextSpaceCard({ nextSpace }) {
       <div className="next-space-card__footer">
         <p>{[nextSpace.nickname, nextSpace.professor_name].filter(Boolean).join(" - ")}</p>
       </div>
-    </article>
+    </button>
   );
 }
 

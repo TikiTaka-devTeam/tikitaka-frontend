@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ModeTabs from "../../../components/common/ModeTabs.jsx";
 import DashboardHeader from "../components/DashboardHeader.jsx";
+import DashboardWelcomeBlock from "../components/DashboardWelcomeBlock.jsx";
 import MySpacesSection from "../components/MySpacesSection.jsx";
 import NextSpaceCard from "../components/NextSpaceCard.jsx";
 import RecentSpacesList from "../components/RecentSpacesList.jsx";
@@ -116,22 +117,13 @@ function DashboardPage() {
     <main className="dashboard-page">
       <DashboardHeader profile={profile} />
 
-      <div className="welcome-block">
-        <p>{greeting}</p>
-        {activeSection === SPACES_SECTION ? (
-          <h1>My Spaces</h1>
-        ) : (
-          <h1>
-            <span className="welcome-block__title-main">{profile.name}</span>
-            <span className="welcome-block__title-role">({profile.role_label})</span>
-          </h1>
-        )}
-      </div>
+      <DashboardWelcomeBlock profile={profile} />
 
       <ModeTabs items={tabItems} onChange={handleSectionChange} />
 
-      {activeSection === DASHBOARD_SECTION ? (
-        <>
+      <div key={activeSection} className="dashboard-section-view">
+        {activeSection === DASHBOARD_SECTION ? (
+          <>
           {isLoadingDashboard ? (
             <section className="dashboard-feedback-panel">
               <p>대시보드 데이터를 불러오는 중입니다.</p>
@@ -144,8 +136,8 @@ function DashboardPage() {
                 {nextSpace ? "다음 강의까지 " : "다음 강의 일정"}
                 {nextSpace ? <span>{nextSpace.remain_time}분</span> : null}
               </div>
-              <NextSpaceCard nextSpace={nextSpace} />
-              <RecentSpacesList spaces={recentSpaces} />
+              <NextSpaceCard nextSpace={nextSpace} onSelect={handleSelectSpace} />
+              <RecentSpacesList spaces={recentSpaces} onSelect={handleSelectSpace} />
             </div>
 
             <aside className="dashboard-overview__side">
@@ -153,19 +145,20 @@ function DashboardPage() {
               <WeeklySchedule schedules={schedules} />
             </aside>
           </section>
-        </>
-      ) : (
-        <MySpacesSection
-          spaces={mySpaces}
-          isLoading={isLoadingMySpaces}
-          errorMessage={mySpacesError}
-          onRetry={loadMySpaces}
-          onSelectSpace={handleSelectSpace}
-          ownerName={profile.name}
-          userRole={profile.role}
-          onSpaceCreated={(space) => setMySpaces((prevSpaces) => [space, ...prevSpaces])}
-        />
-      )}
+          </>
+        ) : (
+          <MySpacesSection
+            spaces={mySpaces}
+            isLoading={isLoadingMySpaces}
+            errorMessage={mySpacesError}
+            onRetry={loadMySpaces}
+            onSelectSpace={handleSelectSpace}
+            ownerName={profile.name}
+            userRole={profile.role}
+            onSpaceCreated={(space) => setMySpaces((prevSpaces) => [space, ...prevSpaces])}
+          />
+        )}
+      </div>
     </main>
   );
 }

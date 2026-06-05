@@ -109,6 +109,9 @@
   gap: 12px;
   margin-top: 19.54px;
   margin-bottom: 32px;
+  position: relative;
+  z-index: 3;
+  width: fit-content;
 }
 
 .mode-tabs__item {
@@ -128,6 +131,24 @@
 .mode-tabs__item.is-active {
   background: var(--primary);
   color: var(--text-white);
+}
+
+.dashboard-section-view {
+  position: relative;
+  z-index: 1;
+  animation: dashboard-section-fade 180ms ease both;
+}
+
+@keyframes dashboard-section-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .my-spaces-section {
@@ -289,10 +310,13 @@
   overflow: hidden;
   width: 662px;
   max-width: 100%;
+  padding: 0;
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--surface);
   box-shadow: var(--shadow);
+  text-align: left;
+  cursor: pointer;
 }
 
 .next-space-card__hero {
@@ -376,7 +400,12 @@
   display: flex;
   gap: 17px;
   align-items: flex-start;
+  width: 100%;
   padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
 }
 
 .recent-space-item.has-divider {
