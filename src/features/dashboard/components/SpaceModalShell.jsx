@@ -28,6 +28,8 @@ function SpaceModalShell({
   panelClassName = "",
   leftClassName = "",
   rightClassName = "",
+  headerClassName = "",
+  contentClassName = "",
   leftContent,
   children,
 }) {
@@ -78,11 +80,13 @@ function SpaceModalShell({
 
         <div className={`space-modal__right ${rightClassName}`.trim()}>
           {title ? (
-            <h2 id={titleId} className="space-modal__title">
-              {title}
-            </h2>
+            <div className={`space-modal__header ${headerClassName}`.trim()}>
+              <h2 id={titleId} className="space-modal__title">
+                {title}
+              </h2>
+            </div>
           ) : null}
-          {children}
+          <div className={`space-modal__content ${contentClassName}`.trim()}>{children}</div>
         </div>
       </section>
     </div>

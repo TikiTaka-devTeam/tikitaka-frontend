@@ -10,16 +10,18 @@ function SpaceModalPreviewPane({
   return (
     <div className={`space-modal-preview-pane space-modal-preview-pane--${tone} ${className}`.trim()}>
       {preview ? (
-        <SpacePreviewCard
-          variant="preview"
-          semester={preview.semester}
-          title={preview.title}
-          subtitle={preview.subtitle}
-          startColor={preview.startColor}
-          endColor={preview.endColor}
-          gradient={preview.gradient}
-          className="space-modal-preview-pane__card"
-        />
+        <div className="space-modal-preview-pane__preview">
+          <SpacePreviewCard
+            variant="preview"
+            semester={preview.semester}
+            title={preview.title}
+            subtitle={preview.subtitle}
+            startColor={preview.startColor}
+            endColor={preview.endColor}
+            gradient={preview.gradient}
+            className="space-modal-preview-pane__card"
+          />
+        </div>
       ) : null}
 
       {children ? <div className="space-modal-preview-pane__extra">{children}</div> : null}

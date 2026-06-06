@@ -173,6 +173,8 @@ function JoinSpaceModal({ isOpen, onClose, onSubmit, onLookup }) {
       panelClassName="join-space-modal__panel"
       leftClassName="join-space-modal__left"
       rightClassName="join-space-modal__right"
+      headerClassName="join-space-modal__header"
+      contentClassName="join-space-modal__content-shell"
       leftContent={
         <SpaceModalPreviewPane
           tone="gradient"
