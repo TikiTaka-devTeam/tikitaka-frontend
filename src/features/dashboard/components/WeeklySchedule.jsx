@@ -1,14 +1,44 @@
 const DAYS = ["MON", "TUE", "WED", "THU", "FRI"];
-const HOURS = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+const DEFAULT_START_HOUR = 9;
+const DEFAULT_END_HOUR = 17;
+const HEADER_HEIGHT = 28;
+const BOARD_HEIGHT = 460;
+const MINUTES_PER_SLOT = 5;
+const SLOTS_PER_HOUR = 60 / MINUTES_PER_SLOT;
 
-function toGridRow(schedule) {
-  return schedule.start_hour - 9 + 1;
+function getLastVisibleHour(schedule) {
+  const startHour = Number(schedule?.start_hour);
+  const endHour = Number(schedule?.end_hour);
+  const endMinute = Number(schedule?.end_minute);
+
+  if (!Number.isFinite(startHour) || !Number.isFinite(endHour) || !Number.isFinite(endMinute)) {
+    return DEFAULT_END_HOUR;
+  }
+
+  return Math.max(startHour, Math.ceil((endHour * 60 + endMinute) / 60) - 1);
+}
+
+function getVisibleHours(schedules) {
+  const maxHour = schedules.reduce((latestHour, schedule) => {
+    return Math.max(latestHour, getLastVisibleHour(schedule));
+  }, DEFAULT_END_HOUR);
+
+  return Array.from({ length: maxHour - DEFAULT_START_HOUR + 1 }, (_, index) => {
+    return DEFAULT_START_HOUR + index;
+  });
+}
+
+function toGridRow(schedule, startHour) {
+  const startOffsetInMinutes =
+    (schedule.start_hour - startHour) * 60 + schedule.start_minute;
+
+  return Math.max(0, Math.floor(startOffsetInMinutes / MINUTES_PER_SLOT)) + 1;
 }
 
 function toGridSpan(schedule) {
   const startInMinutes = schedule.start_hour * 60 + schedule.start_minute;
   const endInMinutes = schedule.end_hour * 60 + schedule.end_minute;
-  return Math.max(1, Math.round((endInMinutes - startInMinutes) / 60));
+  return Math.max(1, Math.ceil((endInMinutes - startInMinutes) / MINUTES_PER_SLOT));
 }
 
 function toGridColumn(day) {
@@ -16,8 +46,20 @@ function toGridColumn(day) {
 }
 
 function WeeklySchedule({ schedules }) {
+  const hours = getVisibleHours(schedules);
+  const hourHeight = (BOARD_HEIGHT - HEADER_HEIGHT) / hours.length;
+  const slotHeight = hourHeight / SLOTS_PER_HOUR;
+  const isCompact = hourHeight < 40;
+  const boardStyle = {
+    "--schedule-row-count": hours.length * SLOTS_PER_HOUR,
+    "--schedule-hour-height": `${hourHeight}px`,
+    "--schedule-slot-height": `${slotHeight}px`,
+    "--schedule-block-padding": isCompact ? "2px 3px" : "3px 4px",
+    "--schedule-block-font-size": isCompact ? "11px" : "12px",
+  };
+
   return (
-    <div className="schedule-board">
+    <div className="schedule-board" style={boardStyle}>
       <div className="schedule-board__corner" />
       {DAYS.map((day) => (
         <div key={day} className="schedule-board__day">
@@ -25,16 +67,26 @@ function WeeklySchedule({ schedules }) {
         </div>
       ))}
 
-      {HOURS.map((hour) => (
+      {hours.map((hour) => (
         <div key={hour} className="schedule-board__hour">
           {hour}
         </div>
       ))}
 
-      <div className="schedule-board__grid">
+      <div
+        className="schedule-board__grid"
+        style={{ gridRow: `2 / span ${hours.length}` }}
+      >
         {DAYS.map((day) =>
-          HOURS.map((hour) => (
-            <div key={`${day}-${hour}`} className="schedule-board__cell" />
+          hours.map((hour, hourIndex) => (
+            <div
+              key={`${day}-${hour}`}
+              className="schedule-board__cell"
+              style={{
+                gridColumn: toGridColumn(day),
+                gridRow: `${hourIndex * SLOTS_PER_HOUR + 1} / span ${SLOTS_PER_HOUR}`,
+              }}
+            />
           )),
         )}
 
@@ -44,7 +96,7 @@ function WeeklySchedule({ schedules }) {
             className="schedule-block"
             style={{
               gridColumn: toGridColumn(schedule.day),
-              gridRow: `${toGridRow(schedule)} / span ${toGridSpan(schedule)}`,
+              gridRow: `${toGridRow(schedule, DEFAULT_START_HOUR)} / span ${toGridSpan(schedule)}`,
               background: schedule.color,
             }}
           >
