@@ -196,7 +196,7 @@
   height: 174px;
   border: 1px solid #dcdcdc;
   border-radius: 12px;
-  padding: 11px 10px 0px 15px;
+  padding: 0px 10px 0px 15px;
 }
 
 .terms-content-inner {
@@ -206,7 +206,6 @@
   font-variation-settings: "wght" 400;
   font-size: 12px;
   padding-right: 10px;
-
   box-sizing: border-box;
 }
 
