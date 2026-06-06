@@ -126,6 +126,7 @@ function SignupInformPage() {
   const [selectedProfileFile, setSelectedProfileFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [phoneErrorMessage, setPhoneErrorMessage] = useState("");
 
   const passwordsMatch =
     form.password.length > 0 && form.password === form.passwordConfirm;
@@ -135,9 +136,9 @@ function SignupInformPage() {
       form.name.trim() &&
       form.email.trim() &&
       emailChecked &&
-      form.password &&
+      form.password.length >= 8 &&
       passwordsMatch &&
-      form.phoneNumber.trim() &&
+      form.phoneNumber.trim().length === 8 &&
       form.role &&
       form.univ &&
       form.major.trim() &&
@@ -177,6 +178,7 @@ function SignupInformPage() {
       setPhoneVerified(false);
       setPhoneCodeSent(false);
       setVerificationTimeLeft(VERIFICATION_TIME_LIMIT);
+      setPhoneErrorMessage("");
     }
   };
 
@@ -216,8 +218,15 @@ function SignupInformPage() {
   };
 
   const handleSendCode = () => {
-    if (!form.phoneNumber.trim()) {
-      setErrorMessage("휴대폰 번호를 입력해주세요.");
+    const phoneNumber = form.phoneNumber.trim();
+
+    if (!phoneNumber) {
+      setPhoneErrorMessage("휴대폰 번호를 입력해주세요.");
+      return;
+    }
+
+    if (phoneNumber.length !== 8) {
+      setPhoneErrorMessage("휴대폰 번호는 8자리여야 합니다.");
       return;
     }
 
@@ -225,6 +234,7 @@ function SignupInformPage() {
     setPhoneVerified(false);
     setVerificationTimeLeft(VERIFICATION_TIME_LIMIT);
     setForm((prev) => ({ ...prev, verificationCode: "" }));
+    setPhoneErrorMessage("");
     setErrorMessage("");
   };
 
@@ -246,10 +256,12 @@ function SignupInformPage() {
     const file = event.target.files?.[0];
 
     if (!file) {
+      setSelectedProfileFile(null);
       return;
     }
 
     if (!file.type.startsWith("image/")) {
+      setSelectedProfileFile(null);
       setErrorMessage("이미지 파일만 업로드할 수 있습니다.");
       return;
     }
@@ -262,6 +274,7 @@ function SignupInformPage() {
           ...prev,
           profileUrl: reader.result,
         }));
+        setSelectedProfileFile(file);
         setErrorMessage("");
       }
     };
@@ -285,16 +298,17 @@ function SignupInformPage() {
     setErrorMessage("");
 
     try {
-      let profileUrlToSend = null;
+      let profileImageKeyToSend = null;
+      let profileUrlToShow = form.profileUrl;
 
       if (selectedProfileFile) {
-        const uploadResult =
-          await createProfileImage(selectedProfileFile);
+        const uploadResult = await createProfileImage(selectedProfileFile);
 
-        profileUrlToSend = uploadResult.profileUrl;
+        profileImageKeyToSend = uploadResult.objectKey;
+        profileUrlToShow = uploadResult.profileUrl || form.profileUrl;
       }
 
-      await signup({
+      const payload = {
         email: form.email.trim(),
         password: form.password,
         name: form.name.trim(),
@@ -303,14 +317,19 @@ function SignupInformPage() {
         role: form.role,
         phoneNumber: formatPhoneNumber(form.phonePrefix, form.phoneNumber),
         memberIdNumber: form.memberIdNumber.trim(),
-        profileUrl: profileUrlToSend,
-      });
+      };
+
+      if (profileImageKeyToSend) {
+        payload.profile_image_key = profileImageKeyToSend;
+      }
+
+      await signup(payload);
 
       navigate("/signup-complete", {
         replace: true,
         state: {
           name: form.name.trim(),
-          profileUrl: form.profileUrl,
+          profileUrl: profileUrlToShow,
         },
       });
     } catch (error) {
@@ -322,6 +341,7 @@ function SignupInformPage() {
 
       const message =
         error.response?.data?.message ||
+        error.message ||
         "회원가입에 실패했습니다. 입력 정보를 확인해주세요.";
       setErrorMessage(message);
     } finally {
@@ -400,6 +420,11 @@ function SignupInformPage() {
                 />
               </button>
             </div>
+            {form.password && form.password.length < 8 && (
+              <p className="signup-inform-field-error">
+                비밀번호는 8자리 이상으로 입력해주세요.
+              </p>
+            )}
           </label>
 
           <label className="signup-inform-field">
@@ -427,6 +452,11 @@ function SignupInformPage() {
                 />
               </button>
             </div>
+            {form.passwordConfirm && !passwordsMatch && (
+              <p className="signup-inform-field-error">
+                비밀번호가 일치하지 않습니다.
+              </p>
+            )}
           </label>
 
           <div className="signup-inform-field">
@@ -458,6 +488,11 @@ function SignupInformPage() {
                 {phoneCodeSent ? "인증번호 재전송" : "인증번호 전송"}
               </button>
             </div>
+            {phoneErrorMessage && (
+              <p className="signup-inform-field-error">
+                {phoneErrorMessage}
+              </p>
+            )}
             {phoneCodeSent && (
               <div className="signup-inform-verification">
                 <div className="signup-inform-code">
@@ -505,7 +540,7 @@ function SignupInformPage() {
                   setForm((prev) => ({ ...prev, role: "STUDENT" }))
                 }
               >
-                수강생
+                학생
               </button>
               <button
                 className={form.role === "PROFESSOR" ? "is-selected" : ""}
@@ -514,7 +549,7 @@ function SignupInformPage() {
                   setForm((prev) => ({ ...prev, role: "PROFESSOR" }))
                 }
               >
-                관리자
+                교수
               </button>
             </div>
           </div>

@@ -12,13 +12,9 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-  if (config?.skipAuth) {
-    return config;
-  }
-
   const accessToken = localStorage.getItem("tikitaka_access_token");
 
-  if (accessToken) {
+  if (accessToken && config.skipAuth !== true) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
 
