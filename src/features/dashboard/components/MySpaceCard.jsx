@@ -1,4 +1,5 @@
 import SpacePreviewCard from "./SpacePreviewCard.jsx";
+import { getCurrentSemesterValue } from "../utils/semester.js";
 
 function MySpaceCard({ space, onSelect }) {
   const title = space.nickname || space.name || "스페이스";
@@ -12,7 +13,7 @@ function MySpaceCard({ space, onSelect }) {
     >
       <SpacePreviewCard
         variant="list"
-        semester={space.semester || "2026-1"}
+        semester={space.semester || getCurrentSemesterValue()}
         title={title}
         subtitle={subtitle || "스페이스 열기"}
         gradient={space.gradient}

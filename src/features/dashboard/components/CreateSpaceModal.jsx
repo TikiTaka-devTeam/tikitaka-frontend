@@ -5,6 +5,10 @@ import {
   buildSpaceGradient,
   getSpaceThemeById,
 } from "../data/spaceThemes.js";
+import {
+  getCurrentSemesterValue,
+  getCurrentYearSemesterOptions,
+} from "../utils/semester.js";
 import SpaceModalPreviewPane from "./SpaceModalPreviewPane.jsx";
 import SpaceModalShell from "./SpaceModalShell.jsx";
 import "../styles/create-space-modal.css";
@@ -38,7 +42,7 @@ function createInitialFormState() {
   return {
     name: "",
     nickname: "",
-    semester: "2026-1",
+    semester: getCurrentSemesterValue(),
     themeId: DEFAULT_SPACE_THEME_ID,
     schedules: [createSchedule()],
   };
@@ -184,12 +188,83 @@ function TimePickerField({ id, value, onChange, isOpen, onOpen, onClose }) {
   );
 }
 
+function SemesterPickerField({ id, value, options, isOpen, onChange, onOpen, onClose }) {
+  const rootRef = useRef(null);
+  const selectedOption = options.find((option) => option.value === value);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    function handlePointerDown(event) {
+      if (!rootRef.current?.contains(event.target)) {
+        onClose();
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+    };
+  }, [isOpen, onClose]);
+
+  return (
+    <div ref={rootRef} className="create-space-modal__select-field">
+      <button
+        type="button"
+        id={`${id}-trigger`}
+        className={`create-space-modal__select-trigger ${isOpen ? "is-open" : ""}`}
+        onClick={() => (isOpen ? onClose() : onOpen())}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-controls={id}
+      >
+        {selectedOption?.label ?? value}
+      </button>
+
+      {isOpen ? (
+        <div
+          id={id}
+          className="create-space-modal__select-picker"
+          role="listbox"
+          aria-labelledby={`${id}-trigger`}
+        >
+          {options.map((option) => {
+            const isSelected = option.value === value;
+
+            return (
+              <button
+                key={option.value}
+                type="button"
+                role="option"
+                aria-selected={isSelected}
+                className={`create-space-modal__select-option ${
+                  isSelected ? "is-selected" : ""
+                }`}
+                onClick={() => {
+                  onChange(option.value);
+                  onClose();
+                }}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function CreateSpaceModal({ isOpen, onClose, onCreate, ownerName = "" }) {
   const [formState, setFormState] = useState(createInitialFormState);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasCustomNickname, setHasCustomNickname] = useState(false);
   const [activeTimePicker, setActiveTimePicker] = useState(null);
+  const [isSemesterPickerOpen, setIsSemesterPickerOpen] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -206,18 +281,25 @@ function CreateSpaceModal({ isOpen, onClose, onCreate, ownerName = "" }) {
         return;
       }
 
+      if (isSemesterPickerOpen) {
+        setIsSemesterPickerOpen(false);
+        return;
+      }
+
       onClose?.();
     }
 
     window.addEventListener("keydown", handleKeyDown);
 
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeTimePicker, isOpen, onClose]);
+  }, [activeTimePicker, isOpen, isSemesterPickerOpen, onClose]);
 
   const selectedTheme = useMemo(
     () => getSpaceThemeById(formState.themeId),
     [formState.themeId],
   );
+  const semesterOptions = useMemo(() => getCurrentYearSemesterOptions(), []);
+  const defaultSemester = useMemo(() => getCurrentSemesterValue(), []);
 
   function updateField(fieldName, value) {
     setFormState((prevState) => ({
@@ -317,6 +399,7 @@ function CreateSpaceModal({ isOpen, onClose, onCreate, ownerName = "" }) {
       setFormState(createInitialFormState());
       setHasCustomNickname(false);
       setActiveTimePicker(null);
+      setIsSemesterPickerOpen(false);
       onClose?.();
     } catch (error) {
       setErrorMessage(error?.message || "스페이스 생성에 실패했습니다.");
@@ -326,7 +409,7 @@ function CreateSpaceModal({ isOpen, onClose, onCreate, ownerName = "" }) {
   }
 
   const preview = {
-    semester: formState.semester.trim() || "2026-1",
+    semester: formState.semester.trim() || defaultSemester,
     title: formState.name.trim() || "Space 이름",
     subtitle: `${formState.nickname.trim() || "Space 별명"} - ${ownerName || "사용자"}`,
     startColor: selectedTheme.startColor,
@@ -401,10 +484,17 @@ function CreateSpaceModal({ isOpen, onClose, onCreate, ownerName = "" }) {
 
           <label className="create-space-modal__field">
             <FieldLabel required>학기</FieldLabel>
-            <input
-              type="text"
+            <SemesterPickerField
+              id="create-space-semester-picker"
               value={formState.semester}
-              onChange={(event) => updateField("semester", event.target.value)}
+              options={semesterOptions}
+              isOpen={isSemesterPickerOpen}
+              onChange={(nextValue) => updateField("semester", nextValue)}
+              onOpen={() => {
+                setActiveTimePicker(null);
+                setIsSemesterPickerOpen(true);
+              }}
+              onClose={() => setIsSemesterPickerOpen(false)}
             />
           </label>
 
