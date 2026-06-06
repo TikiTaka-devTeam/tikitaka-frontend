@@ -1,17 +1,3 @@
-function formatLastAccessedAt(value) {
-  if (!value) {
-    return "";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-
-  return `${date.getMonth() + 1}.${date.getDate()} 최근 접속`;
-}
-
 function RecentSpacesList({ spaces, onSelect }) {
   return (
     <section className="dashboard-section">
@@ -23,8 +9,10 @@ function RecentSpacesList({ spaces, onSelect }) {
         ) : null}
 
         {spaces.map((space, index) => {
-          const subline = [space.nickname, space.professor_name].filter(Boolean).join(" · ");
-          const lastAccessedAt = formatLastAccessedAt(space.last_accessed_at);
+          const title = space.name;
+          const subline = [space.nickname || space.name, space.professor_name]
+            .filter(Boolean)
+            .join(" - ");
 
           return (
             <button
@@ -38,8 +26,8 @@ function RecentSpacesList({ spaces, onSelect }) {
                 style={{ background: space.color }}
               />
               <div className="recent-space-item__body">
-                <strong>{space.name}</strong>
-                <p>{[subline, lastAccessedAt].filter(Boolean).join(" · ")}</p>
+                <strong>{title}</strong>
+                <p>{subline}</p>
               </div>
             </button>
           );

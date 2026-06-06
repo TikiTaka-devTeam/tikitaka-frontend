@@ -479,7 +479,7 @@
 }
 
 .schedule-board__hour {
-  height: 48px;
+  height: var(--schedule-hour-height, 48px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -492,10 +492,9 @@
 
 .schedule-board__grid {
   grid-column: 2 / -1;
-  grid-row: 2 / span 9;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(9, 48px);
+  grid-template-rows: repeat(var(--schedule-row-count, 108), var(--schedule-slot-height, 4px));
   position: relative;
 }
 
@@ -510,6 +509,7 @@
 }
 
 .schedule-board__cell {
+  z-index: 0;
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
@@ -517,22 +517,26 @@
 .schedule-block {
   z-index: 1;
   margin: 0;
-  padding: 3px 4px;
+  padding: var(--schedule-block-padding, 3px 4px);
   border-radius: 0;
   color: var(--text-white);
-  font-size: 12px;
+  overflow: hidden;
+  font-size: var(--schedule-block-font-size, 12px);
   font-weight: 700;
-  line-height: 14px;
+  line-height: 1.15;
 }
 
 .schedule-block strong {
   display: block;
   max-width: 52px;
-  font-size: 12px;
+  overflow: hidden;
+  font-size: inherit;
   font-weight: 700;
-  line-height: 14px;
+  line-height: inherit;
   letter-spacing: 0;
+  white-space: nowrap;
   word-break: keep-all;
+  text-overflow: ellipsis;
 }
 
 .theme-sunset {
