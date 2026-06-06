@@ -343,6 +343,8 @@ function CreateSpaceModal({ isOpen, onClose, onCreate, ownerName = "" }) {
       panelClassName="create-space-modal__panel"
       leftClassName="create-space-modal__preview-column"
       rightClassName="create-space-modal__body"
+      headerClassName="create-space-modal__header"
+      contentClassName="create-space-modal__content-shell"
       leftContent={
         <SpaceModalPreviewPane
           tone="neutral"
@@ -378,6 +380,7 @@ function CreateSpaceModal({ isOpen, onClose, onCreate, ownerName = "" }) {
     >
       <form className="create-space-modal__form" onSubmit={handleSubmit}>
         <div className="create-space-modal__scroll">
+          <div className="create-space-modal__scroll-content">
           <label className="create-space-modal__field">
             <FieldLabel required>Space 이름</FieldLabel>
             <input
@@ -488,9 +491,11 @@ function CreateSpaceModal({ isOpen, onClose, onCreate, ownerName = "" }) {
             </button>
           </div>
 
-          {errorMessage ? <p className="create-space-modal__error">{errorMessage}</p> : null}
+          </div>
+        </div>
 
-          <div className="create-space-modal__footer">
+        <div className="create-space-modal__footer">
+          {errorMessage ? <p className="create-space-modal__error">{errorMessage}</p> : null}
             <button
               type="submit"
               className="create-space-modal__submit"
@@ -499,7 +504,6 @@ function CreateSpaceModal({ isOpen, onClose, onCreate, ownerName = "" }) {
               {isSubmitting ? "저장 중..." : "저장"}
             </button>
           </div>
-        </div>
       </form>
     </SpaceModalShell>
   );

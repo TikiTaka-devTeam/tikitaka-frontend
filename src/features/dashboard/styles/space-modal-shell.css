@@ -28,7 +28,19 @@
 }
 
 .space-modal__right {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+}
+
+.space-modal__header,
+.space-modal__content {
+  min-width: 0;
+}
+
+.space-modal__content {
+  flex: 1;
+  min-height: 0;
 }
 
 .space-modal__close {

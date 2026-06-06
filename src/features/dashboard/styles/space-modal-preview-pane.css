@@ -21,6 +21,7 @@
   box-shadow: 0 14px 28px rgba(21, 33, 74, 0.18);
 }
 
+.space-modal-preview-pane__preview,
 .space-modal-preview-pane__extra {
   width: 100%;
 }
