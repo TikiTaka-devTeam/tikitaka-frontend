@@ -2,6 +2,16 @@
 import { useEffect, useRef } from "react";
 import useDrawingStore, { TOOLS } from "../stores/useDrawingStore.js";
 
+const LIVE_STROKE_INTERVAL_MS = 50;
+
+function createStrokeId() {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+
+  return `live-stroke-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
 export default function useCanvas(canvasRef, options = {}) {
   const optionsRef = useRef(options);
 
@@ -27,6 +37,7 @@ export default function useCanvas(canvasRef, options = {}) {
     let activeTool = null;
     let activePointerId = null;
     let lastErasePoint = null;
+    let lastLiveStrokeSentAt = 0;
 
     function drawStroke(stroke) {
       if (
@@ -118,6 +129,32 @@ export default function useCanvas(canvasRef, options = {}) {
       };
     }
 
+    function emitLiveStroke(phase, stroke, force = false) {
+      if (!stroke) return;
+
+      const callback = optionsRef.current?.onLiveStrokeChange;
+
+      if (typeof callback !== "function") {
+        return;
+      }
+
+      const now = Date.now();
+
+      if (!force && now - lastLiveStrokeSentAt < LIVE_STROKE_INTERVAL_MS) {
+        return;
+      }
+
+      lastLiveStrokeSentAt = now;
+
+      callback({
+        phase,
+        stroke: {
+          ...stroke,
+          points: [...(stroke.points ?? [])],
+        },
+      });
+    }
+
     function getEraserTolerance() {
       const { thicknessByTool } = useDrawingStore.getState();
       const eraserThickness = thicknessByTool?.[TOOLS.ERASER] ?? 16;
@@ -170,6 +207,7 @@ export default function useCanvas(canvasRef, options = {}) {
       activeTool = null;
       activePointerId = null;
       lastErasePoint = null;
+      lastLiveStrokeSentAt = 0;
     }
 
     function saveCurrentDrawing() {
@@ -179,6 +217,8 @@ export default function useCanvas(canvasRef, options = {}) {
         ...drawing,
         points: [...drawing.points],
       };
+
+      emitLiveStroke("end", finishedStroke, true);
 
       useDrawingStore.getState().addStroke(finishedStroke);
       drawing = null;
@@ -210,7 +250,6 @@ export default function useCanvas(canvasRef, options = {}) {
     function handlePointerDown(event) {
       if (event.button !== undefined && event.button !== 0) return;
 
-      // 이전 획이 혹시 안 끝난 상태면 새 획 시작 전에 끊어줌
       if (isPointerDown) {
         saveCurrentDrawing();
         resetPointerState();
@@ -260,13 +299,19 @@ export default function useCanvas(canvasRef, options = {}) {
         return;
       }
 
+      const liveStrokeId = createStrokeId();
+
       drawing = {
+        id: liveStrokeId,
+        strokeId: liveStrokeId,
+        scope: "shared",
         tool: activeTool,
         color,
         thickness: thicknessByTool?.[activeTool] ?? 4,
         points: [point],
       };
 
+      emitLiveStroke("start", drawing, true);
       redraw();
     }
 
@@ -281,7 +326,6 @@ export default function useCanvas(canvasRef, options = {}) {
         return;
       }
 
-      // 지우개는 드래그로 계속 동작
       if (activeTool === TOOLS.ERASER) {
         event.preventDefault();
 
@@ -292,7 +336,6 @@ export default function useCanvas(canvasRef, options = {}) {
         return;
       }
 
-      // 펜/형광펜은 버튼이 눌린 상태가 아니면 즉시 끊음
       if (event.buttons !== undefined && event.buttons !== 1) {
         finishPointer(event);
         return;
@@ -304,6 +347,8 @@ export default function useCanvas(canvasRef, options = {}) {
 
       const point = getPoint(event);
       drawing.points.push(point);
+
+      emitLiveStroke("update", drawing);
       redraw();
     }
 
