@@ -5,7 +5,7 @@ import {
   patchMockNotificationRead,
 } from "../mocks/notifications.mock.js";
 
-const useNotificationsMock = import.meta.env.VITE_USE_NOTIFICATIONS_MOCK === "true";
+const useNotificationsMock = import.meta.env.VITE_USE_NOTIFICATIONS_MOCK !== "false";
 
 export async function fetchNotifications({ isRead } = {}) {
   if (useNotificationsMock) {
