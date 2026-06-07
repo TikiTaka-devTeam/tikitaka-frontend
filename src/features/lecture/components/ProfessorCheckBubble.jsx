@@ -1,5 +1,5 @@
 // src/features/lecture/components/ProfessorCheckBubble.jsx
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ProfessorAlertIcon from "../../../assets/icons/lecture/professor_check_active.svg?react";
 import ProfessorDoneIcon from "../../../assets/icons/lecture/professor_note_done.svg?react";
 
@@ -26,8 +26,16 @@ function ProfessorCheckBubble({ draft, note, onSubmit, onCancel, onDone }) {
   const textareaRef = useRef(null);
   const hasSubmittedRef = useRef(false);
 
+  const resizeTextarea = useCallback(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, []);
+
   const bubbleWidth = useMemo(() => {
-    const text = isSaved ? data?.content ?? "" : value.trim();
+    const text = isSaved ? (data?.content ?? "") : value.trim();
     const textWidth = getEstimatedTextWidth(text);
 
     return Math.min(
@@ -46,21 +54,13 @@ function ProfessorCheckBubble({ draft, note, onSubmit, onCancel, onDone }) {
         resizeTextarea();
       });
     }
-  }, [data?.id, data?.content, isSaved]);
+  }, [data?.id, data?.content, isSaved, resizeTextarea]);
 
   useEffect(() => {
     resizeTextarea();
-  }, [value, bubbleWidth]);
+  }, [value, bubbleWidth, resizeTextarea]);
 
   if (!data) return null;
-
-  function resizeTextarea() {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    textarea.style.height = "auto";
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  }
 
   function submitNote() {
     if (isSaved || hasSubmittedRef.current) return;
