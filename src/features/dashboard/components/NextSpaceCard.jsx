@@ -29,7 +29,7 @@ function NextSpaceCard({ nextSpace, onSelect }) {
     return (
       <article className="next-space-card">
         <div className="next-space-card__empty">
-          <p>{"\uC624\uB298\uC740 \uAC15\uC758\uAC00 \uC5C6\uB124\uC694."}</p>
+          <p>오늘은 강의가 없네요.</p>
         </div>
       </article>
     );

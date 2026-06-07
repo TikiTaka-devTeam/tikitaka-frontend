@@ -58,7 +58,7 @@ function DashboardHeader({ profile }) {
         ),
       );
     } catch {
-      setNotificationError("알림 읽음 처리에 실패했습니다.");
+      setNotificationError("알림 읽음 처리가 실패했습니다.");
       throw new Error("Failed to mark notification as read.");
     }
   };
