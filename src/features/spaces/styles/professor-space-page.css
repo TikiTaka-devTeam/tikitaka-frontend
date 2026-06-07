@@ -386,3 +386,26 @@
     padding-right: 20px;
   }
 }
+
+.professor-space-page__title-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.professor-space-page__space-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}

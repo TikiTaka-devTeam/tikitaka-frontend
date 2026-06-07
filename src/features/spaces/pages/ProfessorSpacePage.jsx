@@ -4,7 +4,7 @@ import ModeTabs from "../../../components/common/ModeTabs.jsx";
 import leftArrowIcon from "../../../assets/icons/left_arrow.png";
 import megaphoneIcon from "../../../assets/icons/megaphone.png";
 import plusIcon from "../../../assets/icons/plus.png";
-import { getMySpaces, getSpaceDocuments } from "../api/spaceApi";
+import { getMySpaces, getSpaceDocuments, getSpaceCode } from "../api/spaceApi";
 import { createSpaceDocument } from "../api/professorSpaceApi";
 import LectureUploadModal from "../components/LectureUploadModal.jsx";
 import "../styles/professor-space-page.css";
@@ -35,6 +35,7 @@ function ProfessorSpacePage() {
   const navigate = useNavigate();
 
   const [space, setSpace] = useState(null);
+  const [spaceCode, setSpaceCode] = useState("");
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -57,9 +58,10 @@ function ProfessorSpacePage() {
       setLoading(true);
       setErrorMessage("");
 
-      const [spacesData, documentsData] = await Promise.all([
+      const [spacesData, documentsData, codeData] = await Promise.all([
         getMySpaces(),
         getSpaceDocuments(spaceId),
+        getSpaceCode(spaceId),
       ]);
 
       const currentSpace = Array.isArray(spacesData)
@@ -68,6 +70,7 @@ function ProfessorSpacePage() {
 
       setSpace(currentSpace || null);
       setDocuments(Array.isArray(documentsData) ? documentsData : []);
+      setSpaceCode(codeData?.space_code || codeData?.spaceCode || "");
     } catch (error) {
       console.error(error);
       setErrorMessage("강의자료를 불러오지 못했습니다.");
@@ -158,13 +161,6 @@ function ProfessorSpacePage() {
 
   const handleDocumentClick = (document) => {
     console.log("교수 강의자료 클릭:", document);
-
-    /*
-      교수용 강의자료 상세/수정 페이지가 생기면 여기서 이동.
-
-      예시:
-      navigate(`/professor/documents/${document.document_id}`);
-    */
   };
 
   const handleDocumentKeyDown = (event, document) => {
@@ -212,7 +208,16 @@ function ProfessorSpacePage() {
           <p className="professor-space-page__semester">
             {space?.semester || ""}
           </p>
-          <h1 className="professor-space-page__title">{space?.name || ""}</h1>
+
+          <div className="professor-space-page__title-row">
+            <h1 className="professor-space-page__title">{space?.name || ""}</h1>
+
+            {spaceCode && (
+              <span className="professor-space-page__space-code">
+                #{spaceCode}
+              </span>
+            )}
+          </div>
         </div>
       </section>
 
