@@ -4,10 +4,19 @@ import ModeTabs from "../../../components/common/ModeTabs.jsx";
 import leftArrowIcon from "../../../assets/icons/left_arrow.png";
 import megaphoneIcon from "../../../assets/icons/megaphone.png";
 import plusIcon from "../../../assets/icons/plus.png";
-import { getMySpaces, getSpaceDocuments, getSpaceCode } from "../api/spaceApi";
+import {
+  getMySpaces,
+  getSpaceDocuments,
+  getSpaceCode,
+  getDocumentSlides,
+} from "../api/spaceApi";
 import { createSpaceDocument } from "../api/professorSpaceApi";
 import LectureUploadModal from "../components/LectureUploadModal.jsx";
 import "../styles/professor-space-page.css";
+
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"
+).replace(/\/$/, "");
 
 function formatDate(value) {
   if (!value) return "";
@@ -28,6 +37,66 @@ function formatDate(value) {
 function buildGradient(color) {
   const startColor = color || "#2563eb";
   return `linear-gradient(115deg, ${startColor} 0%, #7fd0d7 100%)`;
+}
+
+function resolveImageUrl(url) {
+  if (!url) return "";
+
+  if (
+    url.startsWith("http://") ||
+    url.startsWith("https://") ||
+    url.startsWith("data:") ||
+    url.startsWith("blob:")
+  ) {
+    return url;
+  }
+
+  if (url.startsWith("/")) {
+    return `${API_BASE_URL}${url}`;
+  }
+
+  return `${API_BASE_URL}/${url}`;
+}
+
+async function attachFirstSlideThumbnails(rawDocuments) {
+  if (!Array.isArray(rawDocuments)) {
+    return [];
+  }
+
+  const documentsWithThumbnails = await Promise.all(
+    rawDocuments.map(async (document) => {
+      if (document.thumbnail_url) {
+        return {
+          ...document,
+          display_thumbnail_url: document.thumbnail_url,
+        };
+      }
+
+      try {
+        const slides = await getDocumentSlides(document.document_id);
+
+        const firstSlide = Array.isArray(slides)
+          ? [...slides]
+              .filter((slide) => !slide.is_deleted)
+              .sort((a, b) => a.page_number - b.page_number)[0]
+          : null;
+
+        return {
+          ...document,
+          display_thumbnail_url: firstSlide?.image_url || "",
+        };
+      } catch (error) {
+        console.error("첫 번째 슬라이드 썸네일 조회 실패:", error);
+
+        return {
+          ...document,
+          display_thumbnail_url: "",
+        };
+      }
+    }),
+  );
+
+  return documentsWithThumbnails;
 }
 
 function ProfessorSpacePage() {
@@ -68,8 +137,12 @@ function ProfessorSpacePage() {
         ? spacesData.find((item) => item.space_id === spaceId)
         : null;
 
+      const documentsWithThumbnails = await attachFirstSlideThumbnails(
+        Array.isArray(documentsData) ? documentsData : [],
+      );
+
       setSpace(currentSpace || null);
-      setDocuments(Array.isArray(documentsData) ? documentsData : []);
+      setDocuments(documentsWithThumbnails);
       setSpaceCode(codeData?.space_code || codeData?.spaceCode || "");
     } catch (error) {
       console.error(error);
@@ -161,6 +234,20 @@ function ProfessorSpacePage() {
 
   const handleDocumentClick = (document) => {
     console.log("교수 강의자료 클릭:", document);
+
+    const documentId =
+      document.document_id ||
+      document.documentId ||
+      document.id;
+
+    if (!spaceId || !documentId) {
+      alert("강의자료 정보를 찾을 수 없습니다.");
+      return;
+    }
+
+    navigate(`/spaces/${spaceId}/documents/${documentId}`, {
+      state: { document },
+    });
   };
 
   const handleDocumentKeyDown = (event, document) => {
@@ -269,60 +356,68 @@ function ProfessorSpacePage() {
               </p>
             </button>
 
-            {documents.map((document) => (
-              <div
-                key={document.document_id}
-                className="professor-space-page__document-card"
-                role="button"
-                tabIndex={0}
-                onClick={() => handleDocumentClick(document)}
-                onKeyDown={(event) => handleDocumentKeyDown(event, document)}
-              >
-                <div className="professor-space-page__thumbnail">
-                  {document.thumbnail_url ? (
-                    <img src={document.thumbnail_url} alt="" />
-                  ) : (
-                    <div className="professor-space-page__thumbnail-empty" />
-                  )}
+            {documents.map((document) => {
+              const documentId =
+                document.document_id ||
+                document.documentId ||
+                document.id;
 
-                  <button
-                    type="button"
-                    className="professor-space-page__document-menu-button"
-                    onClick={(event) =>
-                      handleMenuClick(event, document.document_id)
-                    }
-                    aria-label="강의자료 메뉴"
-                  >
-                    ...
-                  </button>
+              return (
+                <div
+                  key={documentId}
+                  className="professor-space-page__document-card"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleDocumentClick(document)}
+                  onKeyDown={(event) => handleDocumentKeyDown(event, document)}
+                >
+                  <div className="professor-space-page__thumbnail">
+                    {document.display_thumbnail_url ? (
+                      <img
+                        src={resolveImageUrl(document.display_thumbnail_url)}
+                        alt=""
+                      />
+                    ) : (
+                      <div className="professor-space-page__thumbnail-empty" />
+                    )}
 
-                  {openedMenuId === document.document_id && (
-                    <div className="professor-space-page__document-menu">
-                      <button
-                        type="button"
-                        onClick={(event) => handleEditClick(event, document)}
-                      >
-                        수정
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(event) => handleDeleteClick(event, document)}
-                      >
-                        삭제
-                      </button>
-                    </div>
-                  )}
+                    <button
+                      type="button"
+                      className="professor-space-page__document-menu-button"
+                      onClick={(event) => handleMenuClick(event, documentId)}
+                      aria-label="강의자료 메뉴"
+                    >
+                      ...
+                    </button>
+
+                    {openedMenuId === documentId && (
+                      <div className="professor-space-page__document-menu">
+                        <button
+                          type="button"
+                          onClick={(event) => handleEditClick(event, document)}
+                        >
+                          수정
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(event) => handleDeleteClick(event, document)}
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <p className="professor-space-page__document-title">
+                    {document.title}
+                  </p>
+
+                  <p className="professor-space-page__document-date">
+                    {formatDate(document.uploaded_at)}
+                  </p>
                 </div>
-
-                <p className="professor-space-page__document-title">
-                  {document.title}
-                </p>
-
-                <p className="professor-space-page__document-date">
-                  {formatDate(document.uploaded_at)}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
