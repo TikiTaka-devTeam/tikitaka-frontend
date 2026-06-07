@@ -1,8 +1,10 @@
+import { useEffect, useRef, useState } from "react";
+
 const DAYS = ["MON", "TUE", "WED", "THU", "FRI"];
 const DEFAULT_START_HOUR = 9;
 const DEFAULT_END_HOUR = 17;
-const HEADER_HEIGHT = 28;
-const BOARD_HEIGHT = 460;
+const DEFAULT_HEADER_HEIGHT = 28;
+const DEFAULT_BOARD_HEIGHT = 460;
 const MINUTES_PER_SLOT = 5;
 const SLOTS_PER_HOUR = 60 / MINUTES_PER_SLOT;
 
@@ -46,8 +48,66 @@ function toGridColumn(day) {
 }
 
 function WeeklySchedule({ schedules }) {
+  const boardRef = useRef(null);
+  const [boardMetrics, setBoardMetrics] = useState({
+    boardHeight: DEFAULT_BOARD_HEIGHT,
+    headerHeight: DEFAULT_HEADER_HEIGHT,
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const boardElement = boardRef.current;
+
+    if (!boardElement) {
+      return undefined;
+    }
+
+    const updateBoardMetrics = () => {
+      const nextBoardHeight = boardElement.clientHeight || DEFAULT_BOARD_HEIGHT;
+      const computedStyles = window.getComputedStyle(boardElement);
+      const nextHeaderHeight =
+        Number.parseFloat(computedStyles.getPropertyValue("--schedule-header-height")) ||
+        DEFAULT_HEADER_HEIGHT;
+
+      setBoardMetrics((currentMetrics) => {
+        if (
+          currentMetrics.boardHeight === nextBoardHeight &&
+          currentMetrics.headerHeight === nextHeaderHeight
+        ) {
+          return currentMetrics;
+        }
+
+        return {
+          boardHeight: nextBoardHeight,
+          headerHeight: nextHeaderHeight,
+        };
+      });
+    };
+
+    updateBoardMetrics();
+
+    if (typeof ResizeObserver === "function") {
+      const resizeObserver = new ResizeObserver(updateBoardMetrics);
+      resizeObserver.observe(boardElement);
+
+      return () => {
+        resizeObserver.disconnect();
+      };
+    }
+
+    window.addEventListener("resize", updateBoardMetrics);
+
+    return () => {
+      window.removeEventListener("resize", updateBoardMetrics);
+    };
+  }, []);
+
   const hours = getVisibleHours(schedules);
-  const hourHeight = (BOARD_HEIGHT - HEADER_HEIGHT) / hours.length;
+  const { boardHeight, headerHeight } = boardMetrics;
+  const hourHeight = (boardHeight - headerHeight) / hours.length;
   const slotHeight = hourHeight / SLOTS_PER_HOUR;
   const isCompact = hourHeight < 40;
   const boardStyle = {
@@ -59,7 +119,7 @@ function WeeklySchedule({ schedules }) {
   };
 
   return (
-    <div className="schedule-board" style={boardStyle}>
+    <div ref={boardRef} className="schedule-board" style={boardStyle}>
       <div className="schedule-board__corner" />
       {DAYS.map((day) => (
         <div key={day} className="schedule-board__day">

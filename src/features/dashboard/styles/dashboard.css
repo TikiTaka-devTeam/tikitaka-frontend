@@ -2,7 +2,10 @@
   min-height: 100vh;
   width: min(100%, 1280px);
   margin: 0 auto;
-  padding: 56px 50px 52px;
+  padding:
+    clamp(24px, 4.5vh, 56px)
+    clamp(16px, 4vw, 50px)
+    clamp(28px, 4vh, 52px);
   background: var(--page-bg);
   color: var(--text-main);
 }
@@ -46,21 +49,52 @@
 .dashboard-overview {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 460px);
-  column-gap: 40px;
-  align-items: start;
-  margin-top: 12px;
+  column-gap: clamp(24px, 3vw, 40px);
+  align-items: stretch;
+  margin-top: clamp(8px, 1.5vh, 12px);
 }
 
 .dashboard-overview__main,
 .dashboard-overview__side {
   min-width: 0;
+  min-height: 0;
+}
+
+.dashboard-overview__main {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-overview__main > .dashboard-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.dashboard-overview__main > .dashboard-section .panel-card {
+  flex: 1;
+}
+
+.dashboard-overview__side {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-overview__side .schedule-board {
+  flex: 1;
+}
+
+.recent-spaces {
+  display: flex;
+  flex-direction: column;
 }
 
 .page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 47px;
+  margin-bottom: clamp(24px, 5vh, 47px);
 }
 
 .welcome-block {
@@ -82,7 +116,7 @@
   margin-bottom: 2px;
   margin-left : 3px;
   font-family: "Pretendard Variable", Pretendard, sans-serif;
-  font-size: 20px;
+  font-size: clamp(18px, 2vw, 20px);
   font-weight: 500;
   line-height: 1.2;
   letter-spacing: 0;
@@ -90,7 +124,7 @@
 
 .welcome-block h1 {
   font-family: "Pretendard Variable", Pretendard, sans-serif;
-  font-size: 40px;
+  font-size: clamp(34px, 3.5vw, 40px);
   line-height: 1.2;
   letter-spacing: -0.04em;
   word-break: keep-all;
@@ -107,8 +141,8 @@
 .mode-tabs {
   display: flex;
   gap: 12px;
-  margin-top: 19.54px;
-  margin-bottom: 32px;
+  margin-top: clamp(14px, 2.4vh, 19.54px);
+  margin-bottom: clamp(20px, 3.4vh, 32px);
   position: relative;
   z-index: 3;
   width: fit-content;
@@ -286,9 +320,9 @@
 }
 
 .section-title {
-  margin-bottom: 10px;
+  margin-bottom: clamp(8px, 1.2vh, 10px);
   font-family: "Pretendard Variable", Pretendard, sans-serif;
-  font-size: 20px;
+  font-size: clamp(18px, 2vw, 20px);
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: 0;
@@ -300,7 +334,7 @@
 
 .section-title--dark {
   font-family: "Pretendard Variable", Pretendard, sans-serif;
-  font-size: 20px;
+  font-size: clamp(18px, 2vw, 20px);
   font-weight: 700;
   line-height: 1.2;
   color: var(--text-main);
@@ -323,34 +357,38 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  min-height: 145px;
-  padding: 24px 24px 18px 18px;
+  min-height: clamp(118px, 18vh, 145px);
+  padding:
+    clamp(18px, 3vh, 24px)
+    clamp(18px, 2vw, 24px)
+    clamp(14px, 2.5vh, 18px)
+    clamp(16px, 1.8vw, 18px);
   color: var(--text-white);
 }
 
 .next-space-card__footer {
-  min-height: 55px;
+  min-height: clamp(46px, 6vh, 55px);
   display: flex;
   align-items: center;
-  padding: 0 24px;
+  padding: 0 clamp(18px, 2vw, 24px);
   background: var(--surface);
 }
 
 .next-space-card__empty {
-  min-height: 200px;
+  min-height: clamp(148px, 24vh, 200px);
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: clamp(18px, 2.6vh, 24px);
 }
 
 .next-space-card__time {
   position: absolute;
-  top: 22px;
-  right: 22px;
+  top: clamp(16px, 2.8vh, 22px);
+  right: clamp(16px, 1.8vw, 22px);
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 20px;
+  font-size: clamp(18px, 1.8vw, 20px);
   font-weight: 700;
   line-height: 24px;
   letter-spacing: 0;
@@ -364,7 +402,7 @@
 
 .next-space-card__meta {
   margin-bottom: 0;
-  font-size: 16px;
+  font-size: clamp(15px, 1.4vw, 16px);
   font-weight: 600;
   line-height: 19px;
   letter-spacing: 0;
@@ -373,9 +411,9 @@
 .next-space-card h2 {
   margin-top: 0;
   margin-bottom: 0;
-  font-size: 24px;
+  font-size: clamp(21px, 2vw, 24px);
   font-weight: 700;
-  line-height: 29px;
+  line-height: 1.22;
   letter-spacing: 0;
 }
 
@@ -388,8 +426,11 @@
 
 .panel-card {
   width: 100%;
-  min-height: 200px;
-  padding: 17px 21px 18px;
+  min-height: 180px;
+  padding:
+    clamp(14px, 2vh, 17px)
+    clamp(18px, 2vw, 21px)
+    clamp(14px, 2.2vh, 18px);
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -397,7 +438,7 @@
 }
 
 .dashboard-section {
-  margin-top: 26px;
+  margin-top: clamp(18px, 3vh, 26px);
 }
 
 .recent-space-item {
@@ -413,14 +454,14 @@
 }
 
 .recent-space-item.has-divider {
-  padding-bottom: 21px;
-  margin-bottom: 18px;
+  padding-bottom: clamp(14px, 2vh, 21px);
+  margin-bottom: clamp(12px, 2vh, 18px);
   border-bottom: 1px solid var(--border);
 }
 
 .recent-space-item__accent {
   width: 6px;
-  height: 62px;
+  height: clamp(52px, 7vh, 62px);
   flex-shrink: 0;
   border-radius: 999px;
 }
@@ -432,22 +473,24 @@
 .recent-space-item__body strong {
   display: block;
   margin-bottom: 2px;
-  font-size: 18px;
+  font-size: clamp(16px, 1.5vw, 18px);
   font-weight: 700;
-  line-height: 26px;
+  line-height: clamp(22px, 3vh, 26px);
   letter-spacing: 0;
 }
 
 .recent-space-item__body p {
   color: #7b859d;
   font-size: 14px;
-  line-height: 26px;
+  line-height: clamp(20px, 3vh, 26px);
 }
 
 .schedule-board {
+  --schedule-header-height: clamp(24px, 3vh, 28px);
   overflow: hidden;
   width: 100%;
-  height: 460px;
+  min-height: 360px;
+  height: clamp(360px, 54vh, 460px);
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -456,7 +499,7 @@
 
 .schedule-board__day,
 .schedule-board__corner {
-  height: 28px;
+  height: var(--schedule-header-height, 28px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -472,7 +515,7 @@
 .schedule-board {
   display: grid;
   grid-template-columns: 30px repeat(5, 1fr);
-  grid-template-rows: 28px;
+  grid-template-rows: var(--schedule-header-height, 28px);
 }
 
 .schedule-board__hour {

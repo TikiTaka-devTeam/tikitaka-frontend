@@ -1,7 +1,7 @@
 function DashboardWelcomeBlock({ profile }) {
   return (
     <div className="welcome-block">
-      <p>어서 오세요!</p>
+      <p>반갑습니다!</p>
       <h1>
         <span className="welcome-block__title-main">{profile?.name}</span>
         <span className="welcome-block__title-role">({profile?.role_label})</span>
