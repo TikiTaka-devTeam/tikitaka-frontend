@@ -14,3 +14,8 @@ export async function getDocumentSlides(documentId) {
   const response = await apiClient.get(`/documents/${documentId}/slides`);
   return response.data;
 }
+
+export async function getSpaceCode(spaceId) {
+  const response = await apiClient.get(`/spaces/${spaceId}/code`);
+  return response.data;
+}
