@@ -129,6 +129,9 @@ function LectureLayout({ mode = "student" }) {
   const removeStrokeWithoutPending = useDrawingStore(
     (state) => state.removeStrokeWithoutPending,
   );
+  const upsertStrokeWithoutPending = useDrawingStore(
+    (state) => state.upsertStrokeWithoutPending,
+  );
   const activeTool = useDrawingStore((state) => state.tool);
   const setTool = useDrawingStore((state) => state.setTool);
 
@@ -355,6 +358,21 @@ function LectureLayout({ mode = "student" }) {
 
     setDraftQuestion(null);
     setSelectedQuestionId(null);
+  }
+
+  function handleLiveStrokeChange({ stroke }) {
+    if (mode !== "professor") return;
+    if (!spaceId || !currentSlide?.slide_id) return;
+    if (!stroke) return;
+
+    sendSharedStroke(socketRef.current, {
+      spaceId,
+      slideId: currentSlide.slide_id,
+      stroke: {
+        ...stroke,
+        scope: "shared",
+      },
+    });
   }
 
   async function handleQuestionSubmit(content) {
@@ -681,12 +699,26 @@ function LectureLayout({ mode = "student" }) {
 
     async function loadSlideData() {
       try {
-        const [strokes, questionList] = await Promise.all([
+        const [strokesResult, questionsResult] = await Promise.allSettled([
           fetchSlideStrokes(currentSlide.slide_id),
           fetchSlideQuestions(currentSlide.slide_id),
         ]);
 
         if (ignore) return;
+
+        const strokes =
+          strokesResult.status === "fulfilled" ? strokesResult.value : [];
+
+        const questionList =
+          questionsResult.status === "fulfilled" ? questionsResult.value : [];
+
+        if (strokesResult.status === "rejected") {
+          console.error("필기 조회 실패", strokesResult.reason);
+        }
+
+        if (questionsResult.status === "rejected") {
+          console.error("질문 조회 실패", questionsResult.reason);
+        }
 
         const drawingStrokes = Array.isArray(strokes)
           ? strokes.filter((stroke) => stroke.tool !== TOOLS.FIXER)
@@ -773,28 +805,24 @@ function LectureLayout({ mode = "student" }) {
     socketRef.current = createLectureSocket({
       spaceId,
       slideId: currentSlide.slide_id,
+
       onSharedStroke: (stroke, payload) => {
         lastReceivedStrokeSeqRef.current =
-          payload?.strokeSeq ?? lastReceivedStrokeSeqRef.current;
+          payload?.strokeSeq ??
+          payload?.stroke_seq ??
+          lastReceivedStrokeSeqRef.current;
 
         if (mode !== "professor") {
-          const currentStrokes = useDrawingStore.getState().strokes;
-          const incomingKey = getStrokeKey(stroke);
-
-          const alreadyExists = currentStrokes.some((currentStroke) => {
-            return getStrokeKey(currentStroke) === incomingKey;
-          });
-
-          if (!alreadyExists) {
-            loadStrokes([...currentStrokes, stroke]);
-          }
+          upsertStrokeWithoutPending(stroke);
         }
       },
+
       onSharedStrokeDelete: (stroke) => {
         if (mode !== "professor") {
           removeStrokeWithoutPending(stroke);
         }
       },
+
       onQuestionCreated: (question) => {
         const nextQuestion = normalizeQuestionResponse(question, {
           documentId: activeDocId,
@@ -812,6 +840,7 @@ function LectureLayout({ mode = "student" }) {
           return [...prev, nextQuestion];
         });
       },
+
       onConnect: () => {
         requestStrokeResync(socketRef.current, {
           spaceId,
@@ -819,6 +848,7 @@ function LectureLayout({ mode = "student" }) {
           lastReceivedStrokeSeq: lastReceivedStrokeSeqRef.current,
         });
       },
+
       onError: (error) => {
         console.error(error);
       },
@@ -834,8 +864,8 @@ function LectureLayout({ mode = "student" }) {
     activeDocId,
     currentSlide?.page_number,
     mode,
-    loadStrokes,
     removeStrokeWithoutPending,
+    upsertStrokeWithoutPending,
   ]);
 
   useEffect(() => {
@@ -849,26 +879,34 @@ function LectureLayout({ mode = "student" }) {
         const result = await saveSlideStrokes(slideId, strokesToSave, mode);
         const savedStrokes = attachSavedStrokeIds(strokesToSave, result);
 
-        if (mode === "professor") {
-          savedStrokes.forEach((stroke) => {
-            sendSharedStroke(socketRef.current, {
-              spaceId,
-              slideId,
-              stroke,
-            });
-          });
-        }
+        /*
+          교수 필기는 그리는 중에 handleLiveStrokeChange에서 이미 WebSocket으로 전송됩니다.
+          여기서 다시 sendSharedStroke를 호출하면 학생 화면에 중복 stroke가 생길 수 있으므로,
+          저장 후 추가 브로드캐스트는 하지 않습니다.
+        */
 
         clearPending();
 
         await reloadCurrentSlideStrokes(slideId);
+
+        if (mode !== "professor") {
+          savedStrokes.forEach((stroke) => {
+            upsertStrokeWithoutPending(stroke);
+          });
+        }
       } catch (error) {
         console.error("필기 저장 실패", error);
       }
     }
 
     savePendingStrokes();
-  }, [pendingSave, currentSlide?.slide_id, clearPending, mode, spaceId]);
+  }, [
+    pendingSave,
+    currentSlide?.slide_id,
+    clearPending,
+    mode,
+    upsertStrokeWithoutPending,
+  ]);
 
   useEffect(() => {
     if (pendingDelete.length === 0) return;
@@ -950,6 +988,9 @@ function LectureLayout({ mode = "student" }) {
                 onProfessorNoteSubmit={handleProfessorNoteSubmit}
                 onProfessorNoteCancel={handleProfessorNoteCancel}
                 onProfessorNoteDone={handleProfessorNoteDone}
+                onLiveStrokeChange={
+                  mode === "professor" ? handleLiveStrokeChange : undefined
+                }
               />
 
               {activeTool === TOOLS.LIST && (
