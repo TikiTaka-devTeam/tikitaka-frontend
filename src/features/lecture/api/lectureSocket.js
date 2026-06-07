@@ -1,3 +1,4 @@
+// src/features/lecture/api/lectureSocket.js
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 
@@ -18,6 +19,24 @@ function createTempId(prefix = "socket") {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function getUniqueSlideIds({ slideId, slideIds }) {
+  const ids = [];
+
+  if (Array.isArray(slideIds)) {
+    slideIds.forEach((id) => {
+      if (id) {
+        ids.push(String(id));
+      }
+    });
+  }
+
+  if (slideId) {
+    ids.push(String(slideId));
+  }
+
+  return [...new Set(ids)];
+}
+
 function normalizeSocketStroke(payload) {
   const strokeData = payload.stroke ?? payload;
 
@@ -32,6 +51,7 @@ function normalizeSocketStroke(payload) {
   return {
     id: strokeId,
     strokeId,
+    slideId: payload.slideId ?? payload.slide_id ?? strokeData.slideId,
     tool: strokeData.tool,
     points: strokeData.points ?? [],
     color: strokeData.color ?? "#000000",
@@ -57,6 +77,7 @@ function normalizeSocketDelete(payload) {
   return {
     id: strokeId,
     strokeId,
+    slideId: payload.slideId ?? payload.slide_id ?? strokeData.slideId,
     strokeSeq: payload.strokeSeq ?? payload.stroke_seq,
     scope: "shared",
   };
@@ -109,7 +130,9 @@ function normalizeSocketQuestion(payload) {
 }
 
 function ackStroke(client, { spaceId, slideId, strokeSeq }) {
-  if (!client?.connected || strokeSeq == null) return;
+  if (!client?.connected || strokeSeq == null || !slideId) {
+    return;
+  }
 
   client.publish({
     destination: `/app/spaces/${spaceId}/slides/${slideId}/ack`,
@@ -123,69 +146,107 @@ function ackStroke(client, { spaceId, slideId, strokeSeq }) {
 export function createLectureSocket({
   spaceId,
   slideId,
+  slideIds,
   onSharedStroke,
   onSharedStrokeDelete,
   onQuestionCreated,
   onConnect,
   onError,
 }) {
+  const targetSlideIds = getUniqueSlideIds({
+    slideId,
+    slideIds,
+  });
+
   const client = new Client({
     webSocketFactory: () => new SockJS(`${API_BASE_URL}/ws`),
     connectHeaders: getTokenHeader(),
     reconnectDelay: 3000,
 
     onConnect: () => {
-      client.subscribe(
-        `/topic/spaces/${spaceId}/slides/${slideId}/shared-strokes`,
-        (message) => {
-          const payload = JSON.parse(message.body);
-          const type = payload.type;
+      console.log("WebSocket 연결 성공:", {
+        spaceId,
+        slideId,
+        slideIds: targetSlideIds,
+      });
 
-          if (
-            type === "SHARED_STROKE_DELETE" ||
-            type === "SHARED_STROKE_DELETED"
-          ) {
-            const deletedStroke = normalizeSocketDelete(payload);
-            onSharedStrokeDelete?.(deletedStroke, payload);
+      targetSlideIds.forEach((targetSlideId) => {
+        client.subscribe(
+          `/topic/spaces/${spaceId}/slides/${targetSlideId}/shared-strokes`,
+          (message) => {
+            console.log("shared-strokes 메시지 수신 raw:", {
+              slideId: targetSlideId,
+              body: message.body,
+            });
+
+            const payload = JSON.parse(message.body);
+            const type = payload.type;
+
+            const normalizedPayload = {
+              ...payload,
+              slideId: payload.slideId ?? payload.slide_id ?? targetSlideId,
+            };
+
+            if (
+              type === "SHARED_STROKE_DELETE" ||
+              type === "SHARED_STROKE_DELETED"
+            ) {
+              const deletedStroke = normalizeSocketDelete(normalizedPayload);
+
+              onSharedStrokeDelete?.(deletedStroke, normalizedPayload);
+
+              ackStroke(client, {
+                spaceId,
+                slideId: targetSlideId,
+                strokeSeq: payload.strokeSeq ?? payload.stroke_seq,
+              });
+
+              return;
+            }
+
+            const stroke = normalizeSocketStroke(normalizedPayload);
+            onSharedStroke?.(stroke, normalizedPayload);
 
             ackStroke(client, {
               spaceId,
-              slideId,
+              slideId: targetSlideId,
               strokeSeq: payload.strokeSeq ?? payload.stroke_seq,
             });
+          },
+        );
 
-            return;
-          }
+        client.subscribe(
+          `/topic/spaces/${spaceId}/slides/${targetSlideId}/questions`,
+          (message) => {
+            console.log("questions 메시지 수신 raw:", {
+              slideId: targetSlideId,
+              body: message.body,
+            });
 
-          const stroke = normalizeSocketStroke(payload);
-          onSharedStroke?.(stroke, payload);
+            const payload = JSON.parse(message.body);
 
-          ackStroke(client, {
-            spaceId,
-            slideId,
-            strokeSeq: payload.strokeSeq ?? payload.stroke_seq,
-          });
-        },
-      );
+            const normalizedPayload = {
+              ...payload,
+              slideId: payload.slideId ?? payload.slide_id ?? targetSlideId,
+            };
 
-      client.subscribe(
-        `/topic/spaces/${spaceId}/slides/${slideId}/questions`,
-        (message) => {
-          const payload = JSON.parse(message.body);
-          const question = normalizeSocketQuestion(payload);
+            const question = normalizeSocketQuestion(normalizedPayload);
 
-          onQuestionCreated?.(question, payload);
-        },
-      );
+            onQuestionCreated?.(question, normalizedPayload);
+          },
+        );
+      });
 
       onConnect?.();
     },
 
     onStompError: (frame) => {
+      console.error("STOMP 오류:", frame);
       onError?.(frame);
     },
 
     onWebSocketError: (error) => {
+      console.error("WebSocket 오류:", error);
       onError?.(error);
     },
   });
@@ -196,40 +257,62 @@ export function createLectureSocket({
 }
 
 export function sendSharedStroke(client, { spaceId, slideId, stroke }) {
-  if (!client?.connected) return;
+  console.log("sendSharedStroke 호출됨:", {
+    connected: client?.connected,
+    spaceId,
+    slideId,
+    stroke,
+  });
+
+  if (!client?.connected) {
+    console.warn("WebSocket 연결 안 됨. shared stroke 전송 실패");
+    return;
+  }
 
   const strokeId = stroke.strokeId ?? stroke.stroke_id ?? stroke.id;
 
   if (!strokeId) {
+    console.warn("strokeId 없음. shared stroke 전송 실패:", stroke);
     return;
   }
+
+  const body = {
+    type: "SHARED_STROKE_CHANGED",
+    slideId,
+    strokeId,
+    stroke: {
+      strokeId,
+      tool: stroke.tool,
+      points: stroke.points ?? [],
+      color: stroke.color ?? "#000000",
+      thickness: Number(stroke.thickness ?? 2),
+      content: stroke.content ?? "",
+      strokeOrder: Number(stroke.strokeOrder ?? 0),
+    },
+  };
+
+  console.log("WebSocket publish:", {
+    destination: `/app/spaces/${spaceId}/slides/${slideId}/shared-strokes`,
+    body,
+  });
 
   client.publish({
     destination: `/app/spaces/${spaceId}/slides/${slideId}/shared-strokes`,
     headers: getTokenHeader(),
-    body: JSON.stringify({
-      type: "SHARED_STROKE_CREATE",
-      slideId,
-      strokeId,
-      stroke: {
-        strokeId,
-        tool: stroke.tool,
-        points: stroke.points ?? [],
-        color: stroke.color ?? "#000000",
-        thickness: Number(stroke.thickness ?? 2),
-        content: stroke.content ?? "",
-        strokeOrder: Number(stroke.strokeOrder ?? 0),
-      },
-    }),
+    body: JSON.stringify(body),
   });
 }
 
 export function sendSharedStrokeDelete(client, { spaceId, slideId, stroke }) {
-  if (!client?.connected) return;
+  if (!client?.connected) {
+    console.warn("WebSocket 연결 안 됨. shared stroke delete 전송 실패");
+    return;
+  }
 
   const strokeId = stroke.strokeId ?? stroke.stroke_id ?? stroke.id;
 
   if (!strokeId) {
+    console.warn("strokeId 없음. shared stroke delete 전송 실패:", stroke);
     return;
   }
 
@@ -248,7 +331,10 @@ export function sendSharedStrokeDelete(client, { spaceId, slideId, stroke }) {
 }
 
 export function sendQuestionCreated(client, { spaceId, slideId, question }) {
-  if (!client?.connected) return;
+  if (!client?.connected) {
+    console.warn("WebSocket 연결 안 됨. question 전송 실패");
+    return;
+  }
 
   client.publish({
     destination: `/app/spaces/${spaceId}/slides/${slideId}/questions`,
@@ -265,7 +351,9 @@ export function requestStrokeResync(
   client,
   { spaceId, slideId, lastReceivedStrokeSeq = 0 },
 ) {
-  if (!client?.connected) return;
+  if (!client?.connected || !slideId) {
+    return;
+  }
 
   client.publish({
     destination: `/app/spaces/${spaceId}/slides/${slideId}/resync`,
