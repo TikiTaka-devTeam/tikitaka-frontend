@@ -1,4 +1,3 @@
-// src/features/lecture/components/LectureLayout.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import TopNav from "./TopNav.jsx";
