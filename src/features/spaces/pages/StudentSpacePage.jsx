@@ -181,12 +181,16 @@ function StudentSpacePage() {
   const handleDocumentClick = (document) => {
     console.log("문서 클릭:", document);
 
-    /*
-      다음 페이지 구현되면 여기서 이동.
+    const documentId = document.document_id || document.documentId || document.id;
 
-      예시:
-      navigate(`/documents/${document.document_id}`);
-    */
+    if (!spaceId || !documentId) {
+      alert("강의자료 정보를 찾을 수 없습니다.");
+      return;
+    }
+
+    navigate(`/spaces/${spaceId}/documents/${documentId}`, {
+      state: { document },
+    });
   };
 
   return (
@@ -235,33 +239,38 @@ function StudentSpacePage() {
 
         {!loading && !errorMessage && documents.length > 0 && (
           <div className="student-space-page__documents">
-            {documents.map((document) => (
-              <button
-                key={document.document_id}
-                type="button"
-                className="student-space-page__document-card"
-                onClick={() => handleDocumentClick(document)}
-              >
-                <div className="student-space-page__thumbnail">
-                  {document.display_thumbnail_url ? (
-                    <img
-                      src={resolveImageUrl(document.display_thumbnail_url)}
-                      alt=""
-                    />
-                  ) : (
-                    <div className="student-space-page__thumbnail-empty" />
-                  )}
-                </div>
+            {documents.map((document) => {
+              const documentId =
+                document.document_id || document.documentId || document.id;
 
-                <p className="student-space-page__document-title">
-                  {document.title}
-                </p>
+              return (
+                <button
+                  key={documentId}
+                  type="button"
+                  className="student-space-page__document-card"
+                  onClick={() => handleDocumentClick(document)}
+                >
+                  <div className="student-space-page__thumbnail">
+                    {document.display_thumbnail_url ? (
+                      <img
+                        src={resolveImageUrl(document.display_thumbnail_url)}
+                        alt=""
+                      />
+                    ) : (
+                      <div className="student-space-page__thumbnail-empty" />
+                    )}
+                  </div>
 
-                <p className="student-space-page__document-date">
-                  {formatDate(document.uploaded_at)}
-                </p>
-              </button>
-            ))}
+                  <p className="student-space-page__document-title">
+                    {document.title}
+                  </p>
+
+                  <p className="student-space-page__document-date">
+                    {formatDate(document.uploaded_at || document.uploadedAt)}
+                  </p>
+                </button>
+              );
+            })}
           </div>
         )}
       </section>

@@ -7,6 +7,8 @@ import DashboardPage from "../features/dashboard/pages/DashboardPage.jsx";
 import StudentSpacePage from "../features/spaces/pages/StudentSpacePage.jsx";
 import ProfessorSpacePage from "../features/spaces/pages/ProfessorSpacePage.jsx";
 import ProfessorSpaceMemberPage from "../features/spaces/pages/ProfessorSpaceMemberPage.jsx";
+import StudentLecturePage from "../features/lecture/pages/StudentLecturePage.jsx";
+import ProfessorLecturePage from "../features/lecture/pages/ProfessorLecturePage.jsx";
 
 function App() {
   const accessToken = localStorage.getItem("tikitaka_access_token");
@@ -61,6 +63,10 @@ function App() {
         }
       />
 
+      {/* 임시 테스트 라우트: 디자인 확인용 */}
+      <Route path="/lecture-student-test" element={<StudentLecturePage />} />
+      <Route path="/lecture-professor-test" element={<ProfessorLecturePage />} />
+
       <Route
         path="/spaces/:spaceId"
         element={
@@ -68,8 +74,25 @@ function App() {
             <StudentSpacePage />
           ) : accessToken && user?.role === "PROFESSOR" ? (
             <ProfessorSpacePage />
-          ) : (
+          ) : accessToken ? (
             <Navigate to="/dashboard" replace />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+
+      <Route
+        path="/spaces/:spaceId/documents/:documentId"
+        element={
+          accessToken && user?.role === "PROFESSOR" ? (
+            <ProfessorLecturePage />
+          ) : accessToken && user?.role === "STUDENT" ? (
+            <StudentLecturePage />
+          ) : accessToken ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <Navigate to="/login" replace />
           )
         }
       />
