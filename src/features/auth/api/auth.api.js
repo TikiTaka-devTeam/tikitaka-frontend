@@ -8,38 +8,74 @@ export const checkEmailDuplicate = (email) =>
 export const signup = (payload) =>
   apiClient.post("/auth/signup", payload);
 
+export const getProfileImageUploadUrl = (payload) =>
+  apiClient.post("/auth/create-profile-image", payload, { skipAuth: true });
+
 export const createProfileImage = async (file) => {
-  const formData = new FormData();
-  formData.append("file", file);
+  const { data } = await getProfileImageUploadUrl({
+    original_filename: file.name,
+    content_type: file.type,
+  });
 
-  const response = await apiClient.post(
-    "/auth/create-profile-image",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+  const uploadUrl = data.upload_url;
+  const objectKey = data.object_key;
+  const profileUrl = data.profile_url;
+
+  if (!uploadUrl || !objectKey) {
+    throw new Error("프로필 이미지 업로드 URL을 가져오지 못했습니다.");
+  }
+
+  await fetch(uploadUrl, {
+    method: "PUT",
+    body: file,
+    headers: {
+      "Content-Type": file.type,
     },
-  );
+    credentials: "omit",
+  });
 
-  return response.data;
-};
+  // S3 PUT with one retry and detailed logging
+  let lastError = null;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const resp = await fetch(uploadUrl, {
+        method: "PUT",
+        body: file,
+        headers: {
+          "Content-Type": file.type,
+        },
+        credentials: "omit",
+      });
 
-export const uploadProfileImage = async (file) => {
-  const formData = new FormData();
-  formData.append("file", file);
+      if (resp.ok) {
+        // success
+        lastError = null;
+        break;
+      }
 
-  const response = await apiClient.post(
-    "/auth/profile-image",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    },
-  );
+      const respText = await resp.text().catch(() => "");
+      lastError = new Error(
+        `S3 업로드 실패: ${resp.status} ${resp.statusText}${
+          respText ? ` - ${respText}` : ""
+        }`,
+      );
+      console.warn(`createProfileImage: attempt ${attempt} failed:`, lastError);
+    } catch (err) {
+      lastError = err;
+      console.warn(`createProfileImage: attempt ${attempt} fetch error:`, err);
+    }
 
-  return response.data;
+    if (attempt < 2) {
+      // backoff before retry
+      await new Promise((r) => setTimeout(r, 500 * attempt));
+    }
+  }
+
+  if (lastError) {
+    throw lastError;
+  }
+
+  return { objectKey, profileUrl };
 };
 
 export const logout = () => apiClient.post("/auth/logout");

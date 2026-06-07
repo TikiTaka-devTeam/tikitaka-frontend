@@ -1,6 +1,8 @@
 .dashboard-page {
   min-height: 100vh;
-  padding: 56px 50px 40px;
+  width: min(100%, 1280px);
+  margin: 0 auto;
+  padding: 56px 50px 52px;
   background: var(--page-bg);
   color: var(--text-main);
 }
@@ -43,8 +45,8 @@
 
 .dashboard-overview {
   display: grid;
-  grid-template-columns: minmax(0, 662px) minmax(320px, 1fr);
-  column-gap: 76px;
+  grid-template-columns: minmax(0, 1fr) clamp(360px, 32vw, 460px);
+  column-gap: 40px;
   align-items: start;
   margin-top: 12px;
 }
@@ -58,7 +60,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 52px;
+  margin-bottom: 47px;
+}
+
+.welcome-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .welcome-block p,
@@ -71,15 +79,21 @@
 }
 
 .welcome-block p {
-  margin-bottom: 4px;
-  font-size: 1.05rem;
+  margin-bottom: 2px;
+  margin-left : 3px;
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+  font-size: 20px;
   font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0;
 }
 
 .welcome-block h1 {
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
   font-size: 40px;
-  line-height: 1.08;
+  line-height: 1.2;
   letter-spacing: -0.04em;
+  word-break: keep-all;
 }
 
 .welcome-block__title-main {
@@ -93,8 +107,11 @@
 .mode-tabs {
   display: flex;
   gap: 12px;
-  margin-top: 28px;
-  margin-bottom: 28px;
+  margin-top: 19.54px;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 3;
+  width: fit-content;
 }
 
 .mode-tabs__item {
@@ -114,6 +131,24 @@
 .mode-tabs__item.is-active {
   background: var(--primary);
   color: var(--text-white);
+}
+
+.dashboard-section-view {
+  position: relative;
+  z-index: 1;
+  animation: dashboard-section-fade 180ms ease both;
+}
+
+@keyframes dashboard-section-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .my-spaces-section {
@@ -275,10 +310,13 @@
   overflow: hidden;
   width: 662px;
   max-width: 100%;
+  padding: 0;
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--surface);
   box-shadow: var(--shadow);
+  text-align: left;
+  cursor: pointer;
 }
 
 .next-space-card__hero {
@@ -312,11 +350,17 @@
   right: 22px;
   display: inline-flex;
   align-items: center;
-  gap: 1px;
+  gap: 5px;
   font-size: 20px;
   font-weight: 700;
   line-height: 24px;
   letter-spacing: 0;
+}
+
+.next-space-card__time img {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
 }
 
 .next-space-card__meta {
@@ -362,7 +406,12 @@
   display: flex;
   gap: 17px;
   align-items: flex-start;
+  width: 100%;
   padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
 }
 
 .recent-space-item.has-divider {
@@ -430,7 +479,7 @@
 }
 
 .schedule-board__hour {
-  height: 48px;
+  height: var(--schedule-hour-height, 48px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -443,10 +492,9 @@
 
 .schedule-board__grid {
   grid-column: 2 / -1;
-  grid-row: 2 / span 9;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(9, 48px);
+  grid-template-rows: repeat(var(--schedule-row-count, 108), var(--schedule-slot-height, 4px));
   position: relative;
 }
 
@@ -461,6 +509,7 @@
 }
 
 .schedule-board__cell {
+  z-index: 0;
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
@@ -468,22 +517,26 @@
 .schedule-block {
   z-index: 1;
   margin: 0;
-  padding: 3px 4px;
+  padding: var(--schedule-block-padding, 3px 4px);
   border-radius: 0;
   color: var(--text-white);
-  font-size: 12px;
+  overflow: hidden;
+  font-size: var(--schedule-block-font-size, 12px);
   font-weight: 700;
-  line-height: 14px;
+  line-height: 1.15;
 }
 
 .schedule-block strong {
   display: block;
   max-width: 52px;
-  font-size: 12px;
+  overflow: hidden;
+  font-size: inherit;
   font-weight: 700;
-  line-height: 14px;
+  line-height: inherit;
   letter-spacing: 0;
+  white-space: nowrap;
   word-break: keep-all;
+  text-overflow: ellipsis;
 }
 
 .theme-sunset {
@@ -504,13 +557,17 @@
 
 @media (max-width: 1200px) {
   .dashboard-page {
-    padding: 40px 28px 36px;
+    padding: 40px 51px 36px;
   }
 
   .dashboard-overview {
     grid-template-columns: 1fr;
     row-gap: 26px;
     column-gap: 0;
+  }
+
+  .welcome-block h1 {
+    font-size: 40px;
   }
 
   .my-spaces-grid {
@@ -527,8 +584,18 @@
     margin-bottom: 28px;
   }
 
+  .welcome-block p {
+    font-size: 16px;
+  }
+
   .welcome-block h1 {
     font-size: 40px;
+    line-height: 1.2;
+  }
+
+  .mode-tabs {
+    margin-top: 20px;
+    margin-bottom: 28px;
   }
 
   .section-title,

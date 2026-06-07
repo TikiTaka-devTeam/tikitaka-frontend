@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import userIconSrc from "../../assets/icons/userIcon.png";
 import NotificationPopover from "./NotificationPopover.jsx";
 import "./header-actions.css";
 
@@ -35,13 +34,19 @@ function HeaderActions({
   isLoadingNotifications = false,
   notificationError = "",
   onNotificationRead,
+  avatarSrc = "",
   avatarLabel = "\uC0C8\uC2F9",
   notificationLabel = "\uC54C\uB9BC",
   profileLabel = "\uD504\uB85C\uD544",
 }) {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notificationFilter, setNotificationFilter] = useState("all");
+  const [hasAvatarError, setHasAvatarError] = useState(false);
   const notificationAreaRef = useRef(null);
+
+  useEffect(() => {
+    setHasAvatarError(false);
+  }, [avatarSrc]);
 
   useEffect(() => {
     if (!isNotificationOpen) {
@@ -81,6 +86,9 @@ function HeaderActions({
     }
   };
 
+  const avatarText = avatarLabel.trim().charAt(0) || "\uC0C8";
+  const hasAvatarImage = Boolean(avatarSrc?.trim()) && !hasAvatarError;
+
   return (
     <div className="header-actions">
       <div className="header-actions__notifications" ref={notificationAreaRef}>
@@ -116,11 +124,18 @@ function HeaderActions({
         className="header-actions__button"
         aria-label={profileLabel}
       >
-        <img
-          className="header-actions__avatar-image"
-          src={userIconSrc}
-          alt={avatarLabel}
-        />
+        {hasAvatarImage ? (
+          <img
+            className="header-actions__avatar-image"
+            src={avatarSrc}
+            alt={avatarLabel}
+            onError={() => setHasAvatarError(true)}
+          />
+        ) : (
+          <span className="header-actions__avatar" aria-hidden="true">
+            {avatarText}
+          </span>
+        )}
       </button>
     </div>
   );

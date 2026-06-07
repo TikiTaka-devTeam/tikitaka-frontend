@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import "../styles/space-modal-shell.css";
 
 function CloseIcon() {
@@ -26,14 +28,31 @@ function SpaceModalShell({
   panelClassName = "",
   leftClassName = "",
   rightClassName = "",
+  headerClassName = "",
+  contentClassName = "",
   leftContent,
   children,
 }) {
+  useEffect(() => {
+    if (!isOpen || typeof document === "undefined") {
+      return undefined;
+    }
+
+    const { body } = document;
+    const previousOverflow = body.style.overflow;
+
+    body.style.overflow = "hidden";
+
+    return () => {
+      body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
   if (!isOpen) {
     return null;
   }
 
-  return (
+  const modalContent = (
     <div
       className={`space-modal ${overlayClassName}`.trim()}
       role="presentation"
@@ -61,15 +80,23 @@ function SpaceModalShell({
 
         <div className={`space-modal__right ${rightClassName}`.trim()}>
           {title ? (
-            <h2 id={titleId} className="space-modal__title">
-              {title}
-            </h2>
+            <div className={`space-modal__header ${headerClassName}`.trim()}>
+              <h2 id={titleId} className="space-modal__title">
+                {title}
+              </h2>
+            </div>
           ) : null}
-          {children}
+          <div className={`space-modal__content ${contentClassName}`.trim()}>{children}</div>
         </div>
       </section>
     </div>
   );
+
+  if (typeof document === "undefined") {
+    return modalContent;
+  }
+
+  return createPortal(modalContent, document.body);
 }
 
 export default SpaceModalShell;

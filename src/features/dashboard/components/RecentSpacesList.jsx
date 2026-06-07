@@ -1,18 +1,4 @@
-function formatLastAccessedAt(value) {
-  if (!value) {
-    return "";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-
-  return `${date.getMonth() + 1}.${date.getDate()} 최근 접속`;
-}
-
-function RecentSpacesList({ spaces }) {
+function RecentSpacesList({ spaces, onSelect }) {
   return (
     <section className="dashboard-section">
       <div className="section-title section-title--dark">최근 Spaces</div>
@@ -23,23 +9,27 @@ function RecentSpacesList({ spaces }) {
         ) : null}
 
         {spaces.map((space, index) => {
-          const subline = [space.nickname, space.professor_name].filter(Boolean).join(" · ");
-          const lastAccessedAt = formatLastAccessedAt(space.last_accessed_at);
+          const title = space.name;
+          const subline = [space.nickname || space.name, space.professor_name]
+            .filter(Boolean)
+            .join(" - ");
 
           return (
-            <article
+            <button
               key={space.space_id}
+              type="button"
               className={`recent-space-item ${index < spaces.length - 1 ? "has-divider" : ""}`}
+              onClick={() => onSelect?.(space)}
             >
               <span
                 className="recent-space-item__accent"
                 style={{ background: space.color }}
               />
               <div className="recent-space-item__body">
-                <strong>{space.name}</strong>
-                <p>{[subline, lastAccessedAt].filter(Boolean).join(" · ")}</p>
+                <strong>{title}</strong>
+                <p>{subline}</p>
               </div>
-            </article>
+            </button>
           );
         })}
       </div>

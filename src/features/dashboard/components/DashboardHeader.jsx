@@ -75,6 +75,7 @@ function DashboardHeader({ profile }) {
       isLoadingNotifications={isLoadingNotifications}
       notificationError={notificationError}
       onNotificationRead={handleNotificationRead}
+      avatarSrc={profile.profile_url ?? ""}
       avatarLabel={profile.name}
     />
   );
