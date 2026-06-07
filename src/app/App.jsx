@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "../features/auth/pages/LoginPage.jsx";
+import ProfileSettingPage from "../features/auth/pages/ProfileSettingPage.jsx";
 import SignupCompletePage from "../features/auth/pages/SignupCompletePage.jsx";
 import SignupInformPage from "../features/auth/pages/SignupInformPage.jsx";
 import SignupTermsPage from "../features/auth/pages/SignupTermsPage.jsx";
@@ -60,6 +61,13 @@ function App() {
         path="/dashboard"
         element={
           accessToken ? <DashboardPage /> : <Navigate to="/login" replace />
+        }
+      />
+
+      <Route
+        path="/profile-setting"
+        element={
+          accessToken ? <ProfileSettingPage /> : <Navigate to="/login" replace />
         }
       />
 

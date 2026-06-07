@@ -106,6 +106,7 @@ function SlideViewer({
   onProfessorNoteSubmit,
   onProfessorNoteCancel,
   onProfessorNoteDone,
+  onLiveStrokeChange,
 }) {
   const canvasRef = useRef(null);
   const stageRef = useRef(null);
@@ -130,6 +131,7 @@ function SlideViewer({
   useCanvas(canvasRef, {
     onQuestionPoint,
     onProfessorNotePoint,
+    onLiveStrokeChange,
   });
 
   useEffect(() => {
