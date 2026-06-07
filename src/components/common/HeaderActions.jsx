@@ -38,15 +38,12 @@ function HeaderActions({
   avatarLabel = "\uC0C8\uC2F9",
   notificationLabel = "\uC54C\uB9BC",
   profileLabel = "\uD504\uB85C\uD544",
+  onProfileClick,
 }) {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notificationFilter, setNotificationFilter] = useState("all");
-  const [hasAvatarError, setHasAvatarError] = useState(false);
+  const [failedAvatarSrc, setFailedAvatarSrc] = useState("");
   const notificationAreaRef = useRef(null);
-
-  useEffect(() => {
-    setHasAvatarError(false);
-  }, [avatarSrc]);
 
   useEffect(() => {
     if (!isNotificationOpen) {
@@ -87,7 +84,9 @@ function HeaderActions({
   };
 
   const avatarText = avatarLabel.trim().charAt(0) || "\uC0C8";
-  const hasAvatarImage = Boolean(avatarSrc?.trim()) && !hasAvatarError;
+  const normalizedAvatarSrc = avatarSrc?.trim() ?? "";
+  const hasAvatarImage =
+    Boolean(normalizedAvatarSrc) && normalizedAvatarSrc !== failedAvatarSrc;
 
   return (
     <div className="header-actions">
@@ -123,13 +122,14 @@ function HeaderActions({
         type="button"
         className="header-actions__button"
         aria-label={profileLabel}
+        onClick={onProfileClick}
       >
         {hasAvatarImage ? (
           <img
             className="header-actions__avatar-image"
-            src={avatarSrc}
+            src={normalizedAvatarSrc}
             alt={avatarLabel}
-            onError={() => setHasAvatarError(true)}
+            onError={() => setFailedAvatarSrc(normalizedAvatarSrc)}
           />
         ) : (
           <span className="header-actions__avatar" aria-hidden="true">

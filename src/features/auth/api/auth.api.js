@@ -8,6 +8,8 @@ export const checkEmailDuplicate = (email) =>
 export const signup = (payload) =>
   apiClient.post("/auth/signup", payload);
 
+export const getCurrentUser = () => apiClient.get("/users");
+
 export const getProfileImageUploadUrl = (payload) =>
   apiClient.post("/auth/create-profile-image", payload, { skipAuth: true });
 
