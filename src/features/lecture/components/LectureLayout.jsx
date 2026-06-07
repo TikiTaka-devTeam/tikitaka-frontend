@@ -22,8 +22,6 @@ import {
   createLectureSocket,
   requestStrokeResync,
   sendQuestionCreated,
-  sendSharedStroke,
-  sendSharedStrokeDelete,
 } from "../api/lectureSocket.js";
 import "../styles/lecture.css";
 
@@ -35,15 +33,6 @@ function createLocalId(prefix) {
   }
 
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-
-function getStrokeKey(stroke) {
-  return String(
-    stroke?.strokeId ??
-      stroke?.stroke_id ??
-      stroke?.id ??
-      `${stroke?.tool}-${stroke?.strokeOrder}`,
-  );
 }
 
 function getQuestionKey(question) {
@@ -103,7 +92,7 @@ function LectureLayout({ mode = "student" }) {
   const { spaceId, documentId } = useParams();
   const scaleVars = useScale();
   const socketRef = useRef(null);
-  const lastReceivedStrokeSeqRef = useRef(0);
+  const currentSlideIdRef = useRef(null);
 
   const [documents, setDocuments] = useState([]);
   const [activeDocId, setActiveDocId] = useState(null);
@@ -126,9 +115,6 @@ function LectureLayout({ mode = "student" }) {
   const clearPendingDelete = useDrawingStore(
     (state) => state.clearPendingDelete,
   );
-  const removeStrokeWithoutPending = useDrawingStore(
-    (state) => state.removeStrokeWithoutPending,
-  );
   const activeTool = useDrawingStore((state) => state.tool);
   const setTool = useDrawingStore((state) => state.setTool);
 
@@ -141,6 +127,13 @@ function LectureLayout({ mode = "student" }) {
   const slides = activeDoc?.slides ?? [];
   const currentSlide = slides[pageIndex];
 
+  const slideIdsKey = useMemo(() => {
+    return slides
+      .map((slide) => slide?.slide_id)
+      .filter(Boolean)
+      .join(",");
+  }, [slides]);
+
   const currentSlideQuestions = questions.filter(
     (question) =>
       String(question.documentId) === String(activeDocId) &&
@@ -152,6 +145,10 @@ function LectureLayout({ mode = "student" }) {
       String(note.documentId) === String(activeDocId) &&
       String(note.slideId) === String(currentSlide?.slide_id),
   );
+
+  useEffect(() => {
+    currentSlideIdRef.current = currentSlide?.slide_id ?? null;
+  }, [currentSlide?.slide_id]);
 
   function handleBackToSpace() {
     if (spaceId) {
@@ -553,22 +550,14 @@ function LectureLayout({ mode = "student" }) {
       return;
     }
 
-    const strokeToDelete = {
-      id: targetNote.strokeId,
-      strokeId: targetNote.strokeId,
-      scope: targetNote.scope || "shared",
-    };
-
     try {
-      await deleteSlideStroke(strokeToDelete);
+      await deleteSlideStroke({
+        id: targetNote.strokeId,
+        strokeId: targetNote.strokeId,
+        scope: targetNote.scope || "shared",
+      });
 
-      if (mode === "professor") {
-        sendSharedStrokeDelete(socketRef.current, {
-          spaceId,
-          slideId: targetNote.slideId,
-          stroke: strokeToDelete,
-        });
-      }
+      await reloadCurrentSlideStrokes(targetNote.slideId);
     } catch (error) {
       console.error("교수 수정 아이콘 완료 처리 실패", error);
     }
@@ -681,12 +670,26 @@ function LectureLayout({ mode = "student" }) {
 
     async function loadSlideData() {
       try {
-        const [strokes, questionList] = await Promise.all([
+        const [strokesResult, questionsResult] = await Promise.allSettled([
           fetchSlideStrokes(currentSlide.slide_id),
           fetchSlideQuestions(currentSlide.slide_id),
         ]);
 
         if (ignore) return;
+
+        const strokes =
+          strokesResult.status === "fulfilled" ? strokesResult.value : [];
+
+        const questionList =
+          questionsResult.status === "fulfilled" ? questionsResult.value : [];
+
+        if (strokesResult.status === "rejected") {
+          console.error("필기 조회 실패", strokesResult.reason);
+        }
+
+        if (questionsResult.status === "rejected") {
+          console.error("질문 조회 실패", questionsResult.reason);
+        }
 
         const drawingStrokes = Array.isArray(strokes)
           ? strokes.filter((stroke) => stroke.tool !== TOOLS.FIXER)
@@ -765,41 +768,74 @@ function LectureLayout({ mode = "student" }) {
   }, [activeDocId, currentSlide?.slide_id, loadStrokes]);
 
   useEffect(() => {
-    if (!spaceId || !currentSlide?.slide_id) return;
+    const slideIds = slides.map((slide) => slide?.slide_id).filter(Boolean);
+
+    if (!spaceId || slideIds.length === 0) {
+      return;
+    }
 
     socketRef.current?.deactivate?.();
-    lastReceivedStrokeSeqRef.current = 0;
 
     socketRef.current = createLectureSocket({
       spaceId,
-      slideId: currentSlide.slide_id,
-      onSharedStroke: (stroke, payload) => {
-        lastReceivedStrokeSeqRef.current =
-          payload?.strokeSeq ?? lastReceivedStrokeSeqRef.current;
+      slideId: slideIds[0],
+      slideIds,
 
-        if (mode !== "professor") {
-          const currentStrokes = useDrawingStore.getState().strokes;
-          const incomingKey = getStrokeKey(stroke);
+      onSharedStroke: async (stroke, payload) => {
+        console.log("교수 필기 변경 신호 수신:", stroke, payload);
 
-          const alreadyExists = currentStrokes.some((currentStroke) => {
-            return getStrokeKey(currentStroke) === incomingKey;
-          });
+        const changedSlideId =
+          payload?.slideId ??
+          payload?.slide_id ??
+          stroke?.slideId ??
+          stroke?.slide_id;
 
-          if (!alreadyExists) {
-            loadStrokes([...currentStrokes, stroke]);
-          }
+        const currentSlideId = currentSlideIdRef.current;
+
+        console.log("필기 신호 slide 비교:", {
+          changedSlideId,
+          currentSlideId,
+        });
+
+        if (
+          mode !== "professor" &&
+          changedSlideId &&
+          currentSlideId &&
+          String(changedSlideId) === String(currentSlideId)
+        ) {
+          await reloadCurrentSlideStrokes(changedSlideId);
         }
       },
-      onSharedStrokeDelete: (stroke) => {
-        if (mode !== "professor") {
-          removeStrokeWithoutPending(stroke);
+
+      onSharedStrokeDelete: async (stroke, payload) => {
+        const changedSlideId =
+          payload?.slideId ??
+          payload?.slide_id ??
+          stroke?.slideId ??
+          stroke?.slide_id;
+
+        const currentSlideId = currentSlideIdRef.current;
+
+        console.log("필기 삭제 신호 slide 비교:", {
+          changedSlideId,
+          currentSlideId,
+        });
+
+        if (
+          mode !== "professor" &&
+          changedSlideId &&
+          currentSlideId &&
+          String(changedSlideId) === String(currentSlideId)
+        ) {
+          await reloadCurrentSlideStrokes(changedSlideId);
         }
       },
+
       onQuestionCreated: (question) => {
         const nextQuestion = normalizeQuestionResponse(question, {
           documentId: activeDocId,
-          slideId: currentSlide.slide_id,
-          pageNumber: currentSlide.page_number,
+          slideId: question.slideId ?? question.slide_id,
+          pageNumber: question.pageNumber ?? question.page_number,
         });
 
         setQuestions((prev) => {
@@ -812,13 +848,22 @@ function LectureLayout({ mode = "student" }) {
           return [...prev, nextQuestion];
         });
       },
+
       onConnect: () => {
-        requestStrokeResync(socketRef.current, {
+        console.log("문서 전체 슬라이드 WebSocket 구독 완료:", {
           spaceId,
-          slideId: currentSlide.slide_id,
-          lastReceivedStrokeSeq: lastReceivedStrokeSeqRef.current,
+          slideIds,
+        });
+
+        slideIds.forEach((targetSlideId) => {
+          requestStrokeResync(socketRef.current, {
+            spaceId,
+            slideId: targetSlideId,
+            lastReceivedStrokeSeq: 0,
+          });
         });
       },
+
       onError: (error) => {
         console.error(error);
       },
@@ -828,36 +873,19 @@ function LectureLayout({ mode = "student" }) {
       socketRef.current?.deactivate?.();
       socketRef.current = null;
     };
-  }, [
-    spaceId,
-    currentSlide?.slide_id,
-    activeDocId,
-    currentSlide?.page_number,
-    mode,
-    loadStrokes,
-    removeStrokeWithoutPending,
-  ]);
+  }, [spaceId, activeDocId, mode, slideIdsKey]);
 
   useEffect(() => {
-    if (!currentSlide?.slide_id || pendingSave.length === 0) return;
+    if (!currentSlide?.slide_id || pendingSave.length === 0) {
+      return;
+    }
 
     const slideId = currentSlide.slide_id;
     const strokesToSave = [...pendingSave];
 
     async function savePendingStrokes() {
       try {
-        const result = await saveSlideStrokes(slideId, strokesToSave, mode);
-        const savedStrokes = attachSavedStrokeIds(strokesToSave, result);
-
-        if (mode === "professor") {
-          savedStrokes.forEach((stroke) => {
-            sendSharedStroke(socketRef.current, {
-              spaceId,
-              slideId,
-              stroke,
-            });
-          });
-        }
+        await saveSlideStrokes(slideId, strokesToSave, mode);
 
         clearPending();
 
@@ -868,43 +896,33 @@ function LectureLayout({ mode = "student" }) {
     }
 
     savePendingStrokes();
-  }, [pendingSave, currentSlide?.slide_id, clearPending, mode, spaceId]);
+  }, [pendingSave, currentSlide?.slide_id, clearPending, mode]);
 
   useEffect(() => {
-    if (pendingDelete.length === 0) return;
+    if (pendingDelete.length === 0) {
+      return;
+    }
 
     const strokesToDelete = [...pendingDelete];
 
     async function deletePendingStrokes() {
       try {
-        if (mode === "professor" && currentSlide?.slide_id) {
-          strokesToDelete.forEach((stroke) => {
-            sendSharedStrokeDelete(socketRef.current, {
-              spaceId,
-              slideId: currentSlide.slide_id,
-              stroke,
-            });
-          });
-        }
-
         await Promise.all(
           strokesToDelete.map((stroke) => deleteSlideStroke(stroke)),
         );
 
         clearPendingDelete();
+
+        if (currentSlide?.slide_id) {
+          await reloadCurrentSlideStrokes(currentSlide.slide_id);
+        }
       } catch (error) {
         console.error("필기 삭제 저장 실패", error);
       }
     }
 
     deletePendingStrokes();
-  }, [
-    pendingDelete,
-    clearPendingDelete,
-    mode,
-    spaceId,
-    currentSlide?.slide_id,
-  ]);
+  }, [pendingDelete, clearPendingDelete, currentSlide?.slide_id]);
 
   return (
     <div className="lecture-page" style={scaleVars}>

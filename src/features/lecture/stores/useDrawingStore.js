@@ -40,9 +40,7 @@ function finalizePoints(points) {
   return points
     .filter((point) => {
       return (
-        point &&
-        typeof point.x === "number" &&
-        typeof point.y === "number"
+        point && typeof point.x === "number" && typeof point.y === "number"
       );
     })
     .map((point) => ({
@@ -94,6 +92,42 @@ function normalizeDeletedStroke(stroke) {
     id: stroke?.id ?? savedStrokeId,
     strokeId: savedStrokeId,
     scope: stroke?.scope || "shared",
+  };
+}
+
+function normalizeIncomingStroke(stroke) {
+  if (!stroke) return null;
+
+  const savedStrokeId =
+    stroke.strokeId ?? stroke.stroke_id ?? stroke.id ?? null;
+  const points = finalizePoints(stroke.points);
+
+  if (
+    stroke.tool !== TOOLS.PEN &&
+    stroke.tool !== TOOLS.HIGHLIGHTER &&
+    stroke.tool !== TOOLS.FIXER
+  ) {
+    return null;
+  }
+
+  if (points.length === 0) {
+    return null;
+  }
+
+  return {
+    ...stroke,
+    id: stroke.id ?? savedStrokeId ?? createId(),
+    strokeId: savedStrokeId,
+    scope: stroke.scope || "shared",
+    content: stroke.content ?? "",
+    color: stroke.color ?? "#1c1c1e",
+    thickness: clampThickness(stroke.thickness ?? 4),
+    strokeOrder:
+      typeof stroke.strokeOrder === "number"
+        ? stroke.strokeOrder
+        : Number(stroke.stroke_order ?? 0),
+    strokeSeq: stroke.strokeSeq ?? stroke.stroke_seq,
+    points,
   };
 }
 
@@ -202,10 +236,7 @@ const useDrawingStore = create((set, get) => ({
     const normalizedStrokes = Array.isArray(strokes)
       ? strokes.map((stroke) => {
           const savedStrokeId =
-            stroke.strokeId ??
-            stroke.stroke_id ??
-            stroke.id ??
-            null;
+            stroke.strokeId ?? stroke.stroke_id ?? stroke.id ?? null;
 
           return {
             ...stroke,
@@ -221,6 +252,38 @@ const useDrawingStore = create((set, get) => ({
       redoStack: [],
       pendingSave: [],
       pendingDelete: [],
+    });
+  },
+
+  upsertStrokeWithoutPending: (incomingStroke) => {
+    const normalizedStroke = normalizeIncomingStroke(incomingStroke);
+
+    if (!normalizedStroke) {
+      return;
+    }
+
+    const incomingKey = getStrokeKey(normalizedStroke);
+
+    set((state) => {
+      const existingIndex = state.strokes.findIndex((stroke) => {
+        return getStrokeKey(stroke) === incomingKey;
+      });
+
+      if (existingIndex < 0) {
+        return {
+          strokes: [...state.strokes, normalizedStroke],
+        };
+      }
+
+      const nextStrokes = [...state.strokes];
+      nextStrokes[existingIndex] = {
+        ...nextStrokes[existingIndex],
+        ...normalizedStroke,
+      };
+
+      return {
+        strokes: nextStrokes,
+      };
     });
   },
 
