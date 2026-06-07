@@ -1,5 +1,4 @@
-// src/api/lectureApi.js
-import { apiRequest } from "./client.js";
+import { apiClient } from "../../../lib/api/client.js";
 
 function normalizeStrokeTool(tool) {
   if (tool === "PROFESSOR_NOTE") return "FIXER";
@@ -45,31 +44,17 @@ export function normalizeStrokeResponse(stroke) {
 export function normalizeQuestionResponse(question, fallback = {}) {
   return {
     id:
-      question.question_id ??
-      question.questionId ??
-      question.id ??
-      fallback.id,
+      question.question_id ?? question.questionId ?? question.id ?? fallback.id,
 
     documentId: fallback.documentId,
 
-    slideId:
-      question.slide_id ??
-      question.slideId ??
-      fallback.slideId,
+    slideId: question.slide_id ?? question.slideId ?? fallback.slideId,
 
     pageNumber: fallback.pageNumber,
 
-    x:
-      question.x_ratio ??
-      question.xRatio ??
-      fallback.x ??
-      0,
+    x: question.x_ratio ?? question.xRatio ?? fallback.x ?? 0,
 
-    y:
-      question.y_ratio ??
-      question.yRatio ??
-      fallback.y ??
-      0,
+    y: question.y_ratio ?? question.yRatio ?? fallback.y ?? 0,
 
     content: question.content ?? fallback.content ?? "",
 
@@ -80,18 +65,12 @@ export function normalizeQuestionResponse(question, fallback = {}) {
       "",
 
     likeCount:
-      question.like_count ??
-      question.likeCount ??
-      fallback.likeCount ??
-      0,
+      question.like_count ?? question.likeCount ?? fallback.likeCount ?? 0,
 
     status: question.status ?? fallback.status ?? "PENDING",
 
     isRefined:
-      question.is_refined ??
-      question.isRefined ??
-      fallback.isRefined ??
-      false,
+      question.is_refined ?? question.isRefined ?? fallback.isRefined ?? false,
 
     createdAt:
       question.created_at ??
@@ -137,32 +116,38 @@ export function normalizeSlideResponse(slide, index = 0) {
   };
 }
 
-export function fetchSpaceDocuments(spaceId) {
-  return apiRequest(`/api/v1/spaces/${spaceId}/documents`);
+export async function fetchSpaceDocuments(spaceId) {
+  const response = await apiClient.get(`/spaces/${spaceId}/documents`);
+  return response.data;
 }
 
-export function fetchDocumentSlides(documentId) {
-  return apiRequest(`/api/v1/documents/${documentId}/slides`);
+export async function fetchDocumentSlides(documentId) {
+  const response = await apiClient.get(`/documents/${documentId}/slides`);
+  return response.data;
 }
 
-export function uploadLectureDocument(spaceId, { title, file }) {
+export async function uploadLectureDocument(spaceId, { title, file }) {
   const formData = new FormData();
 
   formData.append("title", title);
   formData.append("file", file);
 
-  return apiRequest(`/api/v1/spaces/${spaceId}/documents`, {
-    method: "POST",
-    body: formData,
-  });
+  const response = await apiClient.post(
+    `/spaces/${spaceId}/documents`,
+    formData,
+  );
+
+  return response.data;
 }
 
-export function fetchPrivateStrokes(slideId) {
-  return apiRequest(`/api/v1/slides/${slideId}/private-strokes`);
+export async function fetchPrivateStrokes(slideId) {
+  const response = await apiClient.get(`/slides/${slideId}/private-strokes`);
+  return response.data;
 }
 
-export function fetchSharedStrokes(slideId) {
-  return apiRequest(`/api/v1/slides/${slideId}/shared-strokes`);
+export async function fetchSharedStrokes(slideId) {
+  const response = await apiClient.get(`/slides/${slideId}/shared-strokes`);
+  return response.data;
 }
 
 export async function fetchSlideStrokes(slideId) {
@@ -191,22 +176,20 @@ export async function fetchSlideStrokes(slideId) {
   );
 }
 
-export function savePrivateStrokes(slideId, strokes) {
-  return apiRequest(`/api/v1/slides/${slideId}/private-strokes`, {
-    method: "POST",
-    body: JSON.stringify({
-      strokes: strokes.map(normalizeStrokePayload),
-    }),
+export async function savePrivateStrokes(slideId, strokes) {
+  const response = await apiClient.post(`/slides/${slideId}/private-strokes`, {
+    strokes: strokes.map(normalizeStrokePayload),
   });
+
+  return response.data;
 }
 
-export function saveSharedStrokes(slideId, strokes) {
-  return apiRequest(`/api/v1/slides/${slideId}/shared-strokes`, {
-    method: "POST",
-    body: JSON.stringify({
-      strokes: strokes.map(normalizeStrokePayload),
-    }),
+export async function saveSharedStrokes(slideId, strokes) {
+  const response = await apiClient.post(`/slides/${slideId}/shared-strokes`, {
+    strokes: strokes.map(normalizeStrokePayload),
   });
+
+  return response.data;
 }
 
 export function saveSlideStrokes(slideId, strokes, mode = "student") {
@@ -221,16 +204,14 @@ export function saveSlideStroke(slideId, stroke, mode = "student") {
   return saveSlideStrokes(slideId, [stroke], mode);
 }
 
-export function deletePrivateStroke(strokeId) {
-  return apiRequest(`/api/v1/private-strokes/${strokeId}`, {
-    method: "PATCH",
-  });
+export async function deletePrivateStroke(strokeId) {
+  const response = await apiClient.patch(`/private-strokes/${strokeId}`);
+  return response.data;
 }
 
-export function deleteSharedStroke(strokeId) {
-  return apiRequest(`/api/v1/shared-strokes/${strokeId}`, {
-    method: "PATCH",
-  });
+export async function deleteSharedStroke(strokeId) {
+  const response = await apiClient.patch(`/shared-strokes/${strokeId}`);
+  return response.data;
 }
 
 export function deleteSlideStroke(stroke) {
@@ -241,28 +222,35 @@ export function deleteSlideStroke(stroke) {
   return deletePrivateStroke(stroke.strokeId ?? stroke.id);
 }
 
-export function fetchSlideQuestions(slideId) {
-  return apiRequest(`/api/v1/slides/${slideId}/questions`);
+export async function fetchSlideQuestions(slideId) {
+  const response = await apiClient.get(`/slides/${slideId}/questions`);
+  return response.data;
 }
 
-export function createQuestion(slideId, question) {
-  return apiRequest(`/api/v1/slides/${slideId}/questions`, {
-    method: "POST",
-    body: JSON.stringify(normalizeQuestionPayload(question)),
-  });
+export async function createQuestion(slideId, question) {
+  const response = await apiClient.post(
+    `/slides/${slideId}/questions`,
+    normalizeQuestionPayload(question),
+  );
+
+  return response.data;
 }
 
-export function fetchQuestionOverlay(slideId) {
-  return apiRequest(`/api/v1/slides/${slideId}/questions/overlay`);
+export async function fetchQuestionOverlay(slideId) {
+  const response = await apiClient.get(`/slides/${slideId}/questions/overlay`);
+  return response.data;
 }
 
-export function fetchQuestionDetail(questionId) {
-  return apiRequest(`/api/v1/questions/${questionId}`);
+export async function fetchQuestionDetail(questionId) {
+  const response = await apiClient.get(`/questions/${questionId}`);
+  return response.data;
 }
 
-export function createAnswer(questionId, answer) {
-  return apiRequest(`/api/v1/questions/${questionId}/answer`, {
-    method: "POST",
-    body: JSON.stringify(answer),
-  });
+export async function createAnswer(questionId, answer) {
+  const response = await apiClient.post(
+    `/questions/${questionId}/answer`,
+    answer,
+  );
+
+  return response.data;
 }
