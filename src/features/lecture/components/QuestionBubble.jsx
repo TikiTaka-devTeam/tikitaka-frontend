@@ -1,5 +1,5 @@
 // src/features/lecture/components/QuestionBubble.jsx
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import QuestionArrowIcon from "../../../assets/icons/lecture/question_arrow.svg?react";
 
 const MIN_BUBBLE_WIDTH = 150;
@@ -31,8 +31,16 @@ function QuestionBubble({
   const textareaRef = useRef(null);
   const hasSubmittedRef = useRef(false);
 
+  const resizeTextarea = useCallback(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, []);
+
   const bubbleWidth = useMemo(() => {
-    const text = isSaved ? data?.content ?? "" : value.trim();
+    const text = isSaved ? (data?.content ?? "") : value.trim();
     const textWidth = getEstimatedTextWidth(text);
 
     return Math.min(
@@ -51,21 +59,13 @@ function QuestionBubble({
         resizeTextarea();
       });
     }
-  }, [data?.id, data?.content, isSaved]);
+  }, [data?.id, data?.content, isSaved, resizeTextarea]);
 
   useEffect(() => {
     resizeTextarea();
-  }, [value, bubbleWidth]);
+  }, [value, bubbleWidth, resizeTextarea]);
 
   if (!data) return null;
-
-  function resizeTextarea() {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    textarea.style.height = "auto";
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  }
 
   function submitQuestion() {
     if (isSaved || hasSubmittedRef.current) return;

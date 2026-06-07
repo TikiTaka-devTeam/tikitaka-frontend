@@ -1,9 +1,9 @@
-// src/features/lecture/api/lectureSocket.js
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"
+).replace(/\/$/, "");
 
 function getTokenHeader() {
   const token = localStorage.getItem("tikitaka_access_token");
@@ -95,27 +95,16 @@ function normalizeSocketQuestion(payload) {
 
     content: question.content ?? "",
 
-    refinedContent:
-      question.refined_content ??
-      question.refinedContent ??
-      "",
+    refinedContent: question.refined_content ?? question.refinedContent ?? "",
 
-    likeCount:
-      question.like_count ??
-      question.likeCount ??
-      0,
+    likeCount: question.like_count ?? question.likeCount ?? 0,
 
     status: question.status ?? "PENDING",
 
-    isRefined:
-      question.is_refined ??
-      question.isRefined ??
-      false,
+    isRefined: question.is_refined ?? question.isRefined ?? false,
 
     createdAt:
-      question.created_at ??
-      question.createdAt ??
-      new Date().toISOString(),
+      question.created_at ?? question.createdAt ?? new Date().toISOString(),
   };
 }
 

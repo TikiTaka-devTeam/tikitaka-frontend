@@ -21,6 +21,7 @@ import { getSpaceDocuments } from "../../spaces/api/spaceApi.js";
 import {
   createLectureSocket,
   requestStrokeResync,
+  sendQuestionCreated,
   sendSharedStroke,
   sendSharedStrokeDelete,
 } from "../api/lectureSocket.js";
@@ -85,10 +86,7 @@ function attachSavedStrokeIds(strokes, result) {
 
   return strokes.map((stroke, index) => {
     const savedStrokeId =
-      stroke.strokeId ??
-      stroke.stroke_id ??
-      savedStrokeIds[index] ??
-      stroke.id;
+      stroke.strokeId ?? stroke.stroke_id ?? savedStrokeIds[index] ?? stroke.id;
 
     return {
       ...stroke,
@@ -136,9 +134,7 @@ function LectureLayout({ mode = "student" }) {
 
   const activeDoc = useMemo(
     () =>
-      documents.find(
-        (doc) => String(doc.document_id) === String(activeDocId),
-      ),
+      documents.find((doc) => String(doc.document_id) === String(activeDocId)),
     [documents, activeDocId],
   );
 
@@ -440,6 +436,12 @@ function LectureLayout({ mode = "student" }) {
         return [...prev, nextQuestion];
       });
 
+      sendQuestionCreated(socketRef.current, {
+        spaceId,
+        slideId: localQuestion.slideId,
+        question: nextQuestion,
+      });
+
       await refreshCurrentSlideQuestions();
     } catch (error) {
       console.error(error);
@@ -638,15 +640,10 @@ function LectureLayout({ mode = "student" }) {
             resolvedDocument.thumbnailUrl ||
             "",
 
-          pdf_url:
-            resolvedDocument.pdf_url ||
-            resolvedDocument.pdfUrl ||
-            "",
+          pdf_url: resolvedDocument.pdf_url || resolvedDocument.pdfUrl || "",
 
           uploaded_at:
-            resolvedDocument.uploaded_at ||
-            resolvedDocument.uploadedAt ||
-            null,
+            resolvedDocument.uploaded_at || resolvedDocument.uploadedAt || null,
         };
 
         if (ignore) return;
@@ -659,9 +656,7 @@ function LectureLayout({ mode = "student" }) {
         if (ignore) return;
 
         console.error(error);
-        setDocumentError(
-          error.message || "강의자료를 불러오지 못했습니다.",
-        );
+        setDocumentError(error.message || "강의자료를 불러오지 못했습니다.");
       } finally {
         if (!ignore) {
           setIsLoadingDocument(false);
@@ -770,32 +765,6 @@ function LectureLayout({ mode = "student" }) {
   }, [activeDocId, currentSlide?.slide_id, loadStrokes]);
 
   useEffect(() => {
-    if (activeTool !== TOOLS.LIST) return;
-    if (!currentSlide?.slide_id) return;
-
-    let ignore = false;
-
-    async function refreshQuestionsForPolling() {
-      if (ignore) return;
-      await refreshCurrentSlideQuestions();
-    }
-
-    refreshQuestionsForPolling();
-
-    const intervalId = window.setInterval(refreshQuestionsForPolling, 3000);
-
-    return () => {
-      ignore = true;
-      window.clearInterval(intervalId);
-    };
-  }, [
-    activeTool,
-    activeDocId,
-    currentSlide?.slide_id,
-    currentSlide?.page_number,
-  ]);
-
-  useEffect(() => {
     if (!spaceId || !currentSlide?.slide_id) return;
 
     socketRef.current?.deactivate?.();
@@ -826,6 +795,23 @@ function LectureLayout({ mode = "student" }) {
           removeStrokeWithoutPending(stroke);
         }
       },
+      onQuestionCreated: (question) => {
+        const nextQuestion = normalizeQuestionResponse(question, {
+          documentId: activeDocId,
+          slideId: currentSlide.slide_id,
+          pageNumber: currentSlide.page_number,
+        });
+
+        setQuestions((prev) => {
+          const nextKey = getQuestionKey(nextQuestion);
+
+          if (prev.some((item) => getQuestionKey(item) === nextKey)) {
+            return prev;
+          }
+
+          return [...prev, nextQuestion];
+        });
+      },
       onConnect: () => {
         requestStrokeResync(socketRef.current, {
           spaceId,
@@ -845,6 +831,8 @@ function LectureLayout({ mode = "student" }) {
   }, [
     spaceId,
     currentSlide?.slide_id,
+    activeDocId,
+    currentSlide?.page_number,
     mode,
     loadStrokes,
     removeStrokeWithoutPending,
@@ -880,13 +868,7 @@ function LectureLayout({ mode = "student" }) {
     }
 
     savePendingStrokes();
-  }, [
-    pendingSave,
-    currentSlide?.slide_id,
-    clearPending,
-    mode,
-    spaceId,
-  ]);
+  }, [pendingSave, currentSlide?.slide_id, clearPending, mode, spaceId]);
 
   useEffect(() => {
     if (pendingDelete.length === 0) return;
