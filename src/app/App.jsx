@@ -63,10 +63,6 @@ function App() {
         }
       />
 
-      {/* 임시 테스트 라우트: 디자인 확인용 */}
-      <Route path="/lecture-student-test" element={<StudentLecturePage />} />
-      <Route path="/lecture-professor-test" element={<ProfessorLecturePage />} />
-
       <Route
         path="/spaces/:spaceId"
         element={

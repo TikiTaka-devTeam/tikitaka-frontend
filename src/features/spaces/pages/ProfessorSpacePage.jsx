@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ModeTabs from "../../../components/common/ModeTabs.jsx";
 import leftArrowIcon from "../../../assets/icons/left_arrow.png";
@@ -9,14 +9,11 @@ import {
   getSpaceDocuments,
   getSpaceCode,
   getDocumentSlides,
+  createSpaceDocument,
 } from "../api/spaceApi";
-import { createSpaceDocument } from "../api/professorSpaceApi";
+import { resolveAssetUrl } from "../../../lib/utils/resolveAssetUrl.js";
 import LectureUploadModal from "../components/LectureUploadModal.jsx";
 import "../styles/professor-space-page.css";
-
-const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"
-).replace(/\/$/, "");
 
 function formatDate(value) {
   if (!value) return "";
@@ -37,25 +34,6 @@ function formatDate(value) {
 function buildGradient(color) {
   const startColor = color || "#2563eb";
   return `linear-gradient(115deg, ${startColor} 0%, #7fd0d7 100%)`;
-}
-
-function resolveImageUrl(url) {
-  if (!url) return "";
-
-  if (
-    url.startsWith("http://") ||
-    url.startsWith("https://") ||
-    url.startsWith("data:") ||
-    url.startsWith("blob:")
-  ) {
-    return url;
-  }
-
-  if (url.startsWith("/")) {
-    return `${API_BASE_URL}${url}`;
-  }
-
-  return `${API_BASE_URL}/${url}`;
 }
 
 async function attachFirstSlideThumbnails(rawDocuments) {
@@ -116,7 +94,7 @@ function ProfessorSpacePage() {
     return buildGradient(space?.color);
   }, [space?.color]);
 
-  async function loadProfessorSpacePage() {
+  const loadProfessorSpacePage = useCallback(async () => {
     if (!spaceId) {
       setErrorMessage("강의 정보를 찾을 수 없습니다.");
       setLoading(false);
@@ -150,7 +128,7 @@ function ProfessorSpacePage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [spaceId]);
 
   useEffect(() => {
     let ignore = false;
@@ -165,7 +143,7 @@ function ProfessorSpacePage() {
     return () => {
       ignore = true;
     };
-  }, [spaceId]);
+  }, [loadProfessorSpacePage]);
 
   const tabs = [
     {
@@ -192,10 +170,6 @@ function ProfessorSpacePage() {
 
   const handleBack = () => {
     navigate("/dashboard?section=spaces");
-  };
-
-  const handleMegaphoneClick = () => {
-    console.log("공지/알림 버튼 클릭");
   };
 
   const handleCreateBoxClick = () => {
@@ -233,8 +207,6 @@ function ProfessorSpacePage() {
   };
 
   const handleDocumentClick = (document) => {
-    console.log("교수 강의자료 클릭:", document);
-
     const documentId =
       document.document_id ||
       document.documentId ||
@@ -264,16 +236,14 @@ function ProfessorSpacePage() {
     setOpenedMenuId((prev) => (prev === documentId ? "" : documentId));
   };
 
-  const handleEditClick = (event, document) => {
+  const handleEditClick = (event) => {
     event.stopPropagation();
     setOpenedMenuId("");
-    console.log("수정 클릭:", document);
   };
 
-  const handleDeleteClick = (event, document) => {
+  const handleDeleteClick = (event) => {
     event.stopPropagation();
     setOpenedMenuId("");
-    console.log("삭제 클릭:", document);
   };
 
   return (
@@ -317,7 +287,6 @@ function ProfessorSpacePage() {
           <button
             type="button"
             className="professor-space-page__megaphone-button"
-            onClick={handleMegaphoneClick}
             aria-label="공지"
           >
             <img src={megaphoneIcon} alt="" />
@@ -374,7 +343,7 @@ function ProfessorSpacePage() {
                   <div className="professor-space-page__thumbnail">
                     {document.display_thumbnail_url ? (
                       <img
-                        src={resolveImageUrl(document.display_thumbnail_url)}
+                        src={resolveAssetUrl(document.display_thumbnail_url)}
                         alt=""
                       />
                     ) : (
@@ -394,13 +363,13 @@ function ProfessorSpacePage() {
                       <div className="professor-space-page__document-menu">
                         <button
                           type="button"
-                          onClick={(event) => handleEditClick(event, document)}
+                          onClick={handleEditClick}
                         >
                           수정
                         </button>
                         <button
                           type="button"
-                          onClick={(event) => handleDeleteClick(event, document)}
+                          onClick={handleDeleteClick}
                         >
                           삭제
                         </button>

@@ -1,17 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ModeTabs from "../../../components/common/ModeTabs.jsx";
 import leftArrowIcon from "../../../assets/icons/left_arrow.png";
 import megaphoneIcon from "../../../assets/icons/megaphone.png";
 import userIcon from "../../../assets/icons/userIcon.png";
 import reloadIcon from "../../../assets/icons/reload.png";
-import { getMySpaces } from "../api/spaceApi";
 import {
   approveSpaceMember,
   denySpaceMember,
+  getMySpaces,
   getPendingSpaceMembers,
   getSpaceMembers,
-} from "../api/professorSpaceMemberApi";
+} from "../api/spaceApi.js";
 import "../styles/professor-space-member-page.css";
 
 function buildGradient(color) {
@@ -122,7 +122,7 @@ function ProfessorSpaceMemberPage() {
     return buildGradient(space?.color);
   }, [space?.color]);
 
-  async function loadProfessorSpaceMemberPage() {
+  const loadProfessorSpaceMemberPage = useCallback(async () => {
     if (!spaceId) {
       setErrorMessage("강의 정보를 찾을 수 없습니다.");
       setLoading(false);
@@ -152,7 +152,7 @@ function ProfessorSpaceMemberPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [spaceId]);
 
   useEffect(() => {
     let ignore = false;
@@ -167,7 +167,7 @@ function ProfessorSpaceMemberPage() {
     return () => {
       ignore = true;
     };
-  }, [spaceId]);
+  }, [loadProfessorSpaceMemberPage]);
 
   const tabs = [
     {
@@ -195,10 +195,6 @@ function ProfessorSpaceMemberPage() {
 
   const handleBack = () => {
     navigate("/dashboard?section=spaces");
-  };
-
-  const handleMegaphoneClick = () => {
-    console.log("공지/알림 버튼 클릭");
   };
 
   const handleReloadClick = async () => {
@@ -269,7 +265,6 @@ function ProfessorSpaceMemberPage() {
           <button
             type="button"
             className="professor-space-member-page__megaphone-button"
-            onClick={handleMegaphoneClick}
             aria-label="공지"
           >
             <img src={megaphoneIcon} alt="" />

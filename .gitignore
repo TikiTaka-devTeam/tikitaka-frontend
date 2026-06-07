@@ -23,6 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 .env
+.env.example
 
 # Prevent accidental backend source trees from being committed into the frontend repo
 src/main/java/

@@ -23,11 +23,16 @@ function QuestionPanel({
       <div className="question-panel__body">
         {hasQuestions ? (
           <div className="question-panel__cards">
-            {questions.map((question, index) => {
+            {questions.map((question) => {
               const questionText =
                 typeof question === "string"
                   ? question
                   : question.content ?? question.text ?? "";
+              const questionKey =
+                typeof question === "string"
+                  ? question
+                  : question.id ??
+                    `${question.slideId}-${question.x}-${question.y}-${questionText}`;
 
               const isSelected =
                 typeof question === "object" &&
@@ -36,7 +41,7 @@ function QuestionPanel({
               return (
                 <article
                   className={`question-card ${isSelected ? "is-selected" : ""}`}
-                  key={question.id ?? index}
+                  key={questionKey}
                   onClick={() => {
                     if (typeof question === "object") {
                       onSelectQuestion?.(question);

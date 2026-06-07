@@ -1,21 +1,7 @@
 // src/features/lecture/components/QuestionBubble.jsx
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import QuestionArrowIcon from "../../../assets/icons/lecture/question_arrow.svg?react";
-
-const MIN_BUBBLE_WIDTH = 150;
-const MAX_BUBBLE_WIDTH = 350;
-
-function getEstimatedTextWidth(text) {
-  const target = text || "질문을 입력하세요";
-
-  return Array.from(target).reduce((sum, char) => {
-    if (char === " ") return sum + 4;
-    if (/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(char)) return sum + 13;
-    if (/[A-Z]/.test(char)) return sum + 8;
-    if (/[a-z0-9]/.test(char)) return sum + 7;
-    return sum + 8;
-  }, 0);
-}
+import { getBubbleWidth } from "../utils/getBubbleWidth.js";
 
 function QuestionBubble({
   draft,
@@ -33,16 +19,18 @@ function QuestionBubble({
 
   const bubbleWidth = useMemo(() => {
     const text = isSaved ? data?.content ?? "" : value.trim();
-    const textWidth = getEstimatedTextWidth(text);
-
-    return Math.min(
-      MAX_BUBBLE_WIDTH,
-      Math.max(MIN_BUBBLE_WIDTH, textWidth + 76),
-    );
+    return getBubbleWidth(text, "질문을 입력하세요");
   }, [value, data?.content, isSaved]);
 
+  const resizeTextarea = useCallback(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, []);
+
   useEffect(() => {
-    setValue(data?.content ?? "");
     hasSubmittedRef.current = false;
 
     if (!isSaved) {
@@ -51,21 +39,13 @@ function QuestionBubble({
         resizeTextarea();
       });
     }
-  }, [data?.id, data?.content, isSaved]);
+  }, [data?.id, isSaved, resizeTextarea]);
 
   useEffect(() => {
     resizeTextarea();
-  }, [value, bubbleWidth]);
+  }, [value, bubbleWidth, resizeTextarea]);
 
   if (!data) return null;
-
-  function resizeTextarea() {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    textarea.style.height = "auto";
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  }
 
   function submitQuestion() {
     if (isSaved || hasSubmittedRef.current) return;

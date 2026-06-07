@@ -1,22 +1,8 @@
 // src/features/lecture/components/ProfessorCheckBubble.jsx
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ProfessorAlertIcon from "../../../assets/icons/lecture/professor_check_active.svg?react";
 import ProfessorDoneIcon from "../../../assets/icons/lecture/professor_note_done.svg?react";
-
-const MIN_BUBBLE_WIDTH = 150;
-const MAX_BUBBLE_WIDTH = 350;
-
-function getEstimatedTextWidth(text) {
-  const target = text || "수정사항을 입력하세요";
-
-  return Array.from(target).reduce((sum, char) => {
-    if (char === " ") return sum + 4;
-    if (/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(char)) return sum + 13;
-    if (/[A-Z]/.test(char)) return sum + 8;
-    if (/[a-z0-9]/.test(char)) return sum + 7;
-    return sum + 8;
-  }, 0);
-}
+import { getBubbleWidth } from "../utils/getBubbleWidth.js";
 
 function ProfessorCheckBubble({ draft, note, onSubmit, onCancel, onDone }) {
   const isSaved = Boolean(note);
@@ -28,16 +14,18 @@ function ProfessorCheckBubble({ draft, note, onSubmit, onCancel, onDone }) {
 
   const bubbleWidth = useMemo(() => {
     const text = isSaved ? data?.content ?? "" : value.trim();
-    const textWidth = getEstimatedTextWidth(text);
-
-    return Math.min(
-      MAX_BUBBLE_WIDTH,
-      Math.max(MIN_BUBBLE_WIDTH, textWidth + 76),
-    );
+    return getBubbleWidth(text, "수정사항을 입력하세요");
   }, [value, data?.content, isSaved]);
 
+  const resizeTextarea = useCallback(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, []);
+
   useEffect(() => {
-    setValue(data?.content ?? "");
     hasSubmittedRef.current = false;
 
     if (!isSaved) {
@@ -46,21 +34,13 @@ function ProfessorCheckBubble({ draft, note, onSubmit, onCancel, onDone }) {
         resizeTextarea();
       });
     }
-  }, [data?.id, data?.content, isSaved]);
+  }, [data?.id, isSaved, resizeTextarea]);
 
   useEffect(() => {
     resizeTextarea();
-  }, [value, bubbleWidth]);
+  }, [value, bubbleWidth, resizeTextarea]);
 
   if (!data) return null;
-
-  function resizeTextarea() {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    textarea.style.height = "auto";
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  }
 
   function submitNote() {
     if (isSaved || hasSubmittedRef.current) return;

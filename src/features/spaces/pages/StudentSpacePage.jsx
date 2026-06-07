@@ -7,11 +7,8 @@ import {
   getSpaceDocuments,
   getDocumentSlides,
 } from "../api/spaceApi";
+import { resolveAssetUrl } from "../../../lib/utils/resolveAssetUrl.js";
 import "../styles/student-space-page.css";
-
-const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"
-).replace(/\/$/, "");
 
 function formatDate(value) {
   if (!value) return "";
@@ -32,25 +29,6 @@ function formatDate(value) {
 function buildGradient(color) {
   const startColor = color || "#6b4de6";
   return `linear-gradient(115deg, ${startColor} 0%, #f47597 100%)`;
-}
-
-function resolveImageUrl(url) {
-  if (!url) return "";
-
-  if (
-    url.startsWith("http://") ||
-    url.startsWith("https://") ||
-    url.startsWith("data:") ||
-    url.startsWith("blob:")
-  ) {
-    return url;
-  }
-
-  if (url.startsWith("/")) {
-    return `${API_BASE_URL}${url}`;
-  }
-
-  return `${API_BASE_URL}/${url}`;
 }
 
 async function attachFirstSlideThumbnails(rawDocuments) {
@@ -179,8 +157,6 @@ function StudentSpacePage() {
   };
 
   const handleDocumentClick = (document) => {
-    console.log("문서 클릭:", document);
-
     const documentId = document.document_id || document.documentId || document.id;
 
     if (!spaceId || !documentId) {
@@ -253,7 +229,7 @@ function StudentSpacePage() {
                   <div className="student-space-page__thumbnail">
                     {document.display_thumbnail_url ? (
                       <img
-                        src={resolveImageUrl(document.display_thumbnail_url)}
+                        src={resolveAssetUrl(document.display_thumbnail_url)}
                         alt=""
                       />
                     ) : (

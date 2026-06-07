@@ -1,5 +1,5 @@
 // src/features/lecture/components/LectureLayout.jsx
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import TopNav from "./TopNav.jsx";
 import Toolbar from "./Toolbar.jsx";
@@ -10,17 +10,20 @@ import useScale from "../hooks/useScale.js";
 import {
   createQuestion,
   deleteSlideStroke,
-  fetchDocumentSlides,
   fetchSlideQuestions,
   fetchSlideStrokes,
   normalizeQuestionResponse,
   normalizeSlideResponse,
   saveSlideStrokes,
 } from "../api/lectureApi.js";
-import { getSpaceDocuments } from "../../spaces/api/spaceApi.js";
+import {
+  getDocumentSlides,
+  getSpaceDocuments,
+} from "../../spaces/api/spaceApi.js";
 import {
   createLectureSocket,
   requestStrokeResync,
+  sendQuestionCreated,
   sendSharedStroke,
   sendSharedStrokeDelete,
 } from "../api/lectureSocket.js";
@@ -246,7 +249,7 @@ function LectureLayout({ mode = "student" }) {
     setSelectedQuestionId(null);
   }
 
-  async function reloadCurrentSlideStrokes(slideId) {
+  const reloadCurrentSlideStrokes = useCallback(async (slideId) => {
     if (!slideId) return;
 
     try {
@@ -293,39 +296,7 @@ function LectureLayout({ mode = "student" }) {
     } catch (error) {
       console.error("필기 재조회 실패", error);
     }
-  }
-
-  async function refreshCurrentSlideQuestions() {
-    if (!activeDocId || !currentSlide?.slide_id) return;
-
-    try {
-      const questionList = await fetchSlideQuestions(currentSlide.slide_id);
-
-      const normalizedQuestions = Array.isArray(questionList)
-        ? questionList.map((question) =>
-            normalizeQuestionResponse(question, {
-              documentId: activeDocId,
-              slideId: currentSlide.slide_id,
-              pageNumber: currentSlide.page_number,
-            }),
-          )
-        : [];
-
-      setQuestions((prev) => {
-        const filteredPrev = prev.filter(
-          (question) =>
-            !(
-              String(question.documentId) === String(activeDocId) &&
-              String(question.slideId) === String(currentSlide.slide_id)
-            ),
-        );
-
-        return [...filteredPrev, ...normalizedQuestions];
-      });
-    } catch (error) {
-      console.error("질문 목록 갱신 실패", error);
-    }
-  }
+  }, [activeDocId, currentSlide?.page_number, loadStrokes]);
 
   function handleQuestionPoint(point) {
     if (!activeDocId || !currentSlide) return;
@@ -440,7 +411,12 @@ function LectureLayout({ mode = "student" }) {
         return [...prev, nextQuestion];
       });
 
-      await refreshCurrentSlideQuestions();
+      sendQuestionCreated(socketRef.current, {
+        spaceId,
+        slideId: localQuestion.slideId,
+        question: nextQuestion,
+      });
+
     } catch (error) {
       console.error(error);
       alert(error.message || "질문 저장에 실패했습니다.");
@@ -590,7 +566,7 @@ function LectureLayout({ mode = "student" }) {
         setIsLoadingDocument(true);
         setDocumentError("");
 
-        const slideList = await fetchDocumentSlides(documentId);
+        const slideList = await getDocumentSlides(documentId);
         const normalizedSlides = Array.isArray(slideList)
           ? slideList
               .map(normalizeSlideResponse)
@@ -767,32 +743,11 @@ function LectureLayout({ mode = "student" }) {
     return () => {
       ignore = true;
     };
-  }, [activeDocId, currentSlide?.slide_id, loadStrokes]);
-
-  useEffect(() => {
-    if (activeTool !== TOOLS.LIST) return;
-    if (!currentSlide?.slide_id) return;
-
-    let ignore = false;
-
-    async function refreshQuestionsForPolling() {
-      if (ignore) return;
-      await refreshCurrentSlideQuestions();
-    }
-
-    refreshQuestionsForPolling();
-
-    const intervalId = window.setInterval(refreshQuestionsForPolling, 3000);
-
-    return () => {
-      ignore = true;
-      window.clearInterval(intervalId);
-    };
   }, [
-    activeTool,
     activeDocId,
     currentSlide?.slide_id,
     currentSlide?.page_number,
+    loadStrokes,
   ]);
 
   useEffect(() => {
@@ -826,6 +781,23 @@ function LectureLayout({ mode = "student" }) {
           removeStrokeWithoutPending(stroke);
         }
       },
+      onQuestionCreated: (question) => {
+        const nextQuestion = normalizeQuestionResponse(question, {
+          documentId: activeDocId,
+          slideId: currentSlide.slide_id,
+          pageNumber: currentSlide.page_number,
+        });
+
+        setQuestions((prev) => {
+          const nextKey = getQuestionKey(nextQuestion);
+
+          if (prev.some((item) => getQuestionKey(item) === nextKey)) {
+            return prev;
+          }
+
+          return [...prev, nextQuestion];
+        });
+      },
       onConnect: () => {
         requestStrokeResync(socketRef.current, {
           spaceId,
@@ -844,7 +816,9 @@ function LectureLayout({ mode = "student" }) {
     };
   }, [
     spaceId,
+    activeDocId,
     currentSlide?.slide_id,
+    currentSlide?.page_number,
     mode,
     loadStrokes,
     removeStrokeWithoutPending,
@@ -886,6 +860,7 @@ function LectureLayout({ mode = "student" }) {
     clearPending,
     mode,
     spaceId,
+    reloadCurrentSlideStrokes,
   ]);
 
   useEffect(() => {

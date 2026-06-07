@@ -41,12 +41,8 @@ function HeaderActions({
 }) {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notificationFilter, setNotificationFilter] = useState("all");
-  const [hasAvatarError, setHasAvatarError] = useState(false);
+  const [failedAvatarSrc, setFailedAvatarSrc] = useState("");
   const notificationAreaRef = useRef(null);
-
-  useEffect(() => {
-    setHasAvatarError(false);
-  }, [avatarSrc]);
 
   useEffect(() => {
     if (!isNotificationOpen) {
@@ -87,7 +83,8 @@ function HeaderActions({
   };
 
   const avatarText = avatarLabel.trim().charAt(0) || "\uC0C8";
-  const hasAvatarImage = Boolean(avatarSrc?.trim()) && !hasAvatarError;
+  const hasAvatarImage =
+    Boolean(avatarSrc?.trim()) && failedAvatarSrc !== avatarSrc;
 
   return (
     <div className="header-actions">
@@ -129,7 +126,7 @@ function HeaderActions({
             className="header-actions__avatar-image"
             src={avatarSrc}
             alt={avatarLabel}
-            onError={() => setHasAvatarError(true)}
+            onError={() => setFailedAvatarSrc(avatarSrc)}
           />
         ) : (
           <span className="header-actions__avatar" aria-hidden="true">

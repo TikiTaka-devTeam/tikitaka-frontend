@@ -1,9 +1,7 @@
 // src/features/lecture/api/lectureSocket.js
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+import { API_BASE_URL } from "../../../lib/config/api.js";
 
 function getTokenHeader() {
   const token = localStorage.getItem("tikitaka_access_token");
@@ -262,7 +260,7 @@ export function sendQuestionCreated(client, { spaceId, slideId, question }) {
   if (!client?.connected) return;
 
   client.publish({
-    destination: `/app/spaces/${spaceId}/slides/${slideId}/questions`,
+    destination: `/topic/spaces/${spaceId}/slides/${slideId}/questions`,
     headers: getTokenHeader(),
     body: JSON.stringify({
       type: "QUESTION_CREATED",

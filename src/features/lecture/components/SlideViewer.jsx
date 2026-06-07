@@ -1,36 +1,12 @@
 // src/features/lecture/components/SlideViewer.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
+import { resolveAssetUrl } from "../../../lib/utils/resolveAssetUrl.js";
 import useCanvas from "../hooks/useCanvas.js";
 import QuestionBubble from "./QuestionBubble.jsx";
 import ProfessorCheckBubble from "./ProfessorCheckBubble.jsx";
 
 const DEFAULT_SLIDE_WIDTH = 1210;
 const DEFAULT_SLIDE_HEIGHT = 720;
-
-const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"
-).replace(/\/$/, "");
-
-function resolveImageUrl(url) {
-  if (!url) return "";
-
-  const value = String(url).trim();
-
-  if (
-    value.startsWith("http://") ||
-    value.startsWith("https://") ||
-    value.startsWith("data:") ||
-    value.startsWith("blob:")
-  ) {
-    return value;
-  }
-
-  if (value.startsWith("/")) {
-    return `${API_BASE_URL}${value}`;
-  }
-
-  return `${API_BASE_URL}/${value}`;
-}
 
 function getSlideSize(slide) {
   const width =
@@ -123,7 +99,7 @@ function SlideViewer({
     (question) => question.id === selectedQuestionId,
   );
 
-  const resolvedImageUrl = resolveImageUrl(
+  const resolvedImageUrl = resolveAssetUrl(
     imageUrl ?? slide?.image_url ?? slide?.imageUrl ?? "",
   );
 
@@ -240,6 +216,7 @@ function SlideViewer({
 
         {draftQuestion && (
           <QuestionBubble
+            key={draftQuestion.id}
             draft={draftQuestion}
             onSubmit={onQuestionSubmit}
             onCancel={onQuestionCancel}
@@ -256,6 +233,7 @@ function SlideViewer({
 
         {draftProfessorNote && (
           <ProfessorCheckBubble
+            key={draftProfessorNote.id}
             draft={draftProfessorNote}
             onSubmit={onProfessorNoteSubmit}
             onCancel={onProfessorNoteCancel}

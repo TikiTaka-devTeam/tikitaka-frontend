@@ -1,5 +1,5 @@
-// src/api/lectureApi.js
-import { apiRequest } from "./client.js";
+// src/features/lecture/api/lectureApi.js
+import { apiClient } from "../../../lib/api/client.js";
 
 function normalizeStrokeTool(tool) {
   if (tool === "PROFESSOR_NOTE") return "FIXER";
@@ -101,16 +101,6 @@ export function normalizeQuestionResponse(question, fallback = {}) {
   };
 }
 
-export function normalizeDocumentSummary(document) {
-  return {
-    document_id: document.document_id ?? document.documentId,
-    title: document.title ?? "강의자료",
-    thumbnail_url: document.thumbnail_url ?? document.thumbnailUrl ?? "",
-    pdf_url: document.pdf_url ?? document.pdfUrl ?? "",
-    uploaded_at: document.uploaded_at ?? document.uploadedAt ?? null,
-  };
-}
-
 export function normalizeSlideResponse(slide, index = 0) {
   return {
     slide_id: slide.slide_id ?? slide.slideId ?? slide.id,
@@ -137,32 +127,14 @@ export function normalizeSlideResponse(slide, index = 0) {
   };
 }
 
-export function fetchSpaceDocuments(spaceId) {
-  return apiRequest(`/api/v1/spaces/${spaceId}/documents`);
+export async function fetchPrivateStrokes(slideId) {
+  const response = await apiClient.get(`/slides/${slideId}/private-strokes`);
+  return response.data;
 }
 
-export function fetchDocumentSlides(documentId) {
-  return apiRequest(`/api/v1/documents/${documentId}/slides`);
-}
-
-export function uploadLectureDocument(spaceId, { title, file }) {
-  const formData = new FormData();
-
-  formData.append("title", title);
-  formData.append("file", file);
-
-  return apiRequest(`/api/v1/spaces/${spaceId}/documents`, {
-    method: "POST",
-    body: formData,
-  });
-}
-
-export function fetchPrivateStrokes(slideId) {
-  return apiRequest(`/api/v1/slides/${slideId}/private-strokes`);
-}
-
-export function fetchSharedStrokes(slideId) {
-  return apiRequest(`/api/v1/slides/${slideId}/shared-strokes`);
+export async function fetchSharedStrokes(slideId) {
+  const response = await apiClient.get(`/slides/${slideId}/shared-strokes`);
+  return response.data;
 }
 
 export async function fetchSlideStrokes(slideId) {
@@ -191,22 +163,20 @@ export async function fetchSlideStrokes(slideId) {
   );
 }
 
-export function savePrivateStrokes(slideId, strokes) {
-  return apiRequest(`/api/v1/slides/${slideId}/private-strokes`, {
-    method: "POST",
-    body: JSON.stringify({
-      strokes: strokes.map(normalizeStrokePayload),
-    }),
+export async function savePrivateStrokes(slideId, strokes) {
+  const response = await apiClient.post(`/slides/${slideId}/private-strokes`, {
+    strokes: strokes.map(normalizeStrokePayload),
   });
+
+  return response.data;
 }
 
-export function saveSharedStrokes(slideId, strokes) {
-  return apiRequest(`/api/v1/slides/${slideId}/shared-strokes`, {
-    method: "POST",
-    body: JSON.stringify({
-      strokes: strokes.map(normalizeStrokePayload),
-    }),
+export async function saveSharedStrokes(slideId, strokes) {
+  const response = await apiClient.post(`/slides/${slideId}/shared-strokes`, {
+    strokes: strokes.map(normalizeStrokePayload),
   });
+
+  return response.data;
 }
 
 export function saveSlideStrokes(slideId, strokes, mode = "student") {
@@ -221,16 +191,14 @@ export function saveSlideStroke(slideId, stroke, mode = "student") {
   return saveSlideStrokes(slideId, [stroke], mode);
 }
 
-export function deletePrivateStroke(strokeId) {
-  return apiRequest(`/api/v1/private-strokes/${strokeId}`, {
-    method: "PATCH",
-  });
+export async function deletePrivateStroke(strokeId) {
+  const response = await apiClient.patch(`/private-strokes/${strokeId}`);
+  return response.data;
 }
 
-export function deleteSharedStroke(strokeId) {
-  return apiRequest(`/api/v1/shared-strokes/${strokeId}`, {
-    method: "PATCH",
-  });
+export async function deleteSharedStroke(strokeId) {
+  const response = await apiClient.patch(`/shared-strokes/${strokeId}`);
+  return response.data;
 }
 
 export function deleteSlideStroke(stroke) {
@@ -241,28 +209,31 @@ export function deleteSlideStroke(stroke) {
   return deletePrivateStroke(stroke.strokeId ?? stroke.id);
 }
 
-export function fetchSlideQuestions(slideId) {
-  return apiRequest(`/api/v1/slides/${slideId}/questions`);
+export async function fetchSlideQuestions(slideId) {
+  const response = await apiClient.get(`/slides/${slideId}/questions`);
+  return response.data;
 }
 
-export function createQuestion(slideId, question) {
-  return apiRequest(`/api/v1/slides/${slideId}/questions`, {
-    method: "POST",
-    body: JSON.stringify(normalizeQuestionPayload(question)),
-  });
+export async function createQuestion(slideId, question) {
+  const response = await apiClient.post(
+    `/slides/${slideId}/questions`,
+    normalizeQuestionPayload(question),
+  );
+
+  return response.data;
 }
 
-export function fetchQuestionOverlay(slideId) {
-  return apiRequest(`/api/v1/slides/${slideId}/questions/overlay`);
+export async function fetchQuestionOverlay(slideId) {
+  const response = await apiClient.get(`/slides/${slideId}/questions/overlay`);
+  return response.data;
 }
 
-export function fetchQuestionDetail(questionId) {
-  return apiRequest(`/api/v1/questions/${questionId}`);
+export async function fetchQuestionDetail(questionId) {
+  const response = await apiClient.get(`/questions/${questionId}`);
+  return response.data;
 }
 
-export function createAnswer(questionId, answer) {
-  return apiRequest(`/api/v1/questions/${questionId}/answer`, {
-    method: "POST",
-    body: JSON.stringify(answer),
-  });
+export async function createAnswer(questionId, answer) {
+  const response = await apiClient.post(`/questions/${questionId}/answer`, answer);
+  return response.data;
 }
