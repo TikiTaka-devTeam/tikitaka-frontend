@@ -96,11 +96,11 @@ function MySpacesSection({
       alert(`${joinedSpaceName} 참여 요청을 보냈습니다.`);
       setIsJoinModalOpen(false);
     } catch (error) {
-      const errorMessage =
+      const nextErrorMessage =
         error?.response?.data?.message ??
-        "Space 참여 요청에 실패했습니다. 잠시 후 다시 시도해주세요.";
+        "Space 참여 요청에 실패했습니다. 잠시 후 다시 시도해 주세요.";
 
-      alert(errorMessage);
+      alert(nextErrorMessage);
       throw error;
     }
   }

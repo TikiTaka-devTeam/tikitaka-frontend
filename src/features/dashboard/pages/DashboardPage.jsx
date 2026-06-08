@@ -14,13 +14,13 @@ const DASHBOARD_SECTION = "dashboard";
 const SPACES_SECTION = "spaces";
 
 const dashboardTabs = [
-  { label: "\uB300\uC2DC\uBCF4\uB4DC", value: DASHBOARD_SECTION },
+  { label: "대시보드", value: DASHBOARD_SECTION },
   { label: "space", value: SPACES_SECTION },
 ];
 
 const emptyProfile = {
-  name: "\uC0AC\uC6A9\uC790",
-  role_label: "\uC0AC\uC6A9\uC790",
+  name: "사용자",
+  role_label: "사용자",
   unread_notification_count: 0,
 };
 
@@ -28,21 +28,21 @@ function formatRemainingTime(value) {
   const minutes = Number(value);
 
   if (!Number.isFinite(minutes) || minutes <= 0) {
-    return "0\uBD84";
+    return "0분";
   }
 
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
 
   if (hours === 0) {
-    return `${remainingMinutes}\uBD84`;
+    return `${remainingMinutes}분`;
   }
 
   if (remainingMinutes === 0) {
-    return `${hours}\uC2DC\uAC04`;
+    return `${hours}시간`;
   }
 
-  return `${hours}\uC2DC\uAC04 ${remainingMinutes}\uBD84`;
+  return `${hours}시간 ${remainingMinutes}분`;
 }
 
 function DashboardPage() {
@@ -102,9 +102,7 @@ function DashboardPage() {
       setMySpaces(Array.isArray(data) ? data : []);
       setHasLoadedMySpaces(true);
     } catch {
-      setMySpacesError(
-        "\uC2A4\uD398\uC774\uC2A4 \uBAA9\uB85D\uC744 \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.",
-      );
+      setMySpacesError("스페이스 목록을 불러오지 못했습니다.");
     } finally {
       setIsLoadingMySpaces(false);
     }
@@ -146,20 +144,14 @@ function DashboardPage() {
           <>
             {isLoadingDashboard ? (
               <section className="dashboard-feedback-panel">
-                <p>
-                  {
-                    "\uB300\uC2DC\uBCF4\uB4DC \uB370\uC774\uD130\uB97C \uBD88\uB7EC\uC624\uB294 \uC911\uC785\uB2C8\uB2E4."
-                  }
-                </p>
+                <p>대시보드 데이터를 불러오는 중입니다.</p>
               </section>
             ) : null}
 
             <section className="dashboard-overview">
               <div className="dashboard-overview__main">
                 <div className="section-title">
-                  {nextSpace
-                    ? "\uB2E4\uC74C \uAC15\uC758\uAE4C\uC9C0 "
-                    : "\uB2E4\uC74C \uAC15\uC758 \uC77C\uC815"}
+                  {nextSpace ? "다음 강의까지 " : "다음 강의 일정"}
                   {nextSpace ? <span>{formatRemainingTime(nextSpace.remain_time)}</span> : null}
                 </div>
                 <NextSpaceCard nextSpace={nextSpace} onSelect={handleSelectSpace} />
@@ -167,9 +159,7 @@ function DashboardPage() {
               </div>
 
               <aside className="dashboard-overview__side">
-                <div className="section-title section-title--dark">
-                  {"\uC2DC\uAC04\uD45C"}
-                </div>
+                <div className="section-title section-title--dark">시간표</div>
                 <WeeklySchedule schedules={schedules} />
               </aside>
             </section>
