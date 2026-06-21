@@ -1,5 +1,9 @@
 import { apiClient } from "../../../lib/api/client.js";
-import { buildSpaceGradient } from "../data/spaceThemes.js";
+import {
+  buildSpaceGradient,
+  getSpaceThemeByColor,
+  resolveSpaceGradient,
+} from "../data/spaceThemes.js";
 
 const ROLE_LABELS = {
   STUDENT: "학생",
@@ -14,6 +18,8 @@ const DAY_LABELS = {
   FRIDAY: "FRI",
 };
 
+
+// 백엔드 응답에 color가 없을 때 사용하는 fallback 색상 목록
 const DASHBOARD_COLOR_PALETTE = ["#5544D8", "#2350B2", "#2766EC", "#22C55E", "#E67E7E"];
 
 function formatLookupDay(day) {
@@ -72,17 +78,25 @@ function mapColorizedSpaces(spaces) {
     return [];
   }
 
-  return spaces.map((space) => ({
-    ...space,
-    space_id: space.space_id ?? space.spaceId ?? "",
-    professor_name: space.professor_name ?? space.professorName ?? "",
-    last_accessed_at: space.last_accessed_at ?? space.lastAccessedAt ?? "",
-    nickname: space.nickname || space.name || "",
-    color: space.color || getColorBySpaceId(space.space_id ?? space.spaceId),
-  }));
+  return spaces.map((space) => {
+    const color = space.color || getColorBySpaceId(space.space_id ?? space.spaceId);
+    const theme = getSpaceThemeByColor(color);
+
+    return {
+      ...space,
+      space_id: space.space_id ?? space.spaceId ?? "",
+      professor_name: space.professor_name ?? space.professorName ?? "",
+      last_accessed_at: space.last_accessed_at ?? space.lastAccessedAt ?? "",
+      nickname: space.nickname || space.name || "",
+      color,
+      startColor: theme?.startColor,
+      endColor: theme?.endColor,
+      gradient: resolveSpaceGradient(color),
+    };
+  });
 }
 
-function mapSchedules(schedules, colorBySpaceId) {
+function mapSchedules(schedules) {
   if (!Array.isArray(schedules)) {
     return [];
   }
@@ -105,12 +119,16 @@ function mapSchedules(schedules, colorBySpaceId) {
       start_minute: startMinute,
       end_hour: endHour,
       end_minute: endMinute,
-      color: colorBySpaceId[spaceId] ?? getColorBySpaceId(spaceId),
+      color:
+        schedule.color ??
+        schedule.space_color ??
+        schedule.spaceColor ??
+        getColorBySpaceId(spaceId),
     };
   });
 }
 
-function mapNextSpace(nextSpace, colorBySpaceId) {
+function mapNextSpace(nextSpace) {
   if (!nextSpace) {
     return null;
   }
@@ -129,7 +147,11 @@ function mapNextSpace(nextSpace, colorBySpaceId) {
     professor_name: professorName,
     remain_time: remainTime,
     nickname: nextSpace.nickname || spaceName || "",
-    color: colorBySpaceId[spaceId] ?? getColorBySpaceId(spaceId),
+    color:
+      nextSpace.color ??
+      nextSpace.space_color ??
+      nextSpace.spaceColor ??
+      getColorBySpaceId(spaceId),
   };
 }
 
@@ -154,17 +176,12 @@ export async function fetchDashboardData() {
     nextSpaceResult.status === "fulfilled" ? nextSpaceResult.value : { data: null };
 
   const recentSpaces = mapColorizedSpaces(recentSpacesResponse.data);
-  const colorBySpaceId = recentSpaces.reduce((accumulator, space) => {
-    const spaceId = space.space_id ?? space.spaceId;
-    accumulator[spaceId] = space.color;
-    return accumulator;
-  }, {});
 
   return {
     profile: mapProfile(profileResult.value.data),
     recentSpaces,
-    schedules: mapSchedules(schedulesResponse.data, colorBySpaceId),
-    nextSpace: mapNextSpace(nextSpaceResponse.data, colorBySpaceId),
+    schedules: mapSchedules(schedulesResponse.data),
+    nextSpace: mapNextSpace(nextSpaceResponse.data),
   };
 }
 

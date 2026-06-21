@@ -1,4 +1,5 @@
 import clockIcon from "../../../assets/icons/clock.svg";
+import { resolveSpaceGradient } from "../data/spaceThemes.js";
 
 function getHeroStyle(color) {
   if (!color) {
@@ -6,7 +7,7 @@ function getHeroStyle(color) {
   }
 
   return {
-    background: `linear-gradient(135deg, ${color} 0%, rgba(255, 255, 255, 0.2) 180%)`,
+    background: resolveSpaceGradient(color),
   };
 }
 

@@ -23,6 +23,35 @@ export function buildSpaceGradient(startColor, endColor) {
   return `linear-gradient(90deg, ${startColor} 0%, ${endColor} 100%)`;
 }
 
+export function getSpaceThemeByColor(color) {
+  if (!color) {
+    return null;
+  }
+
+  const normalizedColor = color.toLowerCase();
+
+  return (
+    SPACE_THEME_PRESETS.find(
+      (theme) => theme.startColor.toLowerCase() === normalizedColor,
+    ) ?? null
+  );
+}
+
+export function resolveSpaceGradient(color) {
+  const theme = getSpaceThemeByColor(color);
+
+  if (theme) {
+    return buildSpaceGradient(theme.startColor, theme.endColor);
+  }
+
+  if (color) {
+    return `linear-gradient(115deg, ${color} 0%, rgba(255, 255, 255, 0.26) 100%)`;
+  }
+
+  const defaultTheme = getSpaceThemeById(DEFAULT_SPACE_THEME_ID);
+  return buildSpaceGradient(defaultTheme.startColor, defaultTheme.endColor);
+}
+
 export function getSpaceThemeById(themeId) {
   return (
     SPACE_THEME_PRESETS.find((theme) => theme.id === themeId) ??

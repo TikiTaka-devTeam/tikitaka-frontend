@@ -5,6 +5,7 @@ import leftArrowIcon from "../../../assets/icons/left_arrow.png";
 import megaphoneIcon from "../../../assets/icons/megaphone.png";
 import userIcon from "../../../assets/icons/userIcon.png";
 import reloadIcon from "../../../assets/icons/reload.png";
+import { resolveSpaceGradient } from "../../dashboard/data/spaceThemes.js";
 import { getMySpaces, recordSpaceAccess } from "../api/spaceApi";
 import {
   approveSpaceMember,
@@ -15,8 +16,7 @@ import {
 import "../styles/professor-space-member-page.css";
 
 function buildGradient(color) {
-  const startColor = color || "#2563eb";
-  return `linear-gradient(115deg, ${startColor} 0%, #7fd0d7 100%)`;
+  return resolveSpaceGradient(color);
 }
 
 function getMemberId(member) {

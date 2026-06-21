@@ -4,6 +4,7 @@ import ModeTabs from "../../../components/common/ModeTabs.jsx";
 import leftArrowIcon from "../../../assets/icons/left_arrow.png";
 import megaphoneIcon from "../../../assets/icons/megaphone.png";
 import plusIcon from "../../../assets/icons/plus.png";
+import { resolveSpaceGradient } from "../../dashboard/data/spaceThemes.js";
 import {
   getMySpaces,
   recordSpaceAccess,
@@ -36,8 +37,7 @@ function formatDate(value) {
 }
 
 function buildGradient(color) {
-  const startColor = color || "#2563eb";
-  return `linear-gradient(115deg, ${startColor} 0%, #7fd0d7 100%)`;
+  return resolveSpaceGradient(color);
 }
 
 function resolveImageUrl(url) {
