@@ -5,6 +5,10 @@ export async function getMySpaces() {
   return response.data;
 }
 
+export async function recordSpaceAccess(spaceId) {
+  await apiClient.post(`/spaces/${spaceId}/access`);
+}
+
 export async function getSpaceDocuments(spaceId) {
   const response = await apiClient.get(`/spaces/${spaceId}/documents`);
   return response.data;

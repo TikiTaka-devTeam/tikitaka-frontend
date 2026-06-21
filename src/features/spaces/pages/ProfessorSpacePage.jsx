@@ -6,6 +6,7 @@ import megaphoneIcon from "../../../assets/icons/megaphone.png";
 import plusIcon from "../../../assets/icons/plus.png";
 import {
   getMySpaces,
+  recordSpaceAccess,
   getSpaceDocuments,
   getSpaceCode,
   getDocumentSlides,
@@ -115,6 +116,14 @@ function ProfessorSpacePage() {
   const headerBackground = useMemo(() => {
     return buildGradient(space?.color);
   }, [space?.color]);
+
+  useEffect(() => {
+    if (!spaceId) return;
+
+    void recordSpaceAccess(spaceId).catch((error) => {
+      console.error("Failed to record space access:", error);
+    });
+  }, [spaceId]);
 
   async function loadProfessorSpacePage() {
     if (!spaceId) {

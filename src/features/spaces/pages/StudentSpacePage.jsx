@@ -4,6 +4,7 @@ import ModeTabs from "../../../components/common/ModeTabs.jsx";
 import leftArrowIcon from "../../../assets/icons/left_arrow.png";
 import {
   getMySpaces,
+  recordSpaceAccess,
   getSpaceDocuments,
   getDocumentSlides,
 } from "../api/spaceApi";
@@ -106,6 +107,14 @@ function StudentSpacePage() {
   const headerBackground = useMemo(() => {
     return buildGradient(space?.color);
   }, [space?.color]);
+
+  useEffect(() => {
+    if (!spaceId) return;
+
+    void recordSpaceAccess(spaceId).catch((error) => {
+      console.error("Failed to record space access:", error);
+    });
+  }, [spaceId]);
 
   useEffect(() => {
     let ignore = false;
