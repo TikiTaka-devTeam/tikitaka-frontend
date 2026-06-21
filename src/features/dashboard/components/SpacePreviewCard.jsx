@@ -1,4 +1,7 @@
-import { buildSpaceGradient } from "../data/spaceThemes.js";
+import {
+  buildSpaceGradient,
+  resolveSpaceGradient,
+} from "../data/spaceThemes.js";
 import "../styles/space-preview-card.css";
 
 function getPreviewStyle({ gradient, startColor, endColor, color }) {
@@ -11,9 +14,7 @@ function getPreviewStyle({ gradient, startColor, endColor, color }) {
   }
 
   if (color) {
-    return {
-      background: `linear-gradient(115deg, ${color} 0%, rgba(255, 255, 255, 0.26) 100%)`,
-    };
+    return { background: resolveSpaceGradient(color) };
   }
 
   return undefined;

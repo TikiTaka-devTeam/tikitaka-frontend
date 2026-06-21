@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ModeTabs from "../../../components/common/ModeTabs.jsx";
 import leftArrowIcon from "../../../assets/icons/left_arrow.png";
+import { resolveSpaceGradient } from "../../dashboard/data/spaceThemes.js";
 import {
   getMySpaces,
   recordSpaceAccess,
@@ -31,8 +32,7 @@ function formatDate(value) {
 }
 
 function buildGradient(color) {
-  const startColor = color || "#6b4de6";
-  return `linear-gradient(115deg, ${startColor} 0%, #f47597 100%)`;
+  return resolveSpaceGradient(color);
 }
 
 function resolveImageUrl(url) {
