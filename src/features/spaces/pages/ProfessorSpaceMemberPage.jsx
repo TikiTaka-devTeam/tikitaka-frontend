@@ -5,7 +5,7 @@ import leftArrowIcon from "../../../assets/icons/left_arrow.png";
 import megaphoneIcon from "../../../assets/icons/megaphone.png";
 import userIcon from "../../../assets/icons/userIcon.png";
 import reloadIcon from "../../../assets/icons/reload.png";
-import { getMySpaces } from "../api/spaceApi";
+import { getMySpaces, recordSpaceAccess } from "../api/spaceApi";
 import {
   approveSpaceMember,
   denySpaceMember,
@@ -121,6 +121,14 @@ function ProfessorSpaceMemberPage() {
   const headerBackground = useMemo(() => {
     return buildGradient(space?.color);
   }, [space?.color]);
+
+  useEffect(() => {
+    if (!spaceId) return;
+
+    void recordSpaceAccess(spaceId).catch((error) => {
+      console.error("Failed to record space access:", error);
+    });
+  }, [spaceId]);
 
   async function loadProfessorSpaceMemberPage() {
     if (!spaceId) {
