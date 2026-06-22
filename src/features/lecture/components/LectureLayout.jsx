@@ -26,6 +26,14 @@ import "../styles/lecture.css";
 
 const MAX_OPEN_DOCUMENTS = 10;
 
+function isEditableTarget(target) {
+  return Boolean(
+    target?.closest?.(
+      'input, textarea, select, [contenteditable="true"], [contenteditable=""]',
+    ),
+  );
+}
+
 function createLocalId(prefix) {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
     return crypto.randomUUID();
@@ -90,6 +98,7 @@ function LectureLayout({ mode = "student" }) {
   const location = useLocation();
   const { spaceId, documentId } = useParams();
   const scaleVars = useScale();
+  const pageRef = useRef(null);
   const socketRef = useRef(null);
   const currentSlideIdRef = useRef(null);
 
@@ -148,6 +157,25 @@ function LectureLayout({ mode = "student" }) {
   useEffect(() => {
     currentSlideIdRef.current = currentSlide?.slide_id ?? null;
   }, [currentSlide?.slide_id]);
+
+  useEffect(() => {
+    const page = pageRef.current;
+    if (!page) return undefined;
+
+    function preventLectureSelection(event) {
+      if (isEditableTarget(event.target)) return;
+
+      event.preventDefault();
+    }
+
+    page.addEventListener("selectstart", preventLectureSelection);
+    page.addEventListener("dragstart", preventLectureSelection);
+
+    return () => {
+      page.removeEventListener("selectstart", preventLectureSelection);
+      page.removeEventListener("dragstart", preventLectureSelection);
+    };
+  }, []);
 
   function handleBackToSpace() {
     if (spaceId) {
@@ -924,7 +952,7 @@ function LectureLayout({ mode = "student" }) {
   }, [pendingDelete, clearPendingDelete, currentSlide?.slide_id]);
 
   return (
-    <div className="lecture-page" style={scaleVars}>
+    <div className="lecture-page" ref={pageRef} style={scaleVars}>
       <div className="lecture-page__frame">
         <TopNav
           title={activeDoc?.title ?? "강의자료"}

@@ -25,14 +25,28 @@
     BlinkMacSystemFont, "Segoe UI", sans-serif;
 
   overflow: hidden;
+
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .lecture-page * {
   box-sizing: border-box;
+
+  -webkit-user-drag: none;
 }
 
 .lecture-page button {
   font-family: inherit;
+}
+
+.lecture-page input,
+.lecture-page textarea,
+.lecture-page select,
+.lecture-page [contenteditable="true"],
+.lecture-page [contenteditable=""] {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 .lecture-page__frame {
