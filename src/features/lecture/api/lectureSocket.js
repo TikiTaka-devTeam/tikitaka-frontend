@@ -330,23 +330,6 @@ export function sendSharedStrokeDelete(client, { spaceId, slideId, stroke }) {
   });
 }
 
-export function sendQuestionCreated(client, { spaceId, slideId, question }) {
-  if (!client?.connected) {
-    console.warn("WebSocket 연결 안 됨. question 전송 실패");
-    return;
-  }
-
-  client.publish({
-    destination: `/app/spaces/${spaceId}/slides/${slideId}/questions`,
-    headers: getTokenHeader(),
-    body: JSON.stringify({
-      type: "QUESTION_CREATED",
-      slideId,
-      question,
-    }),
-  });
-}
-
 export function requestStrokeResync(
   client,
   { spaceId, slideId, lastReceivedStrokeSeq = 0 },
