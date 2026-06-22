@@ -20,7 +20,6 @@ import { getSpaceDocuments } from "../../spaces/api/spaceApi.js";
 import {
   createLectureSocket,
   requestStrokeResync,
-  sendQuestionCreated,
 } from "../api/lectureSocket.js";
 import "../styles/lecture.css";
 
@@ -315,18 +314,22 @@ function LectureLayout({ mode = "student" }) {
     }
   }
 
-  async function refreshCurrentSlideQuestions() {
-    if (!activeDocId || !currentSlide?.slide_id) return;
+  async function reloadSlideQuestions(slideId) {
+    if (!slideId || !activeDocId) return;
 
     try {
-      const questionList = await fetchSlideQuestions(currentSlide.slide_id);
+      const questionList = await fetchSlideQuestions(slideId);
+
+      const targetSlide = slides.find(
+        (slide) => String(slide.slide_id) === String(slideId),
+      );
 
       const normalizedQuestions = Array.isArray(questionList)
         ? questionList.map((question) =>
             normalizeQuestionResponse(question, {
               documentId: activeDocId,
-              slideId: currentSlide.slide_id,
-              pageNumber: currentSlide.page_number,
+              slideId,
+              pageNumber: targetSlide?.page_number,
             }),
           )
         : [];
@@ -336,15 +339,21 @@ function LectureLayout({ mode = "student" }) {
           (question) =>
             !(
               String(question.documentId) === String(activeDocId) &&
-              String(question.slideId) === String(currentSlide.slide_id)
+              String(question.slideId) === String(slideId)
             ),
         );
 
         return [...filteredPrev, ...normalizedQuestions];
       });
     } catch (error) {
-      console.error("질문 목록 갱신 실패", error);
+      console.error("질문 목록 재조회 실패", error);
     }
+  }
+
+  async function refreshCurrentSlideQuestions() {
+    if (!currentSlide?.slide_id) return;
+
+    await reloadSlideQuestions(currentSlide.slide_id);
   }
 
   function handleQuestionPoint(point) {
@@ -458,12 +467,6 @@ function LectureLayout({ mode = "student" }) {
         }
 
         return [...prev, nextQuestion];
-      });
-
-      sendQuestionCreated(socketRef.current, {
-        spaceId,
-        slideId: localQuestion.slideId,
-        question: nextQuestion,
       });
 
       await refreshCurrentSlideQuestions();
@@ -858,22 +861,29 @@ function LectureLayout({ mode = "student" }) {
         }
       },
 
-      onQuestionCreated: (question) => {
-        const nextQuestion = normalizeQuestionResponse(question, {
-          documentId: activeDocId,
-          slideId: question.slideId ?? question.slide_id,
-          pageNumber: question.pageNumber ?? question.page_number,
+      onQuestionCreated: async (question, payload) => {
+        console.log("질문 생성 신호 수신:", question, payload);
+
+        const changedSlideId =
+          payload?.slideId ??
+          payload?.slide_id ??
+          question?.slideId ??
+          question?.slide_id;
+
+        const currentSlideId = currentSlideIdRef.current;
+
+        console.log("질문 신호 slide 비교:", {
+          changedSlideId,
+          currentSlideId,
         });
 
-        setQuestions((prev) => {
-          const nextKey = getQuestionKey(nextQuestion);
-
-          if (prev.some((item) => getQuestionKey(item) === nextKey)) {
-            return prev;
-          }
-
-          return [...prev, nextQuestion];
-        });
+        if (
+          changedSlideId &&
+          currentSlideId &&
+          String(changedSlideId) === String(currentSlideId)
+        ) {
+          await reloadSlideQuestions(changedSlideId);
+        }
       },
 
       onConnect: () => {
