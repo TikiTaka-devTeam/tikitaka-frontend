@@ -86,17 +86,6 @@ function Toolbar({ mode = "student" }) {
     }
 
     setTool(nextTool);
-
-    if (ERASER_POPOVER_TOOLS.includes(nextTool)) {
-      setOpenPopover("eraser-thickness");
-      return;
-    }
-
-    if (RIGHT_THICK_TOOLS.includes(nextTool)) {
-      setOpenPopover("right-thickness");
-      return;
-    }
-
     setOpenPopover(null);
   }
 
