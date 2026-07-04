@@ -120,7 +120,7 @@ function HeaderActions({
 
       <button
         type="button"
-        className="header-actions__button"
+        className="header-actions__button header-actions__button--avatar"
         aria-label={profileLabel}
         onClick={onProfileClick}
       >

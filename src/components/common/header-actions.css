@@ -19,6 +19,7 @@
   background: var(--surface);
   box-shadow: var(--shadow);
   cursor: pointer;
+  padding: 0;
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -34,6 +35,10 @@
   box-shadow:
     0 14px 28px rgba(61, 80, 149, 0.14),
     0 0 0 4px rgba(80, 104, 241, 0.08);
+}
+
+.header-actions__button--avatar {
+  border: 0;
 }
 
 .header-actions__icon {
@@ -61,8 +66,8 @@
 }
 
 .header-actions__avatar-image {
-  width: 42px;
-  height: 42px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   object-fit: cover;
   display: block;
