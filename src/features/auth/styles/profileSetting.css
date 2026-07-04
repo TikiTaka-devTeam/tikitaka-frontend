@@ -56,15 +56,15 @@
 
 .profile-setting-avatar {
   position: relative;
-  width: 125px;
-  height: 125px;
+  width: 153px;
+  height: 153px;
   margin-bottom: 17px;
 }
 
-.profile-setting-avatar img,
+.profile-setting-avatar > img,
 .profile-setting-avatar__fallback {
-  width: 125px;
-  height: 125px;
+  width: 153px;
+  height: 153px;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -83,19 +83,23 @@
 
 .profile-setting-avatar__plus {
   position: absolute;
-  right: 7px;
-  bottom: 9px;
-  width: 35px;
-  height: 35px;
-  display: grid;
-  place-items: center;
+  right: 5px;
+  bottom: 5px;
+  width: 37.5px;
+  height: 37.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
   border-radius: 50%;
-  background: #2766ec;
-  color: #ffffff;
-  font-size: 29px;
-  font-weight: 300;
-  line-height: 1;
+  background: #2563eb;
   box-shadow: 0 2px 6px rgba(39, 102, 236, 0.28);
+}
+
+.profile-setting-avatar__plus img {
+  display: block;
+  width: 15px;
+  height: 15px;
 }
 
 .profile-setting-hero strong {
@@ -175,7 +179,7 @@ button.profile-setting-row {
   }
 
   .profile-setting-hero {
-    margin-top: 44px;
+    margin-top: 45px;
   }
 }
 
@@ -193,18 +197,22 @@ button.profile-setting-row {
   }
 
   .profile-setting-avatar,
-  .profile-setting-avatar img,
+  .profile-setting-avatar > img,
   .profile-setting-avatar__fallback {
     width: 108px;
     height: 108px;
   }
 
   .profile-setting-avatar__plus {
-    right: 3px;
-    bottom: 6px;
+    right: 5px;
+    bottom: 5px;
     width: 31px;
     height: 31px;
-    font-size: 25px;
+  }
+
+  .profile-setting-avatar__plus img {
+    width: 15px;
+    height: 15px;
   }
 
   .profile-setting-panel {

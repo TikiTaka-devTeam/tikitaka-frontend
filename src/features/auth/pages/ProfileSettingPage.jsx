@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import leftArrowIcon from "../../../assets/icons/left_arrow.png";
 import userIcon from "../../../assets/icons/userIcon.png";
+import addImgIcon from "../../../assets/icons/addImg.svg";
 import { getCurrentUser, logout } from "../api/auth.api.js";
 import "../styles/profileSetting.css";
 
@@ -137,7 +138,7 @@ function ProfileSettingPage() {
             <img src={userIcon} alt={`${displayName} 프로필`} />
           )}
           <span className="profile-setting-avatar__plus" aria-hidden="true">
-            +
+            <img src={addImgIcon} alt="" />
           </span>
         </div>
         <strong>{displayName}</strong>
