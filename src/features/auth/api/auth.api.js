@@ -80,4 +80,45 @@ export const createProfileImage = async (file) => {
   return { objectKey, profileUrl };
 };
 
+export const getProfileImagePresignedUrl = (payload) =>
+  apiClient.post("/auth/profile-image/presigned-url", payload);
+
+export const confirmProfileImage = (payload) =>
+  apiClient.post("/auth/profile-image", payload);
+
+export const updateProfileImage = async (file) => {
+  const { data: presigned } = await getProfileImagePresignedUrl({
+    original_filename: file.name,
+    content_type: file.type,
+  });
+
+  const uploadUrl = presigned.upload_url;
+  const objectKey = presigned.object_key;
+
+  if (!uploadUrl || !objectKey) {
+    throw new Error("프로필 이미지 업로드 URL을 가져오지 못했습니다.");
+  }
+
+  const uploadResponse = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": file.type,
+    },
+    body: file,
+    credentials: "omit",
+  });
+
+  if (!uploadResponse.ok) {
+    throw new Error("프로필 이미지를 업로드하지 못했습니다.");
+  }
+
+  const { data } = await confirmProfileImage({
+    object_key: objectKey,
+  });
+
+  return {
+    profileUrl: data.profile_url || presigned.profile_url || "",
+  };
+};
+
 export const logout = () => apiClient.post("/auth/logout");

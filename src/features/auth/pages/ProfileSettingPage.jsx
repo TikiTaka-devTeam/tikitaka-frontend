@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import leftArrowIcon from "../../../assets/icons/left_arrow.png";
 import userIcon from "../../../assets/icons/userIcon.png";
-import { getCurrentUser, logout } from "../api/auth.api.js";
+import addImgIcon from "../../../assets/icons/addImg.svg";
+import { getCurrentUser, logout, updateProfileImage } from "../api/auth.api.js";
 import "../styles/profileSetting.css";
+
+const PROFILE_IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webp"];
 
 function readStoredUser() {
   try {
@@ -48,6 +51,8 @@ function ProfileSettingPage() {
   const [profile, setProfile] = useState(() => readStoredUser());
   const [failedProfileImage, setFailedProfileImage] = useState("");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isUpdatingProfileImage, setIsUpdatingProfileImage] = useState(false);
+  const [profileImageError, setProfileImageError] = useState("");
 
   useEffect(() => {
     let isMounted = true;
@@ -111,6 +116,58 @@ function ProfileSettingPage() {
     }
   };
 
+  const handleProfileImageChange = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    const extension = file.name.split(".").pop()?.toLowerCase() || "";
+
+    if (
+      !file.type.startsWith("image/") ||
+      !PROFILE_IMAGE_EXTENSIONS.includes(extension)
+    ) {
+      setProfileImageError("jpg, jpeg, png, gif, webp 이미지만 업로드할 수 있습니다.");
+      return;
+    }
+
+    setIsUpdatingProfileImage(true);
+    setProfileImageError("");
+
+    try {
+      const { profileUrl } = await updateProfileImage(file);
+
+      if (!profileUrl) {
+        throw new Error("새 프로필 이미지 주소를 가져오지 못했습니다.");
+      }
+
+      setFailedProfileImage("");
+      setProfile((prevProfile) => {
+        const nextProfile = {
+          ...prevProfile,
+          profile_url: profileUrl,
+          profileUrl,
+        };
+
+        localStorage.setItem(
+          "tikitaka_user",
+          JSON.stringify({ ...readStoredUser(), ...nextProfile }),
+        );
+
+        return nextProfile;
+      });
+    } catch (error) {
+      setProfileImageError(
+        error.message || "프로필 이미지를 변경하지 못했습니다.",
+      );
+    } finally {
+      setIsUpdatingProfileImage(false);
+    }
+  };
+
   return (
     <main className="profile-setting-page">
       <header className="profile-setting-header">
@@ -136,12 +193,27 @@ function ProfileSettingPage() {
           ) : (
             <img src={userIcon} alt={`${displayName} 프로필`} />
           )}
-          <span className="profile-setting-avatar__plus" aria-hidden="true">
-            +
-          </span>
+          <label
+            className="profile-setting-avatar__plus"
+            aria-label="프로필 이미지 변경"
+            aria-disabled={isUpdatingProfileImage}
+          >
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              disabled={isUpdatingProfileImage}
+              onChange={handleProfileImageChange}
+            />
+            <img src={addImgIcon} alt="" />
+          </label>
         </div>
         <strong>{displayName}</strong>
         {email ? <p>{email}</p> : null}
+        {profileImageError ? (
+          <p className="profile-setting-avatar__error" role="alert">
+            {profileImageError}
+          </p>
+        ) : null}
       </section>
 
       <section className="profile-setting-panel" aria-label="내 정보 설정">
