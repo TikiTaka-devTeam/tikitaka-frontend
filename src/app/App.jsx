@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "../features/auth/pages/LoginPage.jsx";
 import ProfileSettingPage from "../features/auth/pages/ProfileSettingPage.jsx";
@@ -10,10 +11,35 @@ import ProfessorSpacePage from "../features/spaces/pages/ProfessorSpacePage.jsx"
 import ProfessorSpaceMemberPage from "../features/spaces/pages/ProfessorSpaceMemberPage.jsx";
 import StudentLecturePage from "../features/lecture/pages/StudentLecturePage.jsx";
 import ProfessorLecturePage from "../features/lecture/pages/ProfessorLecturePage.jsx";
+import {
+  listenForegroundMessages,
+  requestFcmToken,
+} from "../firebase/messaging.js";
+import { registerDeviceToken } from "../features/notifications/api/push.api.js";
 
 function App() {
   const accessToken = localStorage.getItem("tikitaka_access_token");
   const user = JSON.parse(localStorage.getItem("tikitaka_user") || "null");
+
+  useEffect(() => {
+    if (!accessToken) {
+      return undefined;
+    }
+
+    return listenForegroundMessages();
+  }, [accessToken]);
+
+  useEffect(() => {
+    if (!accessToken) {
+      return;
+    }
+
+    requestFcmToken()
+      .then((token) => registerDeviceToken(token))
+      .catch((error) => {
+        console.error("FCM 토큰 등록 실패:", error);
+      });
+  }, [accessToken]);
 
   return (
     <Routes>
