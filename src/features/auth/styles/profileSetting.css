@@ -188,12 +188,25 @@ button.profile-setting-row {
   cursor: pointer;
 }
 
+button.profile-setting-row:disabled {
+  cursor: wait;
+  opacity: 0.64;
+}
+
 .profile-setting-row__value {
   min-width: 0;
   color: #a0a0a4;
   font-weight: 700;
   text-align: right;
   overflow-wrap: anywhere;
+}
+
+.profile-setting-message {
+  margin: 8px 0 0;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
 @media (min-width: 1200px) {

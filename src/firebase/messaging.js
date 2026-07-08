@@ -1,4 +1,9 @@
-import { getMessaging, getToken, isSupported } from "firebase/messaging";
+import {
+  getMessaging,
+  getToken,
+  isSupported,
+  onMessage,
+} from "firebase/messaging";
 import { app } from "./firebaseConfig";
 
 export const messaging = getMessaging(app);
@@ -6,6 +11,20 @@ export const messaging = getMessaging(app);
 const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
 let fcmTokenRequestPromise = null;
 let hasLoggedPermissionDenied = false;
+
+function getNotificationContent(payload) {
+  return {
+    title:
+      payload?.notification?.title ??
+      payload?.data?.title ??
+      "TikiTaka",
+    options: {
+      body: payload?.notification?.body ?? payload?.data?.body ?? "",
+      icon: payload?.notification?.icon ?? "/favicon.svg",
+      data: payload?.data ?? {},
+    },
+  };
+}
 
 async function getServiceWorkerRegistration() {
   if (!("serviceWorker" in navigator)) {
@@ -70,5 +89,23 @@ export function requestFcmToken() {
   }
 
   return fcmTokenRequestPromise;
+}
+
+export function listenForegroundMessages() {
+  return onMessage(messaging, async (payload) => {
+    if (!("Notification" in window) || Notification.permission !== "granted") {
+      return;
+    }
+
+    const { title, options } = getNotificationContent(payload);
+    const serviceWorkerRegistration = await getServiceWorkerRegistration();
+
+    if (serviceWorkerRegistration) {
+      await serviceWorkerRegistration.showNotification(title, options);
+      return;
+    }
+
+    new Notification(title, options);
+  });
 }
     

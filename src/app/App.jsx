@@ -11,7 +11,11 @@ import ProfessorSpacePage from "../features/spaces/pages/ProfessorSpacePage.jsx"
 import ProfessorSpaceMemberPage from "../features/spaces/pages/ProfessorSpaceMemberPage.jsx";
 import StudentLecturePage from "../features/lecture/pages/StudentLecturePage.jsx";
 import ProfessorLecturePage from "../features/lecture/pages/ProfessorLecturePage.jsx";
-import { requestFcmToken } from "../firebase/messaging.js";
+import {
+  listenForegroundMessages,
+  requestFcmToken,
+} from "../firebase/messaging.js";
+import { registerDeviceToken } from "../features/notifications/api/push.api.js";
 
 function App() {
   const accessToken = localStorage.getItem("tikitaka_access_token");
@@ -19,12 +23,22 @@ function App() {
 
   useEffect(() => {
     if (!accessToken) {
+      return undefined;
+    }
+
+    return listenForegroundMessages();
+  }, [accessToken]);
+
+  useEffect(() => {
+    if (!accessToken) {
       return;
     }
 
-    requestFcmToken().catch((error) => {
-      console.error("FCM 토큰 발급 실패:", error);
-    });
+    requestFcmToken()
+      .then((token) => registerDeviceToken(token))
+      .catch((error) => {
+        console.error("FCM 토큰 등록 실패:", error);
+      });
   }, [accessToken]);
 
   return (

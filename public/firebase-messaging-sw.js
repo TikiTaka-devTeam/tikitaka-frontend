@@ -18,4 +18,17 @@ firebase.initializeApp({
   measurementId: "G-4Y663ST2BK",
 });
 
-firebase.messaging();
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage((payload) => {
+  const title =
+    payload?.notification?.title ??
+    payload?.data?.title ??
+    "TikiTaka";
+
+  self.registration.showNotification(title, {
+    body: payload?.notification?.body ?? payload?.data?.body ?? "",
+    icon: payload?.notification?.icon ?? "/favicon.svg",
+    data: payload?.data ?? {},
+  });
+});
